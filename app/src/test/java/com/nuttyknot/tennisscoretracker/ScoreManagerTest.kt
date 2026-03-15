@@ -423,6 +423,182 @@ class ScoreManagerTest {
     }
 
     @Test
+    fun `test undo a game win`() {
+        // Win a game: Love -> 15 -> 30 -> 40 -> Game
+        repeat(4) { scoreManager.incrementUserScore() }
+        assertEquals(1, state().userGames)
+        assertEquals("Player 1", state().gameWinner)
+
+        scoreManager.undo()
+        assertEquals(0, state().userGames)
+        assertEquals(PlayerScore.Forty, state().userScore)
+        assertEquals(PlayerScore.Love, state().opponentScore)
+        assertNull(state().gameWinner)
+    }
+
+    @Test
+    fun `test undo a set win`() {
+        // Win a set: 6 games of 4 points each
+        repeat(6) { repeat(4) { scoreManager.incrementUserScore() } }
+        assertEquals(1, state().userSets)
+        assertEquals("Player 1", state().setWinner)
+
+        scoreManager.undo()
+        assertEquals(0, state().userSets)
+        assertEquals(PlayerScore.Forty, state().userScore)
+        assertEquals(5, state().userGames)
+        assertNull(state().setWinner)
+    }
+
+    @Test
+    fun `test undo into a tiebreak`() {
+        // Reach 6-6 tiebreak
+        repeat(6) {
+            repeat(4) { scoreManager.incrementUserScore() }
+            repeat(4) { scoreManager.incrementOpponentScore() }
+        }
+        assertTrue(state().userScore is PlayerScore.TiebreakScore)
+
+        // Win tiebreak 7-0
+        repeat(7) { scoreManager.incrementUserScore() }
+        assertEquals(1, state().userSets)
+        assertEquals("Player 1", state().setWinner)
+
+        // Undo the winning point
+        scoreManager.undo()
+        assertNull(state().setWinner)
+        assertEquals(0, state().userSets)
+        assertTrue(state().userScore is PlayerScore.TiebreakScore)
+        assertEquals(6, (state().userScore as PlayerScore.TiebreakScore).points)
+        assertEquals(0, (state().opponentScore as PlayerScore.TiebreakScore).points)
+    }
+
+    @Test
+    fun `test undo a match win`() {
+        // Win first set
+        repeat(6) { repeat(4) { scoreManager.incrementUserScore() } }
+        scoreManager.startNextSet()
+
+        // Win second set (match win)
+        repeat(6) { repeat(4) { scoreManager.incrementUserScore() } }
+        assertEquals("Player 1", state().matchWinner)
+
+        // Undo
+        scoreManager.undo()
+        assertNull(state().matchWinner)
+        assertEquals(1, state().userSets)
+        assertEquals(PlayerScore.Forty, state().userScore)
+        assertEquals(5, state().userGames)
+
+        // Should be able to continue scoring
+        scoreManager.incrementUserScore()
+        assertEquals(2, state().userSets)
+    }
+
+    @Test
+    fun `test undo after startNextSet does not cross set boundary`() {
+        // Win a set
+        repeat(6) { repeat(4) { scoreManager.incrementUserScore() } }
+        assertEquals("Player 1", state().setWinner)
+
+        scoreManager.startNextSet()
+        assertEquals(0, state().userGames)
+        assertEquals(0, state().opponentGames)
+        assertTrue(state().isNewSet)
+
+        // Score a point in new set
+        scoreManager.incrementUserScore()
+        assertEquals(PlayerScore.Fifteen, state().userScore)
+
+        // Undo goes back to Love-Love in the new set (the state after startNextSet + before point)
+        scoreManager.undo()
+        assertEquals(PlayerScore.Love, state().userScore)
+        // Should still be in the new set context
+        assertEquals(1, state().userSets)
+        assertEquals(0, state().userGames)
+    }
+
+    @Test
+    fun `test multiple undos through a full game`() {
+        // Score 4 points to win a game
+        repeat(4) { scoreManager.incrementUserScore() }
+        assertEquals(1, state().userGames)
+
+        // Undo all 4 points
+        scoreManager.undo() // back to 40-0
+        assertEquals(PlayerScore.Forty, state().userScore)
+        assertEquals(0, state().userGames)
+
+        scoreManager.undo() // back to 30-0
+        assertEquals(PlayerScore.Thirty, state().userScore)
+
+        scoreManager.undo() // back to 15-0
+        assertEquals(PlayerScore.Fifteen, state().userScore)
+
+        scoreManager.undo() // back to 0-0
+        assertEquals(PlayerScore.Love, state().userScore)
+        assertEquals(0, state().userGames)
+    }
+
+    @Test
+    fun `test full realistic three set match`() {
+        // Set 1: Player 1 wins 6-4
+        // Player 1 wins 6 games, Player 2 wins 4 games
+        repeat(4) {
+            repeat(4) { scoreManager.incrementUserScore() } // User game
+            repeat(4) { scoreManager.incrementOpponentScore() } // Opponent game
+        }
+        assertEquals(4, state().userGames)
+        assertEquals(4, state().opponentGames)
+        // User wins 2 more games
+        repeat(2) { repeat(4) { scoreManager.incrementUserScore() } }
+        assertEquals(1, state().userSets)
+        assertEquals("Player 1", state().setWinner)
+        assertEquals(listOf(6 to 4), state().setHistory)
+
+        scoreManager.startNextSet()
+
+        // Set 2: Player 2 wins 6-4
+        repeat(4) {
+            repeat(4) { scoreManager.incrementOpponentScore() }
+            repeat(4) { scoreManager.incrementUserScore() }
+        }
+        repeat(2) { repeat(4) { scoreManager.incrementOpponentScore() } }
+        assertEquals(1, state().opponentSets)
+        assertEquals("Player 2", state().setWinner)
+        assertEquals(listOf(6 to 4, 4 to 6), state().setHistory)
+
+        scoreManager.startNextSet()
+
+        // Set 3: Player 1 wins 7-5
+        repeat(5) {
+            repeat(4) { scoreManager.incrementUserScore() }
+            repeat(4) { scoreManager.incrementOpponentScore() }
+        }
+        // User wins 2 more games to go 7-5
+        repeat(2) { repeat(4) { scoreManager.incrementUserScore() } }
+        assertEquals("Player 1", state().matchWinner)
+        assertEquals(2, state().userSets)
+        assertEquals(1, state().opponentSets)
+        assertEquals(listOf(6 to 4, 4 to 6, 7 to 5), state().setHistory)
+    }
+
+    @Test
+    fun `test announcement set correctly after scoring and cleared on undo`() {
+        // Score a point
+        scoreManager.incrementUserScore()
+        assertEquals("15 Love", state().announcement)
+
+        // Score another point
+        scoreManager.incrementOpponentScore()
+        assertEquals("15 All", state().announcement)
+
+        // Undo clears announcement
+        scoreManager.undo()
+        assertNull(state().announcement)
+    }
+
+    @Test
     fun `test format only changes when score is zero`() {
         // Start with standard format
         scoreManager.updateMatchParameters(matchFormat = MatchFormat.STANDARD)
