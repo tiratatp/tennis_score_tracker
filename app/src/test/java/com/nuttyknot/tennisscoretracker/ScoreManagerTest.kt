@@ -94,4 +94,31 @@ class ScoreManagerTest {
         manager.undo()
         assertEquals(PlayerScore.Love, manager.matchState.value.userScore)
     }
+
+    @Test
+    fun testSetWinAndReset() {
+        val manager = ScoreManager()
+        
+        // Win 6 games to 0
+        for (game in 1..6) {
+            for (point in 1..4) {
+                manager.incrementUserScore()
+            }
+        }
+        
+        assertEquals(6, manager.matchState.value.userGames)
+        assertEquals(0, manager.matchState.value.opponentGames)
+        assertEquals(1, manager.matchState.value.userSets)
+        assertEquals("User", manager.matchState.value.setWinner)
+        assertTrue(manager.matchState.value.isNewSet)
+        
+        // First click after set win should reset games
+        manager.incrementUserScore()
+        
+        assertEquals(0, manager.matchState.value.userGames)
+        assertEquals(0, manager.matchState.value.opponentGames)
+        assertEquals(PlayerScore.Love, manager.matchState.value.userScore)
+        assertEquals(1, manager.matchState.value.userSets)
+        assertEquals(null, manager.matchState.value.setWinner)
+    }
 }

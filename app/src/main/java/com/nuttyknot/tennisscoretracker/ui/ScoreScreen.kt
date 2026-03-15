@@ -61,7 +61,11 @@ fun ScoreScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            val gameStatus = if (state.isDeuce) {
+            val gameStatus = if (state.matchWinner != null) {
+                "MATCH OVER"
+            } else if (state.setWinner != null) {
+                "SET OVER"
+            } else if (state.isDeuce) {
                 "DEUCE"
             } else {
                 "Sets: ${state.userSets} - ${state.opponentSets}  |  Games: ${state.userGames} - ${state.opponentGames}"
@@ -80,8 +84,19 @@ fun ScoreScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(text = "OPPONENT", color = White.copy(alpha = 0.7f), fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                        Text(text = state.opponentScore.display, color = White, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold)
+                        Text(
+                            text = if (state.opponentName.isNotBlank()) state.opponentName.uppercase() else "OPPONENT",
+                            color = White.copy(alpha = 0.7f),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (!state.isUserServing) {
+                                Text(text = "●", color = White, fontSize = 24.sp) // Serving indicator
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
+                            Text(text = state.opponentScore.display, color = White, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold)
+                        }
                     }
 
                     // Game Status (Middle)
@@ -90,6 +105,15 @@ fun ScoreScreen(
                         modifier = Modifier.width(180.dp)
                     ) {
                         Text(text = gameStatus, color = Yellow, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                        if (state.isNewSet && state.matchWinner == null) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = { scoreManager.startNextSet() },
+                                colors = ButtonDefaults.buttonColors(containerColor = Yellow, contentColor = Black)
+                            ) {
+                                Text("START NEXT SET")
+                            }
+                        }
                     }
 
                     // User Score (Right)
@@ -97,8 +121,19 @@ fun ScoreScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(text = state.userScore.display, color = Yellow, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold)
-                        Text(text = "YOU", color = Yellow.copy(alpha = 0.7f), fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = state.userScore.display, color = Yellow, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold)
+                            if (state.isUserServing) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(text = "●", color = Yellow, fontSize = 24.sp) // Serving indicator
+                            }
+                        }
+                        Text(
+                            text = if (state.userName.isNotBlank()) state.userName.uppercase() else "YOU",
+                            color = Yellow.copy(alpha = 0.7f),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             } else {
@@ -110,8 +145,20 @@ fun ScoreScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     // Opponent Score
-                    Text(text = "OPPONENT", color = White.copy(alpha = 0.7f), fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                    Text(text = state.opponentScore.display, color = White, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                    Text(
+                        text = if (state.opponentName.isNotBlank()) state.opponentName.uppercase() else "OPPONENT",
+                        color = White.copy(alpha = 0.7f),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (!state.isUserServing) {
+                            Text(text = "●", color = White, fontSize = 24.sp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                        Text(text = state.opponentScore.display, color = White, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                    }
 
                     Spacer(modifier = Modifier.height(32.dp))
 
@@ -121,8 +168,20 @@ fun ScoreScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // User Score
-                    Text(text = state.userScore.display, color = Yellow, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
-                    Text(text = "YOU", color = Yellow.copy(alpha = 0.7f), fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = state.userScore.display, color = Yellow, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                        if (state.isUserServing) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = "●", color = Yellow, fontSize = 24.sp)
+                        }
+                    }
+                    Text(
+                        text = if (state.userName.isNotBlank()) state.userName.uppercase() else "YOU",
+                        color = Yellow.copy(alpha = 0.7f),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }

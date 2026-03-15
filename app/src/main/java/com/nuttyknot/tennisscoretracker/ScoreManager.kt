@@ -11,52 +11,128 @@ class ScoreManager {
 
     private val historyStack = ArrayDeque<TennisMatchState>()
 
+    private var currentUserName = ""
+    private var currentOpponentName = ""
+    private var initialServerIsUser = true
+
+    fun updateNames(user: String, opponent: String) {
+        currentUserName = user
+        currentOpponentName = opponent
+        _matchState.update { it.copy(
+            userName = user,
+            opponentName = opponent,
+            gameWinner = null,
+            setWinner = null,
+            matchWinner = null,
+            isNewSet = false,
+            announcement = null
+        ) }
+    }
+
+    fun updateInitialServer(isUser: Boolean) {
+        initialServerIsUser = isUser
+        if (historyStack.isEmpty() && _matchState.value.userGames == 0 && _matchState.value.opponentGames == 0 && _matchState.value.userScore == PlayerScore.Love && _matchState.value.opponentScore == PlayerScore.Love) {
+             _matchState.update { it.copy(
+                 isUserServing = isUser,
+                 gameWinner = null,
+                 setWinner = null,
+                 matchWinner = null,
+                 isNewSet = false,
+                 announcement = null
+             ) }
+        }
+    }
+
     fun incrementUserScore() {
+        if (_matchState.value.matchWinner != null) return // Match is over
+        
         historyStack.addLast(_matchState.value)
         _matchState.update { currentState ->
-            calculateNextState(currentState, userScored = true)
+            if (currentState.setWinner != null) {
+                // If set is over, first click just starts next set
+                val nextSetState = currentState.copy(
+                    userGames = 0,
+                    opponentGames = 0,
+                    setWinner = null,
+                    gameWinner = null,
+                    isNewSet = true
+                )
+                nextSetState.copy(announcement = generateAnnouncement(nextSetState))
+            } else {
+                calculateNextState(currentState, userScored = true)
+            }
         }
     }
 
     fun incrementOpponentScore() {
+        if (_matchState.value.matchWinner != null) return // Match is over
+
         historyStack.addLast(_matchState.value)
         _matchState.update { currentState ->
-            calculateNextState(currentState, userScored = false)
+            if (currentState.setWinner != null) {
+                // If set is over, first click just starts next set
+                val nextSetState = currentState.copy(
+                    userGames = 0,
+                    opponentGames = 0,
+                    setWinner = null,
+                    gameWinner = null,
+                    isNewSet = true
+                )
+                nextSetState.copy(announcement = generateAnnouncement(nextSetState))
+            } else {
+                calculateNextState(currentState, userScored = false)
+            }
         }
     }
 
     fun undo() {
         if (historyStack.isNotEmpty()) {
-            val previousState = historyStack.removeLast()
-            _matchState.value = previousState
+             val previousState = historyStack.removeLast()
+             _matchState.value = previousState.copy(announcement = null)
         }
     }
 
     fun reset() {
         historyStack.clear()
-        _matchState.value = TennisMatchState()
+        val newState = TennisMatchState(
+            userName = currentUserName,
+            opponentName = currentOpponentName,
+            isUserServing = initialServerIsUser,
+            announcement = null
+        )
+        _matchState.value = newState
     }
 
     private fun calculateNextState(currentState: TennisMatchState, userScored: Boolean): TennisMatchState {
-        val scoringPlayerScore = if (userScored) currentState.userScore else currentState.opponentScore
-        val otherPlayerScore = if (userScored) currentState.opponentScore else currentState.userScore
+        // Clear previous winner announcement
+        val baseState = currentState.copy(
+            gameWinner = null,
+            setWinner = null,
+            matchWinner = null,
+            isNewSet = false,
+            announcement = null
+        )
+        val scoringPlayerScore = if (userScored) baseState.userScore else baseState.opponentScore
+        val otherPlayerScore = if (userScored) baseState.opponentScore else baseState.userScore
 
-        if (currentState.isDeuce) {
-            return if (userScored) {
-                currentState.copy(userScore = PlayerScore.Advantage, isDeuce = false)
+        if (baseState.isDeuce) {
+            val nextState = if (userScored) {
+                baseState.copy(userScore = PlayerScore.Advantage, isDeuce = false)
             } else {
-                currentState.copy(opponentScore = PlayerScore.Advantage, isDeuce = false)
+                baseState.copy(opponentScore = PlayerScore.Advantage, isDeuce = false)
             }
+            return nextState.copy(announcement = generateAnnouncement(nextState))
         }
 
         if (scoringPlayerScore is PlayerScore.Advantage) {
             // Wins game
-            return winGame(currentState, userScored)
+            return winGame(baseState, userScored)
         }
 
         if (otherPlayerScore is PlayerScore.Advantage) {
             // Back to deuce
-            return currentState.copy(userScore = PlayerScore.Forty, opponentScore = PlayerScore.Forty, isDeuce = true)
+            val nextState = baseState.copy(userScore = PlayerScore.Forty, opponentScore = PlayerScore.Forty, isDeuce = true)
+            return nextState.copy(announcement = generateAnnouncement(nextState))
         }
 
         val nextScore = when (scoringPlayerScore) {
@@ -68,53 +144,125 @@ class ScoreManager {
                 if (otherPlayerScore is PlayerScore.Forty) {
                     throw IllegalStateException("Should be in Deuce state instead of this.")
                 }
-                return winGame(currentState, userScored) // Wins game if other is < 40
+                return winGame(baseState, userScored) // Wins game if other is < 40
             }
             PlayerScore.Advantage -> throw IllegalStateException("Handled above")
         }
 
         val newState = if (userScored) {
-            currentState.copy(userScore = nextScore)
+            baseState.copy(userScore = nextScore)
         } else {
-            currentState.copy(opponentScore = nextScore)
+            baseState.copy(opponentScore = nextScore)
         }
 
         if (newState.userScore is PlayerScore.Forty && newState.opponentScore is PlayerScore.Forty) {
-            return newState.copy(isDeuce = true)
+            val deuceState = newState.copy(isDeuce = true)
+            return deuceState.copy(announcement = generateAnnouncement(deuceState))
         }
 
-        return newState
+        return newState.copy(announcement = generateAnnouncement(newState))
     }
 
     private fun winGame(currentState: TennisMatchState, userScored: Boolean): TennisMatchState {
-        val newGames = if (userScored) currentState.userGames + 1 else currentState.opponentGames + 1
-        
-        // Simplified Set winning logic (First to 6 games, win by 2, or tiebreak at 6-6)
-        // For simplicity in this demo, let's just increment games and see if a set is won if >= 6 and difference >= 2.
         val opponentGamesForCheck = if (userScored) currentState.opponentGames else currentState.opponentGames + 1
         val userGamesForCheck = if (userScored) currentState.userGames + 1 else currentState.userGames
 
-        if (userGamesForCheck >= 6 && userGamesForCheck - opponentGamesForCheck >= 2) {
-            return TennisMatchState(userSets = currentState.userSets + 1, opponentSets = currentState.opponentSets)
-        } else if (opponentGamesForCheck >= 6 && opponentGamesForCheck - userGamesForCheck >= 2) {
-            return TennisMatchState(userSets = currentState.userSets, opponentSets = currentState.opponentSets + 1)
+        val winnerName = if (userScored) {
+            if (currentState.userName.isEmpty()) "User" else currentState.userName
+        } else {
+            if (currentState.opponentName.isEmpty()) "Opponent" else currentState.opponentName
+        }
+
+        // Check if set is won
+        if ((userGamesForCheck >= 6 && userGamesForCheck - opponentGamesForCheck >= 2) || (userGamesForCheck == 7)) {
+            val newSetHistory = currentState.setHistory + (userGamesForCheck to opponentGamesForCheck)
+            val newUserSets = currentState.userSets + 1
+            
+            // Check if match is won (Best of 3)
+            if (newUserSets >= 2) {
+                val matchWonState = currentState.copy(
+                    userScore = PlayerScore.Love,
+                    opponentScore = PlayerScore.Love,
+                    userGames = userGamesForCheck,
+                    opponentGames = opponentGamesForCheck,
+                    userSets = newUserSets,
+                    setHistory = newSetHistory,
+                    matchWinner = winnerName
+                )
+                return matchWonState.copy(announcement = generateAnnouncement(matchWonState))
+            }
+            
+            val setWonState = currentState.copy(
+                userScore = PlayerScore.Love,
+                opponentScore = PlayerScore.Love,
+                userGames = userGamesForCheck,
+                opponentGames = opponentGamesForCheck,
+                userSets = newUserSets,
+                setHistory = newSetHistory,
+                setWinner = winnerName,
+                isNewSet = true,
+                isUserServing = !currentState.isUserServing // Swap for next set
+            )
+            return setWonState.copy(announcement = generateAnnouncement(setWonState))
+        } else if ((opponentGamesForCheck >= 6 && opponentGamesForCheck - userGamesForCheck >= 2) || (opponentGamesForCheck == 7)) {
+            val newSetHistory = currentState.setHistory + (userGamesForCheck to opponentGamesForCheck)
+            val newOpponentSets = currentState.opponentSets + 1
+            
+            // Check if match is won (Best of 3)
+            if (newOpponentSets >= 2) {
+                val matchWonState = currentState.copy(
+                    userScore = PlayerScore.Love,
+                    opponentScore = PlayerScore.Love,
+                    userGames = userGamesForCheck,
+                    opponentGames = opponentGamesForCheck,
+                    opponentSets = newOpponentSets,
+                    setHistory = newSetHistory,
+                    matchWinner = winnerName
+                )
+                return matchWonState.copy(announcement = generateAnnouncement(matchWonState))
+            }
+            
+            val setWonState = currentState.copy(
+                userScore = PlayerScore.Love,
+                opponentScore = PlayerScore.Love,
+                userGames = userGamesForCheck,
+                opponentGames = opponentGamesForCheck,
+                opponentSets = newOpponentSets,
+                setHistory = newSetHistory,
+                setWinner = winnerName,
+                isNewSet = true,
+                isUserServing = !currentState.isUserServing // Swap for next set
+            )
+            return setWonState.copy(announcement = generateAnnouncement(setWonState))
         }
         
         // Otherwise, just new game
-        return if (userScored) {
-            currentState.copy(
-                userScore = PlayerScore.Love,
-                opponentScore = PlayerScore.Love,
-                userGames = newGames,
-                isDeuce = false
-            )
-        } else {
-            currentState.copy(
-                userScore = PlayerScore.Love,
-                opponentScore = PlayerScore.Love,
-                opponentGames = newGames,
-                isDeuce = false
-            )
+        val gameWonState = currentState.copy(
+            userScore = PlayerScore.Love,
+            opponentScore = PlayerScore.Love,
+            userGames = userGamesForCheck,
+            opponentGames = opponentGamesForCheck,
+            isDeuce = false,
+            isUserServing = !currentState.isUserServing, // Swap server after each game
+            gameWinner = winnerName
+        )
+        return gameWonState.copy(announcement = generateAnnouncement(gameWonState))
+    }
+
+    fun startNextSet() {
+        _matchState.update { currentState ->
+            if (currentState.setWinner != null) {
+                val nextSetState = currentState.copy(
+                    userGames = 0,
+                    opponentGames = 0,
+                    setWinner = null,
+                    gameWinner = null,
+                    isNewSet = true // Keep true for "Play" announcement
+                )
+                nextSetState.copy(announcement = generateAnnouncement(nextSetState))
+            } else {
+                currentState
+            }
         }
     }
 }

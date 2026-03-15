@@ -27,6 +27,9 @@ fun SettingsScreen(
     val currentKeycode by settingsManager.keycodeFlow.collectAsState(initial = SettingsManager.DEFAULT_KEYCODE)
     val currentDoubleClick by settingsManager.doubleClickLatencyFlow.collectAsState(initial = SettingsManager.DEFAULT_DOUBLE_CLICK_LATENCY)
     val currentLongPress by settingsManager.longPressLatencyFlow.collectAsState(initial = SettingsManager.DEFAULT_LONG_PRESS_LATENCY)
+    val userName by settingsManager.userNameFlow.collectAsState(initial = SettingsManager.DEFAULT_USER_NAME)
+    val opponentName by settingsManager.opponentNameFlow.collectAsState(initial = SettingsManager.DEFAULT_OPPONENT_NAME)
+    val initialServerIsUser by settingsManager.initialServerIsUserFlow.collectAsState(initial = SettingsManager.DEFAULT_INITIAL_SERVER_IS_USER)
 
     Scaffold(
         topBar = {
@@ -79,7 +82,36 @@ fun SettingsScreen(
                         coroutineScope.launch { settingsManager.updateLongPressLatency(it) }
                     }
                 },
-                description = "Min time window to trigger long press. Default is 1000."
+                description = "Min time window to trigger long press. Default is 1000.",
+                keyboardType = KeyboardType.Number
+            )
+
+            SettingsItem(
+                label = "User Name",
+                value = userName,
+                onValueChange = { newValue ->
+                    coroutineScope.launch { settingsManager.updateUserName(newValue) }
+                },
+                description = "Your name for announcements.",
+                keyboardType = KeyboardType.Text
+            )
+
+            SettingsItem(
+                label = "Opponent Name",
+                value = opponentName,
+                onValueChange = { newValue ->
+                    coroutineScope.launch { settingsManager.updateOpponentName(newValue) }
+                },
+                description = "Opponent's name for announcements.",
+                keyboardType = KeyboardType.Text
+            )
+
+            SettingsToggle(
+                label = "User starts serving",
+                checked = initialServerIsUser,
+                onCheckedChange = { checked ->
+                    coroutineScope.launch { settingsManager.updateInitialServerIsUser(checked) }
+                }
             )
         }
     }
@@ -90,7 +122,8 @@ fun SettingsItem(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    description: String
+    description: String,
+    keyboardType: KeyboardType = KeyboardType.Number
 ) {
     Column {
         Text(text = label, color = White, style = MaterialTheme.typography.titleMedium)
@@ -98,16 +131,42 @@ fun SettingsItem(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = White,
                 unfocusedTextColor = White,
                 focusedBorderColor = White,
                 unfocusedBorderColor = White,
+                cursorColor = White
             ),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(2.dp))
         Text(text = description, color = White.copy(alpha = 0.7f), style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+@Composable
+fun SettingsToggle(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = label, color = White, style = MaterialTheme.typography.titleMedium)
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = White,
+                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                uncheckedThumbColor = White.copy(alpha = 0.5f),
+                uncheckedTrackColor = Black
+            )
+        )
     }
 }

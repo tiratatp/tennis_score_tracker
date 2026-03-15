@@ -63,10 +63,23 @@ class MainActivity : ComponentActivity() {
                 keyEventManager.longPressLatency = latency
             }
         }
+        lifecycleScope.launch {
+            kotlinx.coroutines.flow.combine(
+                settingsManager.userNameFlow,
+                settingsManager.opponentNameFlow
+            ) { user, opponent -> user to opponent }.collectLatest { (user, opponent) ->
+                scoreManager.updateNames(user, opponent)
+            }
+        }
+        lifecycleScope.launch {
+            settingsManager.initialServerIsUserFlow.collectLatest { isUser ->
+                scoreManager.updateInitialServer(isUser)
+            }
+        }
 
         lifecycleScope.launch {
             scoreManager.matchState.drop(1).collectLatest { state ->
-                ttsManager.announceScore(state)
+                state.announcement?.let { ttsManager.announce(it) }
             }
         }
 

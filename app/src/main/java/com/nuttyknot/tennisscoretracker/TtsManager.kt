@@ -17,13 +17,6 @@ class TtsManager(context: Context) {
         }
     }
 
-    fun announceScore(state: TennisMatchState) {
-        if (isInitialized) {
-            val utterance = state.toTtsString()
-            // QUEUE_FLUSH interrupts any current TTS right away
-            tts?.speak(utterance, TextToSpeech.QUEUE_FLUSH, null, "score_utterance")
-        }
-    }
 
     fun announce(text: String) {
         if (isInitialized) {

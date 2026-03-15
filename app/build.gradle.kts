@@ -73,3 +73,10 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
+
+tasks.register<Exec>("run") {
+    dependsOn("installDebug")
+    group = "application"
+    description = "Installs and runs the application"
+    commandLine("adb", "shell", "am", "start", "-n", "${android.namespace}/.MainActivity")
+}
