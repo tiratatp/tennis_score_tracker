@@ -16,7 +16,7 @@ import com.nuttyknot.tennisscoretracker.ui.score.ScoreScreen
 import com.nuttyknot.tennisscoretracker.ui.settings.SettingsScreen
 import kotlinx.coroutines.launch
 
-@Suppress("FunctionNaming", "ktlint:standard:function-naming")
+@Suppress("FunctionName")
 @Composable
 fun TennisAppNavigation(
     navController: NavHostController = rememberNavController(),

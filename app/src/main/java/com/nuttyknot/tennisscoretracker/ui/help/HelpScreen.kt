@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@Suppress("FunctionNaming", "ktlint:standard:function-naming")
+@Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HelpScreen(onDismiss: () -> Unit) {
@@ -56,7 +56,7 @@ fun HelpScreen(onDismiss: () -> Unit) {
     }
 }
 
-@Suppress("FunctionNaming", "ktlint:standard:function-naming")
+@Suppress("FunctionName")
 @Composable
 private fun HelpScreenContent(
     paddingValues: androidx.compose.foundation.layout.PaddingValues,
@@ -110,7 +110,7 @@ private fun HelpScreenContent(
     }
 }
 
-@Suppress("FunctionNaming", "ktlint:standard:function-naming")
+@Suppress("FunctionName")
 @Composable
 private fun ScoringGestures() {
     HelpSection(
@@ -143,7 +143,7 @@ private fun ScoringGestures() {
     Spacer(modifier = Modifier.height(16.dp))
 }
 
-@Suppress("FunctionNaming", "ktlint:standard:function-naming")
+@Suppress("FunctionName")
 @Composable
 private fun HardwareButtons() {
     HelpSection(
@@ -176,7 +176,7 @@ private fun HardwareButtons() {
     )
 }
 
-@Suppress("FunctionNaming", "ktlint:standard:function-naming")
+@Suppress("FunctionName")
 @Composable
 fun HelpSection(
     title: String,
@@ -199,7 +199,7 @@ fun HelpSection(
     }
 }
 
-@Suppress("FunctionNaming", "ktlint:standard:function-naming")
+@Suppress("FunctionName")
 @Composable
 fun GestureItem(
     icon: ImageVector,
