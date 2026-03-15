@@ -22,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.nuttyknot.tennisscoretracker.AppTheme
 
@@ -37,53 +36,6 @@ fun AppSettings(data: AppSettingsData) {
     KeycodeDropdown(
         currentKeycode = data.currentKeycode,
         onKeycodeChange = data.onKeycodeChange,
-    )
-}
-
-@Suppress("FunctionName")
-@Composable
-fun LatencySettings(data: AppSettingsData) {
-    SettingsItem(
-        label = "Double Click Latency (ms)",
-        value = data.currentDoubleClick.toString(),
-        onValueChange = data.onDoubleClickChange,
-        description = "Max time window for a double click. Default is 300.",
-        config =
-            SettingsItemConfig(
-                validate = { v ->
-                    val num = v.toLongOrNull()
-                    when {
-                        v.isBlank() -> "Latency is required"
-                        num == null -> "Must be a valid number"
-                        num < 100 -> "Must be at least 100 ms"
-                        num > 1000 -> "Must be 1000 ms or less"
-                        else -> null
-                    }
-                },
-            ),
-    )
-
-    SettingsItem(
-        label = "Long Press Latency (ms)",
-        value = data.currentLongPress.toString(),
-        onValueChange = data.onLongPressChange,
-        description = "Min time window to trigger long press. Default is 1000.",
-        config =
-            SettingsItemConfig(
-                keyboardType = KeyboardType.Number,
-                validate = { v ->
-                    val num = v.toLongOrNull()
-                    when {
-                        v.isBlank() -> "Latency is required"
-                        num == null -> "Must be a valid number"
-                        num < 300 -> "Must be at least 300 ms"
-                        num > 3000 -> "Must be 3000 ms or less"
-                        num <= data.currentDoubleClick ->
-                            "Must be greater than double click latency (${data.currentDoubleClick} ms)"
-                        else -> null
-                    }
-                },
-            ),
     )
 }
 
@@ -287,11 +239,7 @@ val KEYCODE_OPTIONS =
 
 data class AppSettingsData(
     val currentKeycode: Int,
-    val currentDoubleClick: Long,
-    val currentLongPress: Long,
     val currentTheme: AppTheme,
     val onKeycodeChange: (Int) -> Unit,
-    val onDoubleClickChange: (String) -> Unit,
-    val onLongPressChange: (String) -> Unit,
     val onThemeChange: (AppTheme) -> Unit,
 )

@@ -51,7 +51,7 @@ fun SettingsScreen(
         initial = SettingsManager.DEFAULT_APP_THEME,
     )
 
-    val (playerData, appData) =
+    val (playerData, appData, latencyData) =
         buildSettingsData(
             settingsManager = settingsManager,
             coroutineScope = coroutineScope,
@@ -75,6 +75,7 @@ fun SettingsScreen(
             paddingValues = paddingValues,
             playerData = playerData,
             appData = appData,
+            latencyData = latencyData,
         )
     }
 }
@@ -93,7 +94,7 @@ private fun buildSettingsData(
     settingsManager: SettingsManager,
     coroutineScope: kotlinx.coroutines.CoroutineScope,
     state: SettingsState,
-): Pair<PlayerSettingsData, AppSettingsData> {
+): Triple<PlayerSettingsData, AppSettingsData, LatencySettingsData> {
     val playerData =
         PlayerSettingsData(
             userName = state.userName,
@@ -112,12 +113,18 @@ private fun buildSettingsData(
     val appData =
         AppSettingsData(
             currentKeycode = state.currentKeycode,
-            currentDoubleClick = state.currentDoubleClick,
-            currentLongPress = state.currentLongPress,
             currentTheme = state.appTheme,
             onKeycodeChange = { code ->
                 coroutineScope.launch { settingsManager.updateKeycode(code) }
             },
+            onThemeChange = { theme ->
+                coroutineScope.launch { settingsManager.updateAppTheme(theme) }
+            },
+        )
+    val latencyData =
+        LatencySettingsData(
+            currentDoubleClick = state.currentDoubleClick,
+            currentLongPress = state.currentLongPress,
             onDoubleClickChange = { v ->
                 v.toLongOrNull()?.let {
                     coroutineScope.launch { settingsManager.updateDoubleClickLatency(it) }
@@ -128,11 +135,8 @@ private fun buildSettingsData(
                     coroutineScope.launch { settingsManager.updateLongPressLatency(it) }
                 }
             },
-            onThemeChange = { theme ->
-                coroutineScope.launch { settingsManager.updateAppTheme(theme) }
-            },
         )
-    return playerData to appData
+    return Triple(playerData, appData, latencyData)
 }
 
 @Suppress("FunctionName")
@@ -141,6 +145,7 @@ private fun SettingsLayout(
     paddingValues: androidx.compose.foundation.layout.PaddingValues,
     playerData: PlayerSettingsData,
     appData: AppSettingsData,
+    latencyData: LatencySettingsData,
 ) {
     Column(
         modifier =
@@ -158,7 +163,7 @@ private fun SettingsLayout(
             AppSettings(appData)
         }
         CollapsibleSettingsSection(title = "Advanced") {
-            LatencySettings(appData)
+            LatencySettings(latencyData)
         }
         Spacer(modifier = Modifier.height(32.dp))
         Text(
