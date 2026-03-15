@@ -34,6 +34,8 @@ data class TennisMatchState(
     val setHistory: List<Pair<Int, Int>> = emptyList(),
     val isNewSet: Boolean = false,
     val announcement: String? = null,
+    val matchFormat: MatchFormat = MatchFormat.STANDARD,
+    val isMatchTiebreak: Boolean = false,
 ) {
     val isDeuce: Boolean
         get() = userScore == PlayerScore.Forty && opponentScore == PlayerScore.Forty
@@ -87,8 +89,12 @@ private fun generateNewSetAnnouncement(state: TennisMatchState): String {
         } else {
             state.opponentName.ifEmpty { "Opponent" }
         }
-    val setOrdinal = getOrdinalString(state.userSets + state.opponentSets + 1)
-    return "$setOrdinal Set, $serverName to serve. Play."
+    return if (state.isMatchTiebreak) {
+        "Match Tiebreak, $serverName to serve"
+    } else {
+        val setOrdinal = getOrdinalString(state.userSets + state.opponentSets + 1)
+        "$setOrdinal Set, $serverName to serve. Play."
+    }
 }
 
 private fun generateGameWinningAnnouncement(state: TennisMatchState): String {

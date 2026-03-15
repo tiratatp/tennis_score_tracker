@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -24,6 +25,7 @@ class SettingsManager(private val context: Context) {
         val INITIAL_SERVER_IS_USER = androidx.datastore.preferences.core.booleanPreferencesKey("initial_server_is_user")
         val HAS_SEEN_HELP = androidx.datastore.preferences.core.booleanPreferencesKey("has_seen_help")
         val APP_THEME = androidx.datastore.preferences.core.stringPreferencesKey("app_theme")
+        val MATCH_FORMAT = stringPreferencesKey("match_format")
 
         const val DEFAULT_KEYCODE = KeyEvent.KEYCODE_VOLUME_UP
         const val DEFAULT_DOUBLE_CLICK_LATENCY = 300L
@@ -33,6 +35,7 @@ class SettingsManager(private val context: Context) {
         const val DEFAULT_INITIAL_SERVER_IS_USER = true
         const val DEFAULT_HAS_SEEN_HELP = false
         val DEFAULT_APP_THEME = AppTheme.SKY_BLUE
+        val DEFAULT_MATCH_FORMAT = MatchFormat.STANDARD
     }
 
     val keycodeFlow: Flow<Int> =
@@ -74,6 +77,12 @@ class SettingsManager(private val context: Context) {
         context.dataStore.data.map { preferences ->
             val themeName = preferences[APP_THEME] ?: DEFAULT_APP_THEME.name
             AppTheme.entries.find { it.name == themeName } ?: DEFAULT_APP_THEME
+        }
+
+    val matchFormatFlow: Flow<MatchFormat> =
+        context.dataStore.data.map { preferences ->
+            val formatName = preferences[MATCH_FORMAT] ?: DEFAULT_MATCH_FORMAT.name
+            MatchFormat.entries.find { it.name == formatName } ?: DEFAULT_MATCH_FORMAT
         }
 
     suspend fun updateKeycode(keycode: Int) {
@@ -123,6 +132,18 @@ class SettingsManager(private val context: Context) {
             preferences[APP_THEME] = theme.name
         }
     }
+
+    suspend fun updateMatchFormat(format: MatchFormat) {
+        context.dataStore.edit { preferences ->
+            preferences[MATCH_FORMAT] = format.name
+        }
+    }
+}
+
+enum class MatchFormat(val displayName: String) {
+    STANDARD("Standard Match (Best of 3 Sets)"),
+    LEAGUE("League Match (3rd Set Tiebreak)"),
+    FAST("Fast Match (8-Game Pro Set, No-Ad)"),
 }
 
 enum class AppTheme(val displayName: String, val aliasName: String) {

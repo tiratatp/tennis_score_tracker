@@ -48,6 +48,7 @@ fun TennisAppNavigation(
         }
         composable(Routes.SETTINGS_SCREEN) {
             SettingsScreen(
+                scoreManager = scoreManager,
                 settingsManager = settingsManager,
                 onNavigateBack = { navController.popBackStack() },
             )

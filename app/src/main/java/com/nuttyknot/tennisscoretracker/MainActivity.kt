@@ -129,6 +129,13 @@ class MainActivity : ComponentActivity() {
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsManager.matchFormatFlow.collectLatest { format ->
+                    scoreManager.updateMatchParameters(matchFormat = format)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsManager.appThemeFlow.collectLatest { theme ->
                     pendingTheme = theme
                 }

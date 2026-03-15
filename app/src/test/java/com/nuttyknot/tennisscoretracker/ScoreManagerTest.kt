@@ -264,6 +264,185 @@ class ScoreManagerTest {
     }
 
     @Test
+    fun `test league match tiebreak at 1-1 sets`() {
+        scoreManager.updateMatchParameters(matchFormat = MatchFormat.LEAGUE)
+        scoreManager.reset()
+
+        // User wins first set 6-0
+        repeat(6) { repeat(4) { scoreManager.incrementUserScore() } }
+        assertEquals(1, state().userSets)
+        assertEquals("Player 1", state().setWinner)
+
+        scoreManager.startNextSet()
+
+        // Opponent wins second set 6-0
+        repeat(6) { repeat(4) { scoreManager.incrementOpponentScore() } }
+        assertEquals(1, state().opponentSets)
+        assertEquals("Player 2", state().setWinner)
+
+        // Start 3rd set -> should be match tiebreak
+        scoreManager.startNextSet()
+        assertTrue(state().isMatchTiebreak)
+        assertTrue(state().userScore is PlayerScore.TiebreakScore)
+        assertEquals(0, (state().userScore as PlayerScore.TiebreakScore).points)
+
+        // Play 10-point match tiebreak: user wins 10-0
+        repeat(10) { scoreManager.incrementUserScore() }
+
+        assertEquals("Player 1", state().matchWinner)
+        assertEquals(2, state().userSets)
+        assertEquals(1, state().opponentSets)
+    }
+
+    @Test
+    fun `test league regular tiebreak still works at 6-6`() {
+        scoreManager.updateMatchParameters(matchFormat = MatchFormat.LEAGUE)
+        scoreManager.reset()
+
+        // Both reach 6-6 in first set
+        repeat(6) {
+            repeat(4) { scoreManager.incrementUserScore() }
+            repeat(4) { scoreManager.incrementOpponentScore() }
+        }
+
+        // Should enter 7-point tiebreak
+        assertTrue(state().userScore is PlayerScore.TiebreakScore)
+        assertEquals(6, state().userGames)
+        assertEquals(6, state().opponentGames)
+
+        // User wins tiebreak 7-0
+        repeat(7) { scoreManager.incrementUserScore() }
+
+        assertEquals(7, state().userGames)
+        assertEquals(6, state().opponentGames)
+        assertEquals(1, state().userSets)
+        assertEquals("Player 1", state().setWinner)
+    }
+
+    @Test
+    fun `test league match tiebreak extended past 10`() {
+        scoreManager.updateMatchParameters(matchFormat = MatchFormat.LEAGUE)
+        scoreManager.reset()
+
+        // Each wins 1 set
+        repeat(6) { repeat(4) { scoreManager.incrementUserScore() } }
+        scoreManager.startNextSet()
+        repeat(6) { repeat(4) { scoreManager.incrementOpponentScore() } }
+        scoreManager.startNextSet()
+
+        assertTrue(state().isMatchTiebreak)
+
+        // Reach 9-9 in match tiebreak
+        repeat(9) {
+            scoreManager.incrementUserScore()
+            scoreManager.incrementOpponentScore()
+        }
+        assertEquals(9, (state().userScore as PlayerScore.TiebreakScore).points)
+        assertEquals(9, (state().opponentScore as PlayerScore.TiebreakScore).points)
+        assertNull(state().matchWinner)
+
+        // User wins 11-9
+        scoreManager.incrementUserScore()
+        assertNull(state().matchWinner) // 10-9, need 2 point lead
+        scoreManager.incrementUserScore()
+        assertEquals("Player 1", state().matchWinner)
+    }
+
+    @Test
+    fun `test fast pro set win at 8 games`() {
+        scoreManager.updateMatchParameters(matchFormat = MatchFormat.FAST)
+        scoreManager.reset()
+
+        // User wins 8 games straight
+        repeat(8) {
+            repeat(4) { scoreManager.incrementUserScore() }
+        }
+
+        assertEquals(1, state().userSets)
+        assertEquals("Player 1", state().matchWinner)
+    }
+
+    @Test
+    fun `test fast no-ad scoring`() {
+        scoreManager.updateMatchParameters(matchFormat = MatchFormat.FAST)
+        scoreManager.reset()
+
+        // Reach 40-40 (deuce)
+        repeat(3) { scoreManager.incrementUserScore() }
+        repeat(3) { scoreManager.incrementOpponentScore() }
+
+        assertTrue(state().isDeuce)
+
+        // Next point should win the game directly (no advantage)
+        scoreManager.incrementUserScore()
+        assertEquals(1, state().userGames)
+        assertEquals("Player 1", state().gameWinner)
+    }
+
+    @Test
+    fun `test fast tiebreak at 8-8`() {
+        scoreManager.updateMatchParameters(matchFormat = MatchFormat.FAST)
+        scoreManager.reset()
+
+        // Both reach 8-8
+        repeat(8) {
+            repeat(4) { scoreManager.incrementUserScore() }
+            repeat(4) { scoreManager.incrementOpponentScore() }
+        }
+
+        // Should enter tiebreak
+        assertTrue(state().userScore is PlayerScore.TiebreakScore)
+        assertEquals(8, state().userGames)
+        assertEquals(8, state().opponentGames)
+
+        // User wins 7-point tiebreak
+        repeat(7) { scoreManager.incrementUserScore() }
+        assertEquals("Player 1", state().matchWinner)
+    }
+
+    @Test
+    fun `test fast set win at 8-6`() {
+        scoreManager.updateMatchParameters(matchFormat = MatchFormat.FAST)
+        scoreManager.reset()
+
+        // Both reach 6-6
+        repeat(6) {
+            repeat(4) { scoreManager.incrementUserScore() }
+            repeat(4) { scoreManager.incrementOpponentScore() }
+        }
+
+        // No tiebreak at 6-6 in fast mode (tiebreak is at 8-8)
+        assertFalse(state().userScore is PlayerScore.TiebreakScore)
+
+        // User wins 2 more games to reach 8-6
+        repeat(2) { repeat(4) { scoreManager.incrementUserScore() } }
+
+        assertEquals(8, state().userGames)
+        assertEquals(6, state().opponentGames)
+        assertEquals("Player 1", state().matchWinner)
+    }
+
+    @Test
+    fun `test format only changes when score is zero`() {
+        // Start with standard format
+        scoreManager.updateMatchParameters(matchFormat = MatchFormat.STANDARD)
+        scoreManager.reset()
+
+        // Score a point
+        scoreManager.incrementUserScore()
+        assertEquals(PlayerScore.Fifteen, state().userScore)
+        assertEquals(MatchFormat.STANDARD, state().matchFormat)
+
+        // Try to change format mid-game
+        scoreManager.updateMatchParameters(matchFormat = MatchFormat.FAST)
+        assertEquals(MatchFormat.STANDARD, state().matchFormat) // Should NOT change
+
+        // Reset and verify format now applies
+        scoreManager.reset()
+        assertEquals(MatchFormat.FAST, state().matchFormat)
+    }
+
+    @Test
     fun `test extended tiebreak past 6-6`() {
         // Both reach 6-6 in games
         repeat(6) {

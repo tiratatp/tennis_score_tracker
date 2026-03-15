@@ -19,16 +19,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nuttyknot.tennisscoretracker.AppTheme
+import com.nuttyknot.tennisscoretracker.MatchFormat
+import com.nuttyknot.tennisscoretracker.ScoreManager
 import com.nuttyknot.tennisscoretracker.SettingsManager
 import kotlinx.coroutines.launch
 
 @Suppress("FunctionName")
 @Composable
 fun SettingsScreen(
+    scoreManager: ScoreManager,
     settingsManager: SettingsManager,
     onNavigateBack: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val matchState by scoreManager.matchState.collectAsState()
+    val isMatchInProgress = !matchState.isScoreZero
     val currentKeycode by settingsManager.keycodeFlow.collectAsState(
         initial = SettingsManager.DEFAULT_KEYCODE,
     )
@@ -50,11 +55,15 @@ fun SettingsScreen(
     val appTheme by settingsManager.appThemeFlow.collectAsState(
         initial = SettingsManager.DEFAULT_APP_THEME,
     )
+    val matchFormat by settingsManager.matchFormatFlow.collectAsState(
+        initial = SettingsManager.DEFAULT_MATCH_FORMAT,
+    )
 
     val (playerData, appData, latencyData) =
         buildSettingsData(
             settingsManager = settingsManager,
             coroutineScope = coroutineScope,
+            isMatchInProgress = isMatchInProgress,
             state =
                 SettingsState(
                     userName = userName,
@@ -64,6 +73,7 @@ fun SettingsScreen(
                     currentDoubleClick = currentDoubleClick,
                     currentLongPress = currentLongPress,
                     appTheme = appTheme,
+                    matchFormat = matchFormat,
                 ),
         )
 
@@ -88,11 +98,13 @@ private data class SettingsState(
     val currentDoubleClick: Long,
     val currentLongPress: Long,
     val appTheme: AppTheme,
+    val matchFormat: MatchFormat,
 )
 
 private fun buildSettingsData(
     settingsManager: SettingsManager,
     coroutineScope: kotlinx.coroutines.CoroutineScope,
+    isMatchInProgress: Boolean,
     state: SettingsState,
 ): Triple<PlayerSettingsData, AppSettingsData, LatencySettingsData> {
     val playerData =
@@ -114,11 +126,16 @@ private fun buildSettingsData(
         AppSettingsData(
             currentKeycode = state.currentKeycode,
             currentTheme = state.appTheme,
+            currentMatchFormat = state.matchFormat,
+            isMatchFormatLocked = isMatchInProgress,
             onKeycodeChange = { code ->
                 coroutineScope.launch { settingsManager.updateKeycode(code) }
             },
             onThemeChange = { theme ->
                 coroutineScope.launch { settingsManager.updateAppTheme(theme) }
+            },
+            onMatchFormatChange = { format ->
+                coroutineScope.launch { settingsManager.updateMatchFormat(format) }
             },
         )
     val latencyData =

@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nuttyknot.tennisscoretracker.MatchFormat
 import com.nuttyknot.tennisscoretracker.ScoreManager
 import com.nuttyknot.tennisscoretracker.SettingsManager
 import com.nuttyknot.tennisscoretracker.TennisMatchState
@@ -137,7 +138,10 @@ private fun formatGameStatus(state: TennisMatchState): String {
     return when {
         state.matchWinner != null -> "MATCH OVER"
         state.setWinner != null -> "SET OVER"
+        state.isMatchTiebreak -> "MATCH TIEBREAK"
         state.isDeuce -> "DEUCE"
+        state.matchFormat == MatchFormat.FAST ->
+            "G ${state.userGames}-${state.opponentGames}"
         else ->
             "S ${state.userSets}-${state.opponentSets}  G ${state.userGames}-${state.opponentGames}"
     }

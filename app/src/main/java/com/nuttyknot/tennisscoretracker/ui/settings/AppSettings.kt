@@ -24,10 +24,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nuttyknot.tennisscoretracker.AppTheme
+import com.nuttyknot.tennisscoretracker.MatchFormat
 
 @Suppress("FunctionName")
 @Composable
 fun AppSettings(data: AppSettingsData) {
+    MatchFormatDropdown(
+        currentFormat = data.currentMatchFormat,
+        onFormatChange = data.onMatchFormatChange,
+        enabled = !data.isMatchFormatLocked,
+    )
+
     ThemeDropdown(
         currentTheme = data.currentTheme,
         onThemeChange = data.onThemeChange,
@@ -240,6 +247,99 @@ val KEYCODE_OPTIONS =
 data class AppSettingsData(
     val currentKeycode: Int,
     val currentTheme: AppTheme,
+    val currentMatchFormat: MatchFormat,
+    val isMatchFormatLocked: Boolean = false,
     val onKeycodeChange: (Int) -> Unit,
     val onThemeChange: (AppTheme) -> Unit,
+    val onMatchFormatChange: (MatchFormat) -> Unit,
 )
+
+@Suppress("FunctionName")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MatchFormatDropdown(
+    currentFormat: MatchFormat,
+    onFormatChange: (MatchFormat) -> Unit,
+    enabled: Boolean = true,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val helpText =
+        if (enabled) {
+            "Choose the match format. Changes apply on new match."
+        } else {
+            "Reset the current match to change format."
+        }
+
+    Column {
+        Text(
+            text = "Match Format",
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        MatchFormatMenuBox(currentFormat, onFormatChange, enabled, expanded) { expanded = it }
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = helpText,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+@Suppress("FunctionName")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MatchFormatMenuBox(
+    currentFormat: MatchFormat,
+    onFormatChange: (MatchFormat) -> Unit,
+    enabled: Boolean,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+) {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { if (enabled) onExpandedChange(!expanded) },
+    ) {
+        OutlinedTextField(
+            value = currentFormat.displayName,
+            onValueChange = {},
+            readOnly = true,
+            enabled = enabled,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    disabledTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    disabledBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
+                ),
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange(false) },
+        ) {
+            MatchFormat.entries.forEach { format ->
+                DropdownMenuItem(
+                    text = { Text(format.displayName) },
+                    onClick = {
+                        onFormatChange(format)
+                        onExpandedChange(false)
+                    },
+                    colors =
+                        MenuDefaults.itemColors(
+                            textColor =
+                                if (format == currentFormat) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface
+                                },
+                        ),
+                )
+            }
+        }
+    }
+}
