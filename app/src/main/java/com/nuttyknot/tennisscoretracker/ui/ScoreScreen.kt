@@ -1,6 +1,7 @@
 package com.nuttyknot.tennisscoretracker.ui
 
 import android.content.res.Configuration
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -31,12 +32,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nuttyknot.tennisscoretracker.ScoreManager
+import com.nuttyknot.tennisscoretracker.SettingsManager
 import com.nuttyknot.tennisscoretracker.TennisMatchState
 import com.nuttyknot.tennisscoretracker.ui.theme.Black
 import com.nuttyknot.tennisscoretracker.ui.theme.White
@@ -62,12 +65,16 @@ private object ScoreScreenConstants {
 @Composable
 fun ScoreScreen(
     scoreManager: ScoreManager,
+    settingsManager: SettingsManager,
     onNavigateToSettings: () -> Unit,
     onNavigateToHelp: () -> Unit,
 ) {
     val state by scoreManager.matchState.collectAsState()
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    val doubleClickLatency by settingsManager.doubleClickLatencyFlow
+        .collectAsState(initial = SettingsManager.DEFAULT_DOUBLE_CLICK_LATENCY)
+    val longPressLatency by settingsManager.longPressLatencyFlow
+        .collectAsState(initial = SettingsManager.DEFAULT_LONG_PRESS_LATENCY)
 
     Scaffold(
         topBar = {
@@ -101,20 +108,58 @@ fun ScoreScreen(
         },
         containerColor = Black,
     ) { paddingValues ->
-        BoxWithConstraints(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp),
-        ) {
-            val gameStatus = formatGameStatus(state, isLandscape)
+        ScoreScreenContent(
+            state = state,
+            scoreManager = scoreManager,
+            doubleClickLatency = doubleClickLatency,
+            longPressLatency = longPressLatency,
+            paddingValues = paddingValues,
+        )
+    }
+}
 
-            if (isLandscape) {
-                LandscapeScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, scoreManager)
-            } else {
-                PortraitScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, scoreManager)
-            }
+@Suppress("FunctionName")
+@Composable
+private fun ScoreScreenContent(
+    state: TennisMatchState,
+    scoreManager: ScoreManager,
+    doubleClickLatency: Long,
+    longPressLatency: Long,
+    paddingValues: androidx.compose.foundation.layout.PaddingValues,
+) {
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    BoxWithConstraints(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
+                .pointerInput(doubleClickLatency, longPressLatency) {
+                    detectTapGestures(
+                        onTap = {
+                            if (state.matchWinner == null) {
+                                scoreManager.incrementUserScore()
+                            }
+                        },
+                        onDoubleTap = {
+                            if (state.matchWinner == null) {
+                                scoreManager.incrementOpponentScore()
+                            }
+                        },
+                        onLongPress = {
+                            scoreManager.undo()
+                        },
+                    )
+                },
+    ) {
+        val gameStatus = formatGameStatus(state, isLandscape)
+
+        if (isLandscape) {
+            LandscapeScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, scoreManager)
+        } else {
+            PortraitScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, scoreManager)
         }
     }
 }

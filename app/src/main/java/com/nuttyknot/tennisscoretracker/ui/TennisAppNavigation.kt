@@ -38,6 +38,7 @@ fun TennisAppNavigation(
         composable(Routes.SCORE_SCREEN) {
             ScoreScreen(
                 scoreManager = scoreManager,
+                settingsManager = settingsManager,
                 onNavigateToSettings = { navController.navigate(Routes.SETTINGS_SCREEN) },
                 onNavigateToHelp = { navController.navigate(Routes.HELP_SCREEN) },
             )
