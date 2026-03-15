@@ -2,4 +2,4 @@
 
 - NEVER perform `git commit` or `git push` without explicit permission from the user for that specific action.
 - Always ask the user to review the changes before committing.
-- Always run the linter (e.g., `./gradlew ktlintCheck detekt`) and fix all reported issues after completing your tasks to ensure high code quality.
+- Always run the linter (e.g., `./gradlew ktlintCheck detekt`) and fix all reported issues after completing your tasks and before notifying the user to ensure high code quality and consistency.

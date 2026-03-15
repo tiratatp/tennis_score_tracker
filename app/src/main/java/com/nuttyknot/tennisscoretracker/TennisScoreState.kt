@@ -35,7 +35,17 @@ data class TennisMatchState(
     val setHistory: List<Pair<Int, Int>> = emptyList(),
     val isNewSet: Boolean = false,
     val announcement: String? = null,
-)
+) {
+    val isScoreZero: Boolean
+        get() =
+            userScore == PlayerScore.Love &&
+                opponentScore == PlayerScore.Love &&
+                userGames == 0 &&
+                opponentGames == 0 &&
+                userSets == 0 &&
+                opponentSets == 0 &&
+                setHistory.isEmpty()
+}
 
 // Pure function to generate announcements from state
 fun generateAnnouncement(state: TennisMatchState): String {
