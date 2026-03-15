@@ -46,10 +46,22 @@ private val ColorblindSafeColorScheme =
         onSurface = White,
     )
 
+private val SkyBlueColorScheme =
+    darkColorScheme(
+        primary = SkyBlue,
+        secondary = White,
+        background = Black,
+        surface = Black,
+        onPrimary = Black,
+        onSecondary = Black,
+        onBackground = White,
+        onSurface = White,
+    )
+
 @Suppress("FunctionName")
 @Composable
 fun TennisScoreTrackerTheme(
-    appTheme: AppTheme = AppTheme.COLORBLIND_SAFE,
+    appTheme: AppTheme = AppTheme.SKY_BLUE,
     content: @Composable () -> Unit,
 ) {
     val colorScheme =
@@ -57,6 +69,7 @@ fun TennisScoreTrackerTheme(
             AppTheme.GRAND_SLAM -> GrandSlamColorScheme
             AppTheme.MIAMI_NIGHT -> MiamiNightColorScheme
             AppTheme.COLORBLIND_SAFE -> ColorblindSafeColorScheme
+            AppTheme.SKY_BLUE -> SkyBlueColorScheme
         }
     val view = LocalView.current
     if (!view.isInEditMode) {

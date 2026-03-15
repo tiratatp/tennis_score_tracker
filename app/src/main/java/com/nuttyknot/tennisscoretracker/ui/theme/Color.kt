@@ -19,3 +19,6 @@ val MiamiMagenta = Color(0xFFFF00FF)
 // Colorblind Safe
 val ColorblindOrange = Color(0xFFFF6B00)
 val ColorblindBlue = Color(0xFF38BDF8)
+
+// Sky Blue
+val SkyBlue = Color(0xFF38BDF8)

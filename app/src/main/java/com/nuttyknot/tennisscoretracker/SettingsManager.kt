@@ -32,7 +32,7 @@ class SettingsManager(private val context: Context) {
         const val DEFAULT_OPPONENT_NAME = ""
         const val DEFAULT_INITIAL_SERVER_IS_USER = true
         const val DEFAULT_HAS_SEEN_HELP = false
-        val DEFAULT_APP_THEME = AppTheme.COLORBLIND_SAFE
+        val DEFAULT_APP_THEME = AppTheme.SKY_BLUE
     }
 
     val keycodeFlow: Flow<Int> =
@@ -129,4 +129,5 @@ enum class AppTheme(val displayName: String) {
     GRAND_SLAM("The Grand Slam (Yellow & White)"),
     MIAMI_NIGHT("Miami Night (Cyan & Magenta)"),
     COLORBLIND_SAFE("Colorblind Safe (Orange & Blue)"),
+    SKY_BLUE("Sky Blue (Blue & White)"),
 }
