@@ -1,0 +1,4 @@
+# Assistant Rules
+
+- NEVER perform `git commit` or `git push` without explicit permission from the user for that specific action.
+- Always ask the user to review the changes before committing.

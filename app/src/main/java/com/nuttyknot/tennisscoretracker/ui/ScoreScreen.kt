@@ -26,6 +26,8 @@ fun ScoreScreen(
     onNavigateToSettings: () -> Unit
 ) {
     val state by scoreManager.matchState.collectAsState()
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
     Scaffold(
         topBar = {
@@ -51,65 +53,71 @@ fun ScoreScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            val mainTextSize = (maxHeight.value / 6).sp
+            val gameStatus = if (state.isDeuce) {
+                "DEUCE"
+            } else {
+                "Sets: ${state.userSets} - ${state.opponentSets}  |  Games: ${state.userGames} - ${state.opponentGames}"
+            }
 
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                // Opponent Score
-                Text(
-                    text = "OPPONENT",
-                    color = White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = state.opponentScore.display,
-                    color = White,
-                    fontSize = mainTextSize,
-                    fontWeight = FontWeight.ExtraBold,
-                    textAlign = TextAlign.Center
-                )
+            if (isLandscape) {
+                // Landscape Layout: Side-by-Side
+                val mainTextSize = (maxHeight.value / 1.5).sp
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Opponent Score (Left)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = "OPPONENT", color = White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(text = state.opponentScore.display, color = White, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold)
+                    }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                    // Game Status (Middle)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.width(150.dp)
+                    ) {
+                        Text(text = gameStatus, color = Yellow, fontSize = 16.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
+                    }
 
-                // Game Status
-                val gameStatus = if (state.isDeuce) {
-                    "DEUCE"
-                } else {
-                    "Sets: ${state.userSets} - ${state.opponentSets}  |  Games: ${state.userGames} - ${state.opponentGames}"
+                    // User Score (Right)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(text = state.userScore.display, color = Yellow, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold)
+                        Text(text = "YOU", color = Yellow, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
+            } else {
+                // Portrait Layout: Vertical Stack
+                val mainTextSize = (maxHeight.value / 6).sp
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Opponent Score
+                    Text(text = "OPPONENT", color = White, fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = state.opponentScore.display, color = White, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
 
-                Text(
-                    text = gameStatus,
-                    color = Yellow,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center
-                )
+                    Spacer(modifier = Modifier.height(32.dp))
 
-                Spacer(modifier = Modifier.height(32.dp))
+                    // Game Status
+                    Text(text = gameStatus, color = Yellow, fontSize = 20.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
 
-                // User Score
-                Text(
-                    text = state.userScore.display,
-                    color = Yellow,
-                    fontSize = mainTextSize,
-                    fontWeight = FontWeight.ExtraBold,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "YOU",
-                    color = Yellow,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // User Score
+                    Text(text = state.userScore.display, color = Yellow, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "YOU", color = Yellow, fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                }
             }
         }
     }
