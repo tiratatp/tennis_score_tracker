@@ -81,7 +81,7 @@ private fun HelpScreenContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Welcome to Tennis Score Tracker",
+            text = "Welcome to TennisDroid",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
         )

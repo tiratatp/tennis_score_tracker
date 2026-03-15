@@ -26,7 +26,7 @@ fun ScoreTopBar(
     onResetClick: () -> Unit,
 ) {
     TopAppBar(
-        title = { Text("Tennis Score Tracker", color = MaterialTheme.colorScheme.onBackground) },
+        title = { Text("TennisDroid", color = MaterialTheme.colorScheme.onBackground) },
         actions = {
             IconButton(onClick = onNavigateToHelp) {
                 Icon(

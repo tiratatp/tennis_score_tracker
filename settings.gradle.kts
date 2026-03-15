@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Tennis Score Tracker"
+rootProject.name = "TennisDroid"
 include(":app")

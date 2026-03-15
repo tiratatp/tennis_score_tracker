@@ -1,4 +1,4 @@
-# Tennis Score Tracker
+# TennisDroid
 
 A Native Android application built with Kotlin and Jetpack Compose designed to track tennis match scores using a bluetooth remote. 
 
