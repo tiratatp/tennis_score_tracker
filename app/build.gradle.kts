@@ -5,6 +5,22 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
 }
 
+fun gitVersionCode(): Int {
+    val result =
+        providers.exec {
+            commandLine("git", "tag", "--list", "v*")
+        }.standardOutput.asText.get().trim()
+    return if (result.isEmpty()) 1 else result.lines().size
+}
+
+fun gitVersionName(): String {
+    val result =
+        providers.exec {
+            commandLine("git", "describe", "--tags", "--always")
+        }.standardOutput.asText.get().trim()
+    return result.removePrefix("v").ifEmpty { "0.1" }
+}
+
 android {
     namespace = "com.nuttyknot.tennisscoretracker"
     compileSdk = 35
@@ -13,8 +29,8 @@ android {
         applicationId = "com.nuttyknot.tennisscoretracker"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1"
+        versionCode = gitVersionCode()
+        versionName = gitVersionName()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
