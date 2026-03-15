@@ -80,3 +80,10 @@ tasks.register<Exec>("run") {
     description = "Installs and runs the application"
     commandLine("adb", "shell", "am", "start", "-n", "${android.namespace}/.MainActivity")
 }
+
+// Ensure tests and linters run before the app is installed for debugging
+tasks.whenTaskAdded {
+    if (name == "installDebug") {
+        dependsOn("testDebugUnitTest", "ktlintCheck", "lintDebug")
+    }
+}

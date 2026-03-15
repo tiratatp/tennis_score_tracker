@@ -11,6 +11,8 @@ sealed class PlayerScore(val display: String, val tts: String = display) {
 
     object Advantage : PlayerScore("Ad", "Advantage")
 
+    data class TiebreakScore(val points: Int) : PlayerScore(points.toString(), if (points == 0) "Zero" else points.toString())
+
     override fun toString(): String = display
 }
 

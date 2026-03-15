@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -110,7 +109,10 @@ fun ScoreScreen(
     }
 }
 
-private fun formatGameStatus(state: TennisMatchState, isLandscape: Boolean): String {
+private fun formatGameStatus(
+    state: TennisMatchState,
+    isLandscape: Boolean,
+): String {
     return when {
         state.matchWinner != null -> "MATCH OVER"
         state.setWinner != null -> "SET OVER"
@@ -147,7 +149,7 @@ private fun LandscapeScoreContent(
         // User Score (Left)
         Box(
             modifier = Modifier.weight(1f).fillMaxHeight(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             ScoreColumn(
                 data =
@@ -168,7 +170,7 @@ private fun LandscapeScoreContent(
         // Opponent Score (Right)
         Box(
             modifier = Modifier.weight(1f).fillMaxHeight(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             ScoreColumn(
                 data =
@@ -204,7 +206,7 @@ private fun PortraitScoreContent(
         // User Score (Top)
         Box(
             modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             ScoreColumn(
                 data =
@@ -225,7 +227,7 @@ private fun PortraitScoreContent(
         // Opponent Score (Bottom)
         Box(
             modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             ScoreColumn(
                 data =
@@ -254,7 +256,7 @@ private fun ScoreColumn(
     if (isLandscape) {
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = data.score,
@@ -264,15 +266,16 @@ private fun ScoreColumn(
                 maxLines = 1,
                 softWrap = false,
             )
-            
+
             if (data.isServing) {
                 Text(
                     text = "●",
                     color = color,
                     fontSize = ScoreScreenConstants.INDICATOR_SIZE,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 16.dp)
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 16.dp),
                 )
             }
         }
@@ -280,21 +283,21 @@ private fun ScoreColumn(
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
             // We'll overlay the indicators relative to the Box's edges while keeping
             // the core text perfectly centered in its own layer.
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
                     modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.CenterEnd
+                    contentAlignment = Alignment.CenterEnd,
                 ) {
                     if (data.isServing && !data.isUser) {
                         Text(
                             text = "●",
                             color = color,
                             fontSize = ScoreScreenConstants.INDICATOR_SIZE,
-                            modifier = Modifier.padding(end = ScoreScreenConstants.SERVING_DOT_SPACING)
+                            modifier = Modifier.padding(end = ScoreScreenConstants.SERVING_DOT_SPACING),
                         )
                     }
                 }
@@ -312,14 +315,14 @@ private fun ScoreColumn(
 
                 Box(
                     modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.CenterStart
+                    contentAlignment = Alignment.CenterStart,
                 ) {
                     if (data.isServing && data.isUser) {
                         Text(
                             text = "●",
                             color = color,
                             fontSize = ScoreScreenConstants.INDICATOR_SIZE,
-                            modifier = Modifier.padding(start = ScoreScreenConstants.SERVING_DOT_SPACING)
+                            modifier = Modifier.padding(start = ScoreScreenConstants.SERVING_DOT_SPACING),
                         )
                     }
                 }

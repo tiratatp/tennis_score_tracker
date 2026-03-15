@@ -54,28 +54,29 @@ private data class KeycodeOption(
     val category: String,
 )
 
-private val KEYCODE_OPTIONS = listOf(
-    // Camera Shutter Buttons
-    KeycodeOption("Volume Up", KeyEvent.KEYCODE_VOLUME_UP, "Camera Shutter Buttons"),
-    KeycodeOption("Enter", KeyEvent.KEYCODE_ENTER, "Camera Shutter Buttons"),
-    KeycodeOption("Volume Down", KeyEvent.KEYCODE_VOLUME_DOWN, "Camera Shutter Buttons"),
-    // Media Remotes
-    KeycodeOption("Media Next", KeyEvent.KEYCODE_MEDIA_NEXT, "Media Remotes"),
-    KeycodeOption("Media Previous", KeyEvent.KEYCODE_MEDIA_PREVIOUS, "Media Remotes"),
-    KeycodeOption("Media Play/Pause", KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, "Media Remotes"),
-    KeycodeOption("Media Stop", KeyEvent.KEYCODE_MEDIA_STOP, "Media Remotes"),
-    // Presentation Clickers
-    KeycodeOption("Page Up", KeyEvent.KEYCODE_PAGE_UP, "Presentation Clickers"),
-    KeycodeOption("Page Down", KeyEvent.KEYCODE_PAGE_DOWN, "Presentation Clickers"),
-    KeycodeOption("D-Pad Left", KeyEvent.KEYCODE_DPAD_LEFT, "Presentation Clickers"),
-    KeycodeOption("D-Pad Right", KeyEvent.KEYCODE_DPAD_RIGHT, "Presentation Clickers"),
-    KeycodeOption("Space", KeyEvent.KEYCODE_SPACE, "Presentation Clickers"),
-    // VR / Mini Gamepads
-    KeycodeOption("Button A", KeyEvent.KEYCODE_BUTTON_A, "VR / Mini Gamepads"),
-    KeycodeOption("Button B", KeyEvent.KEYCODE_BUTTON_B, "VR / Mini Gamepads"),
-    KeycodeOption("Button C", KeyEvent.KEYCODE_BUTTON_C, "VR / Mini Gamepads"),
-    KeycodeOption("Escape", KeyEvent.KEYCODE_ESCAPE, "VR / Mini Gamepads"),
-)
+private val KEYCODE_OPTIONS =
+    listOf(
+        // Camera Shutter Buttons
+        KeycodeOption("Volume Up", KeyEvent.KEYCODE_VOLUME_UP, "Camera Shutter Buttons"),
+        KeycodeOption("Enter", KeyEvent.KEYCODE_ENTER, "Camera Shutter Buttons"),
+        KeycodeOption("Volume Down", KeyEvent.KEYCODE_VOLUME_DOWN, "Camera Shutter Buttons"),
+        // Media Remotes
+        KeycodeOption("Media Next", KeyEvent.KEYCODE_MEDIA_NEXT, "Media Remotes"),
+        KeycodeOption("Media Previous", KeyEvent.KEYCODE_MEDIA_PREVIOUS, "Media Remotes"),
+        KeycodeOption("Media Play/Pause", KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, "Media Remotes"),
+        KeycodeOption("Media Stop", KeyEvent.KEYCODE_MEDIA_STOP, "Media Remotes"),
+        // Presentation Clickers
+        KeycodeOption("Page Up", KeyEvent.KEYCODE_PAGE_UP, "Presentation Clickers"),
+        KeycodeOption("Page Down", KeyEvent.KEYCODE_PAGE_DOWN, "Presentation Clickers"),
+        KeycodeOption("D-Pad Left", KeyEvent.KEYCODE_DPAD_LEFT, "Presentation Clickers"),
+        KeycodeOption("D-Pad Right", KeyEvent.KEYCODE_DPAD_RIGHT, "Presentation Clickers"),
+        KeycodeOption("Space", KeyEvent.KEYCODE_SPACE, "Presentation Clickers"),
+        // VR / Mini Gamepads
+        KeycodeOption("Button A", KeyEvent.KEYCODE_BUTTON_A, "VR / Mini Gamepads"),
+        KeycodeOption("Button B", KeyEvent.KEYCODE_BUTTON_B, "VR / Mini Gamepads"),
+        KeycodeOption("Button C", KeyEvent.KEYCODE_BUTTON_C, "VR / Mini Gamepads"),
+        KeycodeOption("Escape", KeyEvent.KEYCODE_ESCAPE, "VR / Mini Gamepads"),
+    )
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -384,13 +385,15 @@ private fun KeycodeDropdown(
                             onKeycodeChange(option.code)
                             expanded = false
                         },
-                        colors = MenuDefaults.itemColors(
-                            textColor = if (option.code == currentKeycode) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurface
-                            },
-                        ),
+                        colors =
+                            MenuDefaults.itemColors(
+                                textColor =
+                                    if (option.code == currentKeycode) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
+                                    },
+                            ),
                     )
                 }
             }
