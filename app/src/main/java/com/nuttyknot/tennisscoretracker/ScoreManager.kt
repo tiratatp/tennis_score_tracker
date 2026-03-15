@@ -32,6 +32,11 @@ class ScoreManager {
         }
     }
 
+    fun reset() {
+        historyStack.clear()
+        _matchState.value = TennisMatchState()
+    }
+
     private fun calculateNextState(currentState: TennisMatchState, userScored: Boolean): TennisMatchState {
         val scoringPlayerScore = if (userScored) currentState.userScore else currentState.opponentScore
         val otherPlayerScore = if (userScored) currentState.opponentScore else currentState.userScore

@@ -3,6 +3,7 @@ package com.nuttyknot.tennisscoretracker.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -34,6 +35,13 @@ fun ScoreScreen(
             TopAppBar(
                 title = { Text("Tennis Score Tracker", color = White) },
                 actions = {
+                    IconButton(onClick = { scoreManager.reset() }) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Reset",
+                            tint = Yellow
+                        )
+                    }
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(
                             imageVector = Icons.Default.Settings,

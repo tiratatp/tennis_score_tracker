@@ -72,4 +72,26 @@ class ScoreManagerTest {
         manager.undo() // User: Love
         assertEquals(PlayerScore.Love, manager.matchState.value.userScore)
     }
+
+    @Test
+    fun testReset() {
+        val manager = ScoreManager()
+        manager.incrementUserScore() // User: 15
+        manager.incrementOpponentScore() // Opponent: 15
+        manager.incrementUserScore() // User: 30
+        
+        manager.reset()
+        
+        assertEquals(PlayerScore.Love, manager.matchState.value.userScore)
+        assertEquals(PlayerScore.Love, manager.matchState.value.opponentScore)
+        assertEquals(0, manager.matchState.value.userGames)
+        assertEquals(0, manager.matchState.value.opponentGames)
+        assertEquals(0, manager.matchState.value.userSets)
+        assertEquals(0, manager.matchState.value.opponentSets)
+        assertFalse(manager.matchState.value.isDeuce)
+        
+        // Ensure history is cleared by checking undo doesn't do anything (or doesn't crash)
+        manager.undo()
+        assertEquals(PlayerScore.Love, manager.matchState.value.userScore)
+    }
 }
