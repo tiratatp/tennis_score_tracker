@@ -123,7 +123,7 @@ private fun ScoreScreenContent(
                     )
                 },
     ) {
-        val gameStatus = formatGameStatus(state, isLandscape)
+        val gameStatus = formatGameStatus(state)
 
         if (isLandscape) {
             LandscapeScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, scoreManager)
@@ -133,23 +133,13 @@ private fun ScoreScreenContent(
     }
 }
 
-private fun formatGameStatus(
-    state: TennisMatchState,
-    isLandscape: Boolean,
-): String {
+private fun formatGameStatus(state: TennisMatchState): String {
     return when {
         state.matchWinner != null -> "MATCH OVER"
         state.setWinner != null -> "SET OVER"
         state.isDeuce -> "DEUCE"
-        else -> {
-            if (isLandscape) {
-                "Sets: ${state.userSets} - ${state.opponentSets}\n" +
-                    "Games: ${state.userGames} - ${state.opponentGames}"
-            } else {
-                "Sets: ${state.userSets} - ${state.opponentSets}  |  " +
-                    "Games: ${state.userGames} - ${state.opponentGames}"
-            }
-        }
+        else ->
+            "S ${state.userSets}-${state.opponentSets}  G ${state.userGames}-${state.opponentGames}"
     }
 }
 
@@ -224,7 +214,7 @@ private fun PortraitScoreContent(
     scoreManager: ScoreManager,
 ) {
     val rawSize = maxHeight / ScoreScreenConstants.PORTRAIT_TEXT_SIZE_RATIO.toFloat()
-    val maxSafeSize = maxWidth / 2.0f
+    val maxSafeSize = maxWidth / ScoreScreenConstants.PORTRAIT_MAX_SAFE_SIZE_FACTOR
     val mainTextSize = minOf(rawSize, maxSafeSize).sp
     Column(
         modifier = Modifier.fillMaxSize(),

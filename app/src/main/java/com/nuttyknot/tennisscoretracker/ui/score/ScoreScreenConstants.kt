@@ -24,16 +24,16 @@ object ScoreScreenConstants {
             Font(googleFont = fontName, fontProvider = fontProvider, weight = FontWeight.Black),
         )
 
-    const val LANDSCAPE_TEXT_SIZE_RATIO = 1.5
-    const val PORTRAIT_TEXT_SIZE_RATIO = 3.0
+    const val LANDSCAPE_TEXT_SIZE_RATIO = 1.3
+    const val PORTRAIT_TEXT_SIZE_RATIO = 1.1
     val MIDDLE_COLUMN_WIDTH = 180.dp
-    val STATUS_TEXT_SIZE_LANDSCAPE = 22.sp
-    val STATUS_TEXT_SIZE_PORTRAIT = 28.sp
+    val STATUS_TEXT_SIZE_LANDSCAPE = 18.sp
+    val STATUS_TEXT_SIZE_PORTRAIT = 24.sp
     val NAME_TEXT_SIZE = 24.sp
-    val INDICATOR_SIZE = 24.sp
     const val NAME_ALPHA = 0.7f
-    val SERVING_DOT_SPACING = 16.dp
+    val SERVING_DOT_RADIUS = 8.dp
     val VERTICAL_SPACING_LARGE = 32.dp
     val VERTICAL_SPACING_MEDIUM = 16.dp
+    const val PORTRAIT_MAX_SAFE_SIZE_FACTOR = 1.5f
     const val LANDSCAPE_MAX_SAFE_SIZE_FACTOR = 2.5f
 }
