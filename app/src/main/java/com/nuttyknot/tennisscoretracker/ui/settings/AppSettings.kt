@@ -38,7 +38,11 @@ fun AppSettings(data: AppSettingsData) {
         currentKeycode = data.currentKeycode,
         onKeycodeChange = data.onKeycodeChange,
     )
+}
 
+@Suppress("FunctionName")
+@Composable
+fun LatencySettings(data: AppSettingsData) {
     SettingsItem(
         label = "Double Click Latency (ms)",
         value = data.currentDoubleClick.toString(),

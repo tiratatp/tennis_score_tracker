@@ -151,8 +151,15 @@ private fun SettingsLayout(
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        PlayerSettings(playerData)
-        AppSettings(appData)
+        SettingsSection(title = "Players") {
+            PlayerSettings(playerData)
+        }
+        SettingsSection(title = "App") {
+            AppSettings(appData)
+        }
+        CollapsibleSettingsSection(title = "Advanced") {
+            LatencySettings(appData)
+        }
         Spacer(modifier = Modifier.height(32.dp))
         Text(
             text = "made with ♥ by NuttyKnot",
