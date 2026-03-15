@@ -1,4 +1,4 @@
-package com.nuttyknot.tennisscoretracker.ui
+package com.nuttyknot.tennisscoretracker.ui.score
 
 import android.content.res.Configuration
 import androidx.compose.foundation.gestures.detectTapGestures

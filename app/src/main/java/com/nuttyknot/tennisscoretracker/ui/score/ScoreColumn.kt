@@ -1,4 +1,4 @@
-package com.nuttyknot.tennisscoretracker.ui
+package com.nuttyknot.tennisscoretracker.ui.score
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
@@ -11,134 +11,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.googlefonts.Font
-import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.nuttyknot.tennisscoretracker.R
 import com.nuttyknot.tennisscoretracker.TennisMatchState
-import com.nuttyknot.tennisscoretracker.ui.theme.Black
-import com.nuttyknot.tennisscoretracker.ui.theme.White
-
-object ScoreScreenConstants {
-    private val fontProvider =
-        GoogleFont.Provider(
-            providerAuthority = "com.google.android.gms.fonts",
-            providerPackage = "com.google.android.gms",
-            certificates = R.array.com_google_android_gms_fonts_certs,
-        )
-
-    private val fontName = GoogleFont("JetBrains Mono")
-
-    val JetBrainsMonoFamily =
-        FontFamily(
-            Font(googleFont = fontName, fontProvider = fontProvider, weight = FontWeight.ExtraBold),
-            Font(googleFont = fontName, fontProvider = fontProvider, weight = FontWeight.Black),
-        )
-
-    const val LANDSCAPE_TEXT_SIZE_RATIO = 1.5
-    const val PORTRAIT_TEXT_SIZE_RATIO = 3.0
-    val MIDDLE_COLUMN_WIDTH = 180.dp
-    val STATUS_TEXT_SIZE_LANDSCAPE = 22.sp
-    val STATUS_TEXT_SIZE_PORTRAIT = 28.sp
-    val NAME_TEXT_SIZE = 24.sp
-    val INDICATOR_SIZE = 24.sp
-    const val NAME_ALPHA = 0.7f
-    val SERVING_DOT_SPACING = 16.dp
-    val VERTICAL_SPACING_LARGE = 32.dp
-    val VERTICAL_SPACING_MEDIUM = 16.dp
-    const val LANDSCAPE_MAX_SAFE_SIZE_FACTOR = 2.5f
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Suppress("FunctionName")
-@Composable
-fun ScoreTopBar(
-    onNavigateToHelp: () -> Unit,
-    onNavigateToSettings: () -> Unit,
-    onResetClick: () -> Unit,
-) {
-    TopAppBar(
-        title = { Text("Tennis Score Tracker", color = White) },
-        actions = {
-            IconButton(onClick = onNavigateToHelp) {
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = "Help",
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            }
-            IconButton(onClick = onResetClick) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Reset",
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            }
-            IconButton(onClick = onNavigateToSettings) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-    )
-}
-
-@Suppress("FunctionName")
-@Composable
-fun ResetConfirmationDialog(
-    showDialog: Boolean,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Reset Score?") },
-            text = { Text("Are you sure you want to reset the current match score?") },
-            confirmButton = {
-                TextButton(onClick = onConfirm) {
-                    Text("RESET", color = MaterialTheme.colorScheme.primary)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text("CANCEL", color = MaterialTheme.colorScheme.onBackground)
-                }
-            },
-            containerColor = Black,
-            titleContentColor = White,
-            textContentColor = White,
-        )
-    }
-}
 
 @Suppress("FunctionName")
 @Composable

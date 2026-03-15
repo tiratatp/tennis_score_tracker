@@ -1,4 +1,4 @@
-package com.nuttyknot.tennisscoretracker.ui
+package com.nuttyknot.tennisscoretracker.ui.help
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

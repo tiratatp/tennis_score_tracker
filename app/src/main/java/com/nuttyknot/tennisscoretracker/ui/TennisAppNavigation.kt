@@ -11,6 +11,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.nuttyknot.tennisscoretracker.ScoreManager
 import com.nuttyknot.tennisscoretracker.SettingsManager
+import com.nuttyknot.tennisscoretracker.ui.help.HelpScreen
+import com.nuttyknot.tennisscoretracker.ui.score.ScoreScreen
+import com.nuttyknot.tennisscoretracker.ui.settings.SettingsScreen
 import kotlinx.coroutines.launch
 
 @Suppress("FunctionNaming", "ktlint:standard:function-naming")
