@@ -36,7 +36,7 @@ fun ScoreScreen(
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = "Settings",
-                            tint = White
+                            tint = Yellow
                         )
                     }
                 },
