@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.TennisScoreTracker" parent="android:Theme.Material.NoActionBar">
+        <!-- Optional: Customize your theme here -->
+    </style>
+</resources>
