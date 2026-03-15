@@ -22,6 +22,7 @@ class SettingsManager(private val context: Context) {
         val USER_NAME = androidx.datastore.preferences.core.stringPreferencesKey("user_name")
         val OPPONENT_NAME = androidx.datastore.preferences.core.stringPreferencesKey("opponent_name")
         val INITIAL_SERVER_IS_USER = androidx.datastore.preferences.core.booleanPreferencesKey("initial_server_is_user")
+        val HAS_SEEN_HELP = androidx.datastore.preferences.core.booleanPreferencesKey("has_seen_help")
 
         const val DEFAULT_KEYCODE = KeyEvent.KEYCODE_VOLUME_UP
         const val DEFAULT_DOUBLE_CLICK_LATENCY = 300L
@@ -29,6 +30,7 @@ class SettingsManager(private val context: Context) {
         const val DEFAULT_USER_NAME = ""
         const val DEFAULT_OPPONENT_NAME = ""
         const val DEFAULT_INITIAL_SERVER_IS_USER = true
+        const val DEFAULT_HAS_SEEN_HELP = false
     }
 
     val keycodeFlow: Flow<Int> =
@@ -59,6 +61,11 @@ class SettingsManager(private val context: Context) {
     val initialServerIsUserFlow: Flow<Boolean> =
         context.dataStore.data.map { preferences ->
             preferences[INITIAL_SERVER_IS_USER] ?: DEFAULT_INITIAL_SERVER_IS_USER
+        }
+
+    val hasSeenHelpFlow: Flow<Boolean> =
+        context.dataStore.data.map { preferences ->
+            preferences[HAS_SEEN_HELP] ?: DEFAULT_HAS_SEEN_HELP
         }
 
     suspend fun updateKeycode(keycode: Int) {
@@ -94,6 +101,12 @@ class SettingsManager(private val context: Context) {
     suspend fun updateInitialServerIsUser(isUser: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[INITIAL_SERVER_IS_USER] = isUser
+        }
+    }
+
+    suspend fun updateHasSeenHelp(hasSeen: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[HAS_SEEN_HELP] = hasSeen
         }
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -62,6 +63,7 @@ private object ScoreScreenConstants {
 fun ScoreScreen(
     scoreManager: ScoreManager,
     onNavigateToSettings: () -> Unit,
+    onNavigateToHelp: () -> Unit,
 ) {
     val state by scoreManager.matchState.collectAsState()
     val configuration = LocalConfiguration.current
@@ -72,6 +74,13 @@ fun ScoreScreen(
             TopAppBar(
                 title = { Text("Tennis Score Tracker", color = White) },
                 actions = {
+                    IconButton(onClick = onNavigateToHelp) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Help",
+                            tint = Yellow,
+                        )
+                    }
                     IconButton(onClick = { scoreManager.reset() }) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
