@@ -8,11 +8,36 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalView
+import com.nuttyknot.tennisscoretracker.AppTheme
 
-private val DarkColorScheme =
+private val GrandSlamColorScheme =
     darkColorScheme(
-        primary = Yellow,
-        secondary = White,
+        primary = GrandSlamYellow,
+        secondary = GrandSlamWhite,
+        background = Black,
+        surface = Black,
+        onPrimary = Black,
+        onSecondary = Black,
+        onBackground = White,
+        onSurface = White,
+    )
+
+private val MiamiNightColorScheme =
+    darkColorScheme(
+        primary = MiamiCyan,
+        secondary = MiamiMagenta,
+        background = Black,
+        surface = Black,
+        onPrimary = Black,
+        onSecondary = Black,
+        onBackground = White,
+        onSurface = White,
+    )
+
+private val ColorblindSafeColorScheme =
+    darkColorScheme(
+        primary = ColorblindOrange,
+        secondary = ColorblindBlue,
         background = Black,
         surface = Black,
         onPrimary = Black,
@@ -23,8 +48,16 @@ private val DarkColorScheme =
 
 @Suppress("FunctionName")
 @Composable
-fun TennisScoreTrackerTheme(content: @Composable () -> Unit) {
-    val colorScheme = DarkColorScheme
+fun TennisScoreTrackerTheme(
+    appTheme: AppTheme = AppTheme.COLORBLIND_SAFE,
+    content: @Composable () -> Unit,
+) {
+    val colorScheme =
+        when (appTheme) {
+            AppTheme.GRAND_SLAM -> GrandSlamColorScheme
+            AppTheme.MIAMI_NIGHT -> MiamiNightColorScheme
+            AppTheme.COLORBLIND_SAFE -> ColorblindSafeColorScheme
+        }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {

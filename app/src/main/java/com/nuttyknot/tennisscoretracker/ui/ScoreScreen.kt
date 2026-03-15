@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,9 +28,6 @@ import androidx.compose.ui.unit.sp
 import com.nuttyknot.tennisscoretracker.ScoreManager
 import com.nuttyknot.tennisscoretracker.SettingsManager
 import com.nuttyknot.tennisscoretracker.TennisMatchState
-import com.nuttyknot.tennisscoretracker.ui.theme.Black
-import com.nuttyknot.tennisscoretracker.ui.theme.White
-import com.nuttyknot.tennisscoretracker.ui.theme.Yellow
 
 // Constants moved to ScoreComponents.kt
 
@@ -74,7 +72,7 @@ fun ScoreScreen(
                 },
             )
         },
-        containerColor = Black,
+        containerColor = MaterialTheme.colorScheme.background,
     ) { paddingValues ->
         ScoreScreenContent(
             state = state,
@@ -188,7 +186,7 @@ private fun LandscapeScoreContent(
                         isUser = true,
                     ),
                 mainTextSize = mainTextSize,
-                color = Yellow,
+                color = MaterialTheme.colorScheme.primary,
                 alignment = Alignment.CenterStart,
             )
         }
@@ -209,7 +207,7 @@ private fun LandscapeScoreContent(
                         isServing = !state.isUserServing,
                     ),
                 mainTextSize = mainTextSize,
-                color = White,
+                color = MaterialTheme.colorScheme.secondary,
                 alignment = Alignment.CenterEnd,
             )
         }
@@ -247,7 +245,7 @@ private fun PortraitScoreContent(
                         isUser = true,
                     ),
                 mainTextSize = mainTextSize,
-                color = Yellow,
+                color = MaterialTheme.colorScheme.primary,
             )
         }
 
@@ -267,7 +265,7 @@ private fun PortraitScoreContent(
                         isServing = !state.isUserServing,
                     ),
                 mainTextSize = mainTextSize,
-                color = White,
+                color = MaterialTheme.colorScheme.secondary,
             )
         }
     }

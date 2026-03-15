@@ -23,6 +23,7 @@ class SettingsManager(private val context: Context) {
         val OPPONENT_NAME = androidx.datastore.preferences.core.stringPreferencesKey("opponent_name")
         val INITIAL_SERVER_IS_USER = androidx.datastore.preferences.core.booleanPreferencesKey("initial_server_is_user")
         val HAS_SEEN_HELP = androidx.datastore.preferences.core.booleanPreferencesKey("has_seen_help")
+        val APP_THEME = androidx.datastore.preferences.core.stringPreferencesKey("app_theme")
 
         const val DEFAULT_KEYCODE = KeyEvent.KEYCODE_VOLUME_UP
         const val DEFAULT_DOUBLE_CLICK_LATENCY = 300L
@@ -31,6 +32,7 @@ class SettingsManager(private val context: Context) {
         const val DEFAULT_OPPONENT_NAME = ""
         const val DEFAULT_INITIAL_SERVER_IS_USER = true
         const val DEFAULT_HAS_SEEN_HELP = false
+        val DEFAULT_APP_THEME = AppTheme.COLORBLIND_SAFE
     }
 
     val keycodeFlow: Flow<Int> =
@@ -66,6 +68,12 @@ class SettingsManager(private val context: Context) {
     val hasSeenHelpFlow: Flow<Boolean> =
         context.dataStore.data.map { preferences ->
             preferences[HAS_SEEN_HELP] ?: DEFAULT_HAS_SEEN_HELP
+        }
+
+    val appThemeFlow: Flow<AppTheme> =
+        context.dataStore.data.map { preferences ->
+            val themeName = preferences[APP_THEME] ?: DEFAULT_APP_THEME.name
+            AppTheme.entries.find { it.name == themeName } ?: DEFAULT_APP_THEME
         }
 
     suspend fun updateKeycode(keycode: Int) {
@@ -109,4 +117,16 @@ class SettingsManager(private val context: Context) {
             preferences[HAS_SEEN_HELP] = hasSeen
         }
     }
+
+    suspend fun updateAppTheme(theme: AppTheme) {
+        context.dataStore.edit { preferences ->
+            preferences[APP_THEME] = theme.name
+        }
+    }
+}
+
+enum class AppTheme(val displayName: String) {
+    GRAND_SLAM("The Grand Slam (Yellow & White)"),
+    MIAMI_NIGHT("Miami Night (Cyan & Magenta)"),
+    COLORBLIND_SAFE("Colorblind Safe (Orange & Blue)"),
 }

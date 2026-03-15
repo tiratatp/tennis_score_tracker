@@ -1,0 +1,481 @@
+package com.nuttyknot.tennisscoretracker.ui
+
+import android.view.KeyEvent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuBoxScope
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import com.nuttyknot.tennisscoretracker.AppTheme
+
+@Suppress("FunctionName")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsTopBar(onNavigateBack: () -> Unit) {
+    TopAppBar(
+        title = { Text("Settings", color = MaterialTheme.colorScheme.onBackground) },
+        navigationIcon = {
+            IconButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = @Suppress("DEPRECATION") Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onBackground,
+                )
+            }
+        },
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background,
+            ),
+    )
+}
+
+@Suppress("FunctionName")
+@Composable
+fun PlayerSettings(data: PlayerSettingsData) {
+    SettingsItem(
+        label = "User Name",
+        value = data.userName,
+        onValueChange = data.onUserNameChange,
+        description = "Your name for announcements.",
+        config =
+            SettingsItemConfig(
+                keyboardType = KeyboardType.Text,
+                validate = { v ->
+                    when {
+                        v.length > 30 -> "Name must be 30 characters or less"
+                        else -> null
+                    }
+                },
+            ),
+    )
+
+    SettingsItem(
+        label = "Opponent Name",
+        value = data.opponentName,
+        onValueChange = data.onOpponentNameChange,
+        description = "Opponent's name for announcements.",
+        config =
+            SettingsItemConfig(
+                keyboardType = KeyboardType.Text,
+                validate = { v ->
+                    when {
+                        v.length > 30 -> "Name must be 30 characters or less"
+                        else -> null
+                    }
+                },
+            ),
+    )
+
+    SettingsToggle(
+        label = "User starts serving",
+        checked = data.initialServerIsUser,
+        onCheckedChange = data.onInitialServerChange,
+    )
+}
+
+@Suppress("FunctionName")
+@Composable
+fun AppSettings(data: AppSettingsData) {
+    ThemeDropdown(
+        currentTheme = data.currentTheme,
+        onThemeChange = data.onThemeChange,
+    )
+
+    KeycodeDropdown(
+        currentKeycode = data.currentKeycode,
+        onKeycodeChange = data.onKeycodeChange,
+    )
+
+    SettingsItem(
+        label = "Double Click Latency (ms)",
+        value = data.currentDoubleClick.toString(),
+        onValueChange = data.onDoubleClickChange,
+        description = "Max time window for a double click. Default is 300.",
+        config =
+            SettingsItemConfig(
+                validate = { v ->
+                    val num = v.toLongOrNull()
+                    when {
+                        v.isBlank() -> "Latency is required"
+                        num == null -> "Must be a valid number"
+                        num < 100 -> "Must be at least 100 ms"
+                        num > 1000 -> "Must be 1000 ms or less"
+                        else -> null
+                    }
+                },
+            ),
+    )
+
+    SettingsItem(
+        label = "Long Press Latency (ms)",
+        value = data.currentLongPress.toString(),
+        onValueChange = data.onLongPressChange,
+        description = "Min time window to trigger long press. Default is 1000.",
+        config =
+            SettingsItemConfig(
+                keyboardType = KeyboardType.Number,
+                validate = { v ->
+                    val num = v.toLongOrNull()
+                    when {
+                        v.isBlank() -> "Latency is required"
+                        num == null -> "Must be a valid number"
+                        num < 300 -> "Must be at least 300 ms"
+                        num > 3000 -> "Must be 3000 ms or less"
+                        num <= data.currentDoubleClick ->
+                            "Must be greater than double click latency (${data.currentDoubleClick} ms)"
+                        else -> null
+                    }
+                },
+            ),
+    )
+}
+
+@Suppress("FunctionName")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ThemeDropdown(
+    currentTheme: AppTheme,
+    onThemeChange: (AppTheme) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column {
+        Text(
+            text = "Color Scheme",
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+        ) {
+            OutlinedTextField(
+                value = currentTheme.displayName,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    ),
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                AppTheme.entries.forEach { theme ->
+                    DropdownMenuItem(
+                        text = { Text(theme.displayName) },
+                        onClick = {
+                            onThemeChange(theme)
+                            expanded = false
+                        },
+                        colors =
+                            MenuDefaults.itemColors(
+                                textColor =
+                                    if (theme == currentTheme) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
+                                    },
+                            ),
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = "Choose a color scheme that suits your style or visibility needs.",
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+@Suppress("FunctionName")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun KeycodeDropdown(
+    currentKeycode: Int,
+    onKeycodeChange: (Int) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val selectedOption = KEYCODE_OPTIONS.find { it.code == currentKeycode }
+    val displayText = selectedOption?.let { "${it.name} (${it.code})" } ?: "Unknown ($currentKeycode)"
+
+    Column {
+        Text(
+            text = "Target KeyCode",
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+        ) {
+            OutlinedTextField(
+                value = displayText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    ),
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+            )
+            if (expanded) {
+                KeycodeMenu(
+                    currentKeycode = currentKeycode,
+                    onKeycodeChange = onKeycodeChange,
+                    onDismiss = { expanded = false },
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = "Select the button your Bluetooth remote sends.",
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+@Suppress("FunctionName")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExposedDropdownMenuBoxScope.KeycodeMenu(
+    currentKeycode: Int,
+    onKeycodeChange: (Int) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ExposedDropdownMenu(
+        expanded = true,
+        onDismissRequest = onDismiss,
+    ) {
+        var lastCategory = ""
+        KEYCODE_OPTIONS.forEach { option ->
+            if (option.category != lastCategory) {
+                lastCategory = option.category
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = lastCategory,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    onClick = {},
+                    enabled = false,
+                )
+            }
+            DropdownMenuItem(
+                text = { Text("${option.name} (${option.code})") },
+                onClick = {
+                    onKeycodeChange(option.code)
+                    onDismiss()
+                },
+                colors =
+                    MenuDefaults.itemColors(
+                        textColor =
+                            if (option.code == currentKeycode) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
+                    ),
+            )
+        }
+    }
+}
+
+@Suppress("FunctionName")
+@Composable
+fun SettingsItem(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    description: String,
+    config: SettingsItemConfig = SettingsItemConfig(),
+) {
+    var localValue by remember(value) { mutableStateOf(value) }
+    val errorMessage = config.validate?.invoke(localValue)
+    val hasError = errorMessage != null
+    Column {
+        Text(
+            text = label,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        OutlinedTextField(
+            value = localValue,
+            onValueChange = { newValue ->
+                localValue = newValue
+                val isValid = config.validate?.invoke(newValue) == null
+                if (isValid) {
+                    onValueChange(newValue)
+                }
+            },
+            isError = hasError,
+            keyboardOptions = KeyboardOptions(keyboardType = config.keyboardType),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    focusedBorderColor =
+                        if (hasError) Color.Red else MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor =
+                        if (hasError) {
+                            Color.Red
+                        } else {
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                        },
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    errorBorderColor = Color.Red,
+                ),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        if (hasError) {
+            Text(
+                text = errorMessage!!,
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+        }
+        Text(
+            text = description,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+@Suppress("FunctionName")
+@Composable
+fun SettingsToggle(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors =
+                SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                    checkedTrackColor = MaterialTheme.colorScheme.primary,
+                    uncheckedThumbColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    uncheckedTrackColor = MaterialTheme.colorScheme.background,
+                ),
+        )
+    }
+}
+
+data class KeycodeOption(
+    val name: String,
+    val code: Int,
+    val category: String,
+)
+
+val KEYCODE_OPTIONS =
+    listOf(
+        // Camera Shutter Buttons
+        KeycodeOption("Volume Up", KeyEvent.KEYCODE_VOLUME_UP, "Camera Shutter Buttons"),
+        KeycodeOption("Enter", KeyEvent.KEYCODE_ENTER, "Camera Shutter Buttons"),
+        KeycodeOption("Volume Down", KeyEvent.KEYCODE_VOLUME_DOWN, "Camera Shutter Buttons"),
+        // Media Remotes
+        KeycodeOption("Media Next", KeyEvent.KEYCODE_MEDIA_NEXT, "Media Remotes"),
+        KeycodeOption("Media Previous", KeyEvent.KEYCODE_MEDIA_PREVIOUS, "Media Remotes"),
+        KeycodeOption("Media Play/Pause", KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, "Media Remotes"),
+        KeycodeOption("Media Stop", KeyEvent.KEYCODE_MEDIA_STOP, "Media Remotes"),
+        // Presentation Clickers
+        KeycodeOption("Page Up", KeyEvent.KEYCODE_PAGE_UP, "Presentation Clickers"),
+        KeycodeOption("Page Down", KeyEvent.KEYCODE_PAGE_DOWN, "Presentation Clickers"),
+        KeycodeOption("D-Pad Left", KeyEvent.KEYCODE_DPAD_LEFT, "Presentation Clickers"),
+        KeycodeOption("D-Pad Right", KeyEvent.KEYCODE_DPAD_RIGHT, "Presentation Clickers"),
+        KeycodeOption("Space", KeyEvent.KEYCODE_SPACE, "Presentation Clickers"),
+        // VR / Mini Gamepads
+        KeycodeOption("Button A", KeyEvent.KEYCODE_BUTTON_A, "VR / Mini Gamepads"),
+        KeycodeOption("Button B", KeyEvent.KEYCODE_BUTTON_B, "VR / Mini Gamepads"),
+        KeycodeOption("Button C", KeyEvent.KEYCODE_BUTTON_C, "VR / Mini Gamepads"),
+        KeycodeOption("Escape", KeyEvent.KEYCODE_ESCAPE, "VR / Mini Gamepads"),
+    )
+
+data class PlayerSettingsData(
+    val userName: String,
+    val opponentName: String,
+    val initialServerIsUser: Boolean,
+    val onUserNameChange: (String) -> Unit,
+    val onOpponentNameChange: (String) -> Unit,
+    val onInitialServerChange: (Boolean) -> Unit,
+)
+
+data class AppSettingsData(
+    val currentKeycode: Int,
+    val currentDoubleClick: Long,
+    val currentLongPress: Long,
+    val currentTheme: AppTheme,
+    val onKeycodeChange: (Int) -> Unit,
+    val onDoubleClickChange: (String) -> Unit,
+    val onLongPressChange: (String) -> Unit,
+    val onThemeChange: (AppTheme) -> Unit,
+)
+
+data class SettingsItemConfig(
+    val keyboardType: KeyboardType = KeyboardType.Number,
+    val validate: ((String) -> String?)? = null,
+)

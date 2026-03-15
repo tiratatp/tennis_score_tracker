@@ -21,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -42,7 +43,6 @@ import com.nuttyknot.tennisscoretracker.R
 import com.nuttyknot.tennisscoretracker.TennisMatchState
 import com.nuttyknot.tennisscoretracker.ui.theme.Black
 import com.nuttyknot.tennisscoretracker.ui.theme.White
-import com.nuttyknot.tennisscoretracker.ui.theme.Yellow
 
 object ScoreScreenConstants {
     private val fontProvider =
@@ -89,25 +89,25 @@ fun ScoreTopBar(
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = "Help",
-                    tint = Yellow,
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             }
             IconButton(onClick = onResetClick) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
                     contentDescription = "Reset",
-                    tint = Yellow,
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             }
             IconButton(onClick = onNavigateToSettings) {
                 Icon(
                     imageVector = Icons.Default.Settings,
                     contentDescription = "Settings",
-                    tint = Yellow,
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Black),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
     )
 }
 
@@ -125,12 +125,12 @@ fun ResetConfirmationDialog(
             text = { Text("Are you sure you want to reset the current match score?") },
             confirmButton = {
                 TextButton(onClick = onConfirm) {
-                    Text("RESET", color = Yellow)
+                    Text("RESET", color = MaterialTheme.colorScheme.primary)
                 }
             },
             dismissButton = {
                 TextButton(onClick = onDismiss) {
-                    Text("CANCEL", color = White)
+                    Text("CANCEL", color = MaterialTheme.colorScheme.onBackground)
                 }
             },
             containerColor = Black,
@@ -167,7 +167,7 @@ fun StatusColumn(
     ) {
         Text(
             text = gameStatus,
-            color = Yellow,
+            color = MaterialTheme.colorScheme.primary,
             fontSize = fontSize,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -176,7 +176,11 @@ fun StatusColumn(
             Spacer(modifier = Modifier.height(ScoreScreenConstants.VERTICAL_SPACING_MEDIUM))
             Button(
                 onClick = { scoreManager.startNextSet() },
-                colors = ButtonDefaults.buttonColors(containerColor = Yellow, contentColor = Black),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
             ) {
                 Text("START NEXT SET")
             }
