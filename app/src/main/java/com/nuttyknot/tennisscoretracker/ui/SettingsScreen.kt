@@ -224,6 +224,13 @@ private fun SettingsLayout(
     ) {
         PlayerSettings(playerData)
         AppSettings(appData)
+        Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            text = "made with ♥ by NuttyKnot",
+            color = White.copy(alpha = 0.5f),
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
     }
 }
 
