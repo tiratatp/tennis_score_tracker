@@ -9,13 +9,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -27,15 +34,48 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.nuttyknot.tennisscoretracker.SettingsManager
 import com.nuttyknot.tennisscoretracker.ui.theme.Black
 import com.nuttyknot.tennisscoretracker.ui.theme.White
 import kotlinx.coroutines.launch
+
+private data class KeycodeOption(
+    val name: String,
+    val code: Int,
+    val category: String,
+)
+
+private val KEYCODE_OPTIONS = listOf(
+    // Camera Shutter Buttons
+    KeycodeOption("Volume Up", KeyEvent.KEYCODE_VOLUME_UP, "Camera Shutter Buttons"),
+    KeycodeOption("Enter", KeyEvent.KEYCODE_ENTER, "Camera Shutter Buttons"),
+    KeycodeOption("Volume Down", KeyEvent.KEYCODE_VOLUME_DOWN, "Camera Shutter Buttons"),
+    // Media Remotes
+    KeycodeOption("Media Next", KeyEvent.KEYCODE_MEDIA_NEXT, "Media Remotes"),
+    KeycodeOption("Media Previous", KeyEvent.KEYCODE_MEDIA_PREVIOUS, "Media Remotes"),
+    KeycodeOption("Media Play/Pause", KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, "Media Remotes"),
+    KeycodeOption("Media Stop", KeyEvent.KEYCODE_MEDIA_STOP, "Media Remotes"),
+    // Presentation Clickers
+    KeycodeOption("Page Up", KeyEvent.KEYCODE_PAGE_UP, "Presentation Clickers"),
+    KeycodeOption("Page Down", KeyEvent.KEYCODE_PAGE_DOWN, "Presentation Clickers"),
+    KeycodeOption("D-Pad Left", KeyEvent.KEYCODE_DPAD_LEFT, "Presentation Clickers"),
+    KeycodeOption("D-Pad Right", KeyEvent.KEYCODE_DPAD_RIGHT, "Presentation Clickers"),
+    KeycodeOption("Space", KeyEvent.KEYCODE_SPACE, "Presentation Clickers"),
+    // VR / Mini Gamepads
+    KeycodeOption("Button A", KeyEvent.KEYCODE_BUTTON_A, "VR / Mini Gamepads"),
+    KeycodeOption("Button B", KeyEvent.KEYCODE_BUTTON_B, "VR / Mini Gamepads"),
+    KeycodeOption("Button C", KeyEvent.KEYCODE_BUTTON_C, "VR / Mini Gamepads"),
+    KeycodeOption("Escape", KeyEvent.KEYCODE_ESCAPE, "VR / Mini Gamepads"),
+)
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -147,10 +187,8 @@ private fun buildSettingsData(
             currentKeycode = state.currentKeycode,
             currentDoubleClick = state.currentDoubleClick,
             currentLongPress = state.currentLongPress,
-            onKeycodeChange = { v ->
-                v.toIntOrNull()?.let {
-                    coroutineScope.launch { settingsManager.updateKeycode(it) }
-                }
+            onKeycodeChange = { code ->
+                coroutineScope.launch { settingsManager.updateKeycode(code) }
             },
             onDoubleClickChange = { v ->
                 v.toLongOrNull()?.let {
@@ -178,6 +216,7 @@ private fun SettingsLayout(
             Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -199,7 +238,7 @@ private data class AppSettingsData(
     val currentKeycode: Int,
     val currentDoubleClick: Long,
     val currentLongPress: Long,
-    val onKeycodeChange: (String) -> Unit,
+    val onKeycodeChange: (Int) -> Unit,
     val onDoubleClickChange: (String) -> Unit,
     val onLongPressChange: (String) -> Unit,
 )
@@ -213,6 +252,12 @@ private fun PlayerSettings(data: PlayerSettingsData) {
         onValueChange = data.onUserNameChange,
         description = "Your name for announcements.",
         keyboardType = KeyboardType.Text,
+        validate = { v ->
+            when {
+                v.length > 30 -> "Name must be 30 characters or less"
+                else -> null
+            }
+        },
     )
 
     SettingsItem(
@@ -221,6 +266,12 @@ private fun PlayerSettings(data: PlayerSettingsData) {
         onValueChange = data.onOpponentNameChange,
         description = "Opponent's name for announcements.",
         keyboardType = KeyboardType.Text,
+        validate = { v ->
+            when {
+                v.length > 30 -> "Name must be 30 characters or less"
+                else -> null
+            }
+        },
     )
 
     SettingsToggle(
@@ -233,11 +284,9 @@ private fun PlayerSettings(data: PlayerSettingsData) {
 @Suppress("FunctionName")
 @Composable
 private fun AppSettings(data: AppSettingsData) {
-    SettingsItem(
-        label = "Target KeyCode",
-        value = data.currentKeycode.toString(),
-        onValueChange = data.onKeycodeChange,
-        description = "Default VOLUME_UP is ${KeyEvent.KEYCODE_VOLUME_UP}",
+    KeycodeDropdown(
+        currentKeycode = data.currentKeycode,
+        onKeycodeChange = data.onKeycodeChange,
     )
 
     SettingsItem(
@@ -245,6 +294,16 @@ private fun AppSettings(data: AppSettingsData) {
         value = data.currentDoubleClick.toString(),
         onValueChange = data.onDoubleClickChange,
         description = "Max time window for a double click. Default is 300.",
+        validate = { v ->
+            val num = v.toLongOrNull()
+            when {
+                v.isBlank() -> "Latency is required"
+                num == null -> "Must be a valid number"
+                num < 100 -> "Must be at least 100 ms"
+                num > 1000 -> "Must be 1000 ms or less"
+                else -> null
+            }
+        },
     )
 
     SettingsItem(
@@ -253,7 +312,96 @@ private fun AppSettings(data: AppSettingsData) {
         onValueChange = data.onLongPressChange,
         description = "Min time window to trigger long press. Default is 1000.",
         keyboardType = KeyboardType.Number,
+        validate = { v ->
+            val num = v.toLongOrNull()
+            when {
+                v.isBlank() -> "Latency is required"
+                num == null -> "Must be a valid number"
+                num < 300 -> "Must be at least 300 ms"
+                num > 3000 -> "Must be 3000 ms or less"
+                num <= data.currentDoubleClick -> "Must be greater than double click latency (${data.currentDoubleClick} ms)"
+                else -> null
+            }
+        },
     )
+}
+
+@Suppress("FunctionName")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun KeycodeDropdown(
+    currentKeycode: Int,
+    onKeycodeChange: (Int) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val selectedOption = KEYCODE_OPTIONS.find { it.code == currentKeycode }
+    val displayText = selectedOption?.let { "${it.name} (${it.code})" } ?: "Unknown ($currentKeycode)"
+
+    Column {
+        Text(text = "Target KeyCode", color = White, style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(4.dp))
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+        ) {
+            OutlinedTextField(
+                value = displayText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = White,
+                        unfocusedTextColor = White,
+                        focusedBorderColor = White,
+                        unfocusedBorderColor = White,
+                    ),
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                var lastCategory = ""
+                KEYCODE_OPTIONS.forEach { option ->
+                    if (option.category != lastCategory) {
+                        lastCategory = option.category
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = option.category,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            },
+                            onClick = {},
+                            enabled = false,
+                        )
+                    }
+                    DropdownMenuItem(
+                        text = { Text("${option.name} (${option.code})") },
+                        onClick = {
+                            onKeycodeChange(option.code)
+                            expanded = false
+                        },
+                        colors = MenuDefaults.itemColors(
+                            textColor = if (option.code == currentKeycode) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
+                        ),
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = "Select the button your Bluetooth remote sends.",
+            color = White.copy(alpha = 0.7f),
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
 }
 
 @Suppress("FunctionName")
@@ -264,25 +412,45 @@ fun SettingsItem(
     onValueChange: (String) -> Unit,
     description: String,
     keyboardType: KeyboardType = KeyboardType.Number,
+    validate: ((String) -> String?)? = null,
 ) {
+    var localValue by remember(value) { mutableStateOf(value) }
+    val errorMessage = validate?.invoke(localValue)
+    val hasError = errorMessage != null
     Column {
         Text(text = label, color = White, style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
+            value = localValue,
+            onValueChange = { newValue ->
+                localValue = newValue
+                val isValid = validate?.invoke(newValue) == null
+                if (isValid) {
+                    onValueChange(newValue)
+                }
+            },
+            isError = hasError,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             colors =
                 OutlinedTextFieldDefaults.colors(
                     focusedTextColor = White,
                     unfocusedTextColor = White,
-                    focusedBorderColor = White,
-                    unfocusedBorderColor = White,
+                    focusedBorderColor = if (hasError) Color.Red else White,
+                    unfocusedBorderColor = if (hasError) Color.Red else White,
                     cursorColor = White,
+                    errorBorderColor = Color.Red,
                 ),
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(2.dp))
+        if (hasError) {
+            Text(
+                text = errorMessage!!,
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+        }
         Text(
             text = description,
             color = White.copy(alpha = 0.7f),
