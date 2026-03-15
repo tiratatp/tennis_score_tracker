@@ -6,15 +6,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private object KeyEventConstants {
-    const val DEBOUNCE_DELAY_MS = 50L
-}
-
 class KeyEventManager(
     private val scope: CoroutineScope,
     private val onSingleClick: () -> Unit,
     private val onDoubleClick: () -> Unit,
     private val onLongPress: () -> Unit,
+    private val timeProvider: () -> Long = { System.currentTimeMillis() },
 ) {
     var targetKeyCode: Int = SettingsManager.DEFAULT_KEYCODE
     var doubleClickLatency: Long = SettingsManager.DEFAULT_DOUBLE_CLICK_LATENCY
@@ -35,8 +32,8 @@ class KeyEventManager(
     ): Boolean {
         if (isTargetKey(keyCode)) {
             val isRepeat = event?.let { it.repeatCount > 0 } ?: false
-            val currentTime = System.currentTimeMillis()
-            val isDebounced = (currentTime - lastEventTime) < KeyEventConstants.DEBOUNCE_DELAY_MS
+            val currentTime = timeProvider()
+            val isDebounced = (currentTime - lastEventTime) < DEBOUNCE_DELAY_MS
 
             if (!isRepeat && !isDebounced) {
                 lastEventTime = currentTime
@@ -87,9 +84,12 @@ class KeyEventManager(
     }
 
     private fun isTargetKey(keyCode: Int): Boolean {
-        // volume up default, also accept ENTER for shutters
         val isDefaultVolumeUp = targetKeyCode == KeyEvent.KEYCODE_VOLUME_UP
         if (isDefaultVolumeUp && keyCode == KeyEvent.KEYCODE_ENTER) return true
         return keyCode == targetKeyCode
+    }
+
+    companion object {
+        internal const val DEBOUNCE_DELAY_MS = 50L
     }
 }
