@@ -2,13 +2,16 @@ package com.nuttyknot.tennisscoretracker.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -39,15 +42,15 @@ import com.nuttyknot.tennisscoretracker.ui.theme.White
 import com.nuttyknot.tennisscoretracker.ui.theme.Yellow
 
 private object ScoreScreenConstants {
-    const val LANDSCAPE_TEXT_SIZE_RATIO = 1.1
-    const val PORTRAIT_TEXT_SIZE_RATIO = 3.5
+    const val LANDSCAPE_TEXT_SIZE_RATIO = 1.0
+    const val PORTRAIT_TEXT_SIZE_RATIO = 3.0
     val MIDDLE_COLUMN_WIDTH = 180.dp
     val STATUS_TEXT_SIZE_LANDSCAPE = 22.sp
     val STATUS_TEXT_SIZE_PORTRAIT = 28.sp
     val NAME_TEXT_SIZE = 24.sp
     val INDICATOR_SIZE = 24.sp
     const val NAME_ALPHA = 0.7f
-    val SERVING_DOT_SPACING = 8.dp
+    val SERVING_DOT_SPACING = 16.dp
     val VERTICAL_SPACING_LARGE = 32.dp
     val VERTICAL_SPACING_MEDIUM = 16.dp
 }
@@ -131,27 +134,7 @@ private fun LandscapeScoreContent(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Opponent Score (Left)
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f),
-        ) {
-            ScoreColumn(
-                data =
-                    ScoreDisplayData(
-                        playerName = state.opponentName.ifEmpty { "OPPONENT" },
-                        score = state.opponentScore.display,
-                        isServing = !state.isUserServing,
-                    ),
-                mainTextSize = mainTextSize,
-                color = White,
-            )
-        }
-
-        // Game Status (Middle)
-        StatusColumn(state = state, gameStatus = gameStatus, scoreManager = scoreManager)
-
-        // User Score (Right)
+        // User Score (Left)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f),
@@ -166,6 +149,26 @@ private fun LandscapeScoreContent(
                     ),
                 mainTextSize = mainTextSize,
                 color = Yellow,
+            )
+        }
+
+        // Game Status (Middle)
+        StatusColumn(state = state, gameStatus = gameStatus, scoreManager = scoreManager)
+
+        // Opponent Score (Right)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            ScoreColumn(
+                data =
+                    ScoreDisplayData(
+                        playerName = state.opponentName.ifEmpty { "OPPONENT" },
+                        score = state.opponentScore.display,
+                        isServing = !state.isUserServing,
+                    ),
+                mainTextSize = mainTextSize,
+                color = White,
             )
         }
     }
@@ -185,37 +188,43 @@ private fun PortraitScoreContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        // Opponent Score
-        ScoreColumn(
-            data =
-                ScoreDisplayData(
-                    playerName = state.opponentName.ifEmpty { "OPPONENT" },
-                    score = state.opponentScore.display,
-                    isServing = !state.isUserServing,
-                ),
-            mainTextSize = mainTextSize,
-            color = White,
-        )
-
-        Spacer(modifier = Modifier.height(ScoreScreenConstants.VERTICAL_SPACING_LARGE))
+        // User Score (Top)
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            ScoreColumn(
+                data =
+                    ScoreDisplayData(
+                        playerName = state.userName.ifEmpty { "YOU" },
+                        score = state.userScore.display,
+                        isServing = state.isUserServing,
+                        isUser = true,
+                    ),
+                mainTextSize = mainTextSize,
+                color = Yellow,
+            )
+        }
 
         // Game Status
         StatusColumn(state = state, gameStatus = gameStatus, scoreManager = scoreManager)
 
-        Spacer(modifier = Modifier.height(ScoreScreenConstants.VERTICAL_SPACING_MEDIUM))
-
-        // User Score
-        ScoreColumn(
-            data =
-                ScoreDisplayData(
-                    playerName = state.userName.ifEmpty { "YOU" },
-                    score = state.userScore.display,
-                    isServing = state.isUserServing,
-                    isUser = true,
-                ),
-            mainTextSize = mainTextSize,
-            color = Yellow,
-        )
+        // Opponent Score (Bottom)
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            ScoreColumn(
+                data =
+                    ScoreDisplayData(
+                        playerName = state.opponentName.ifEmpty { "OPPONENT" },
+                        score = state.opponentScore.display,
+                        isServing = !state.isUserServing,
+                    ),
+                mainTextSize = mainTextSize,
+                color = White,
+            )
+        }
     }
 }
 
@@ -226,44 +235,62 @@ private fun ScoreColumn(
     mainTextSize: androidx.compose.ui.unit.TextUnit,
     color: androidx.compose.ui.graphics.Color,
 ) {
-    if (!data.isUser) {
-        Text(
-            text = data.playerName.uppercase(),
-            color = color.copy(alpha = ScoreScreenConstants.NAME_ALPHA),
-            fontSize = ScoreScreenConstants.NAME_TEXT_SIZE,
-            fontWeight = FontWeight.Bold,
-        )
-    }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        if (data.isServing && !data.isUser) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+        // We'll overlay the indicators relative to the Box's edges while keeping
+        // the core text perfectly centered in its own layer.
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                if (data.isServing && !data.isUser) {
+                    Text(
+                        text = "●",
+                        color = color,
+                        fontSize = ScoreScreenConstants.INDICATOR_SIZE,
+                        modifier = Modifier.padding(end = ScoreScreenConstants.SERVING_DOT_SPACING)
+                    )
+                }
+            }
+
+            // Transparent ghost text to keep the row mathematically partitioned
+            // with exactly the same dimensions as the main text
             Text(
-                text = "●",
-                color = color,
-                fontSize = ScoreScreenConstants.INDICATOR_SIZE,
+                text = data.score,
+                color = androidx.compose.ui.graphics.Color.Transparent,
+                fontSize = mainTextSize,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1,
+                softWrap = false,
             )
-            Spacer(modifier = Modifier.width(ScoreScreenConstants.SERVING_DOT_SPACING))
+
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                if (data.isServing && data.isUser) {
+                    Text(
+                        text = "●",
+                        color = color,
+                        fontSize = ScoreScreenConstants.INDICATOR_SIZE,
+                        modifier = Modifier.padding(start = ScoreScreenConstants.SERVING_DOT_SPACING)
+                    )
+                }
+            }
         }
+
+        // Actual score text, perfectly centered
         Text(
             text = data.score,
             color = color,
             fontSize = mainTextSize,
             fontWeight = FontWeight.ExtraBold,
-        )
-        if (data.isServing && data.isUser) {
-            Spacer(modifier = Modifier.width(ScoreScreenConstants.SERVING_DOT_SPACING))
-            Text(
-                text = "●",
-                color = color,
-                fontSize = ScoreScreenConstants.INDICATOR_SIZE,
-            )
-        }
-    }
-    if (data.isUser) {
-        Text(
-            text = data.playerName.uppercase(),
-            color = color.copy(alpha = ScoreScreenConstants.NAME_ALPHA),
-            fontSize = ScoreScreenConstants.NAME_TEXT_SIZE,
-            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            softWrap = false,
         )
     }
 }
