@@ -92,6 +92,10 @@ private fun HelpScreenContent(
 
         HardwareButtons()
 
+        MatchFormat()
+
+        VoiceAnnouncements()
+
         Button(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -115,19 +119,20 @@ private fun HelpScreenContent(
 private fun ScoringGestures() {
     HelpSection(
         title = "Scoring Gestures",
-        description = "Use these gestures on the score screen to track the match.",
+        description =
+            "These gestures work both on-screen (tap) and with a hardware/Bluetooth button.",
     )
 
     GestureItem(
         icon = Icons.Default.KeyboardArrowUp,
-        label = "Single Click",
+        label = "Tap / Click",
         action = "Increase User Score",
         description = "Tap once to give yourself a point.",
     )
 
     GestureItem(
         icon = Icons.Default.KeyboardArrowUp,
-        label = "Double Click",
+        label = "Double Tap / Click",
         action = "Increase Opponent Score",
         description = "Double tap to give the opponent a point.",
         isDouble = true,
@@ -148,9 +153,51 @@ private fun ScoringGestures() {
 private fun HardwareButtons() {
     HelpSection(
         title = "Hardware Buttons",
-        description = "You can use external buttons for scoring without touching the screen.",
+        description = "Use a Bluetooth remote so you can score without touching the screen.",
     )
 
+    InfoRow(
+        text = "Volume Down or Bluetooth Camera Shutter button can be used.",
+    )
+
+    Text(
+        text = "If your button doesn't work, change the Target KeyCode in Settings.",
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun MatchFormat() {
+    HelpSection(
+        title = "Match Format",
+        description = "Standard tennis rules are applied automatically.",
+    )
+
+    InfoRow(text = "Best of 3 sets.")
+    InfoRow(text = "Tiebreak is played at 6-6 in each set.")
+
+    Spacer(modifier = Modifier.height(24.dp))
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun VoiceAnnouncements() {
+    HelpSection(
+        title = "Voice Announcements",
+        description = "Scores are announced aloud after each point.",
+    )
+
+    InfoRow(text = "Turn up the volume or pair a Bluetooth speaker for best results.")
+
+    Spacer(modifier = Modifier.height(24.dp))
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun InfoRow(text: String) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -163,17 +210,10 @@ private fun HardwareButtons() {
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
-            text = "Volume Down or Bluetooth Camera Shutter button can be used.",
+            text = text,
             style = MaterialTheme.typography.bodyMedium,
         )
     }
-
-    Text(
-        text = "If the Bluetooth button does not work, try changing the Target KeyCode in Settings.",
-        style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
 }
 
 @Suppress("FunctionName")
