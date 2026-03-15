@@ -100,7 +100,7 @@ fun ScoreScreen(
             if (isLandscape) {
                 LandscapeScoreContent(state, gameStatus, maxHeight.value, scoreManager)
             } else {
-                PortraitScoreContent(state, gameStatus, maxHeight.value)
+                PortraitScoreContent(state, gameStatus, maxHeight.value, scoreManager)
             }
         }
     }
@@ -177,6 +177,7 @@ private fun PortraitScoreContent(
     state: TennisMatchState,
     gameStatus: String,
     maxHeight: Float,
+    scoreManager: ScoreManager,
 ) {
     val mainTextSize = (maxHeight / ScoreScreenConstants.PORTRAIT_TEXT_SIZE_RATIO).sp
     Column(
