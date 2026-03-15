@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +47,7 @@ fun ScoreScreen(
     val longPressLatency by settingsManager.longPressLatencyFlow
         .collectAsState(initial = SettingsManager.DEFAULT_LONG_PRESS_LATENCY)
 
-    var showResetDialog by remember { mutableStateOf(false) }
+    var showResetDialog by rememberSaveable { mutableStateOf(false) }
 
     ResetConfirmationDialog(
         showDialog = showResetDialog,
@@ -105,7 +105,7 @@ private fun ScoreScreenContent(
                     horizontal = 16.dp,
                     vertical = if (isLandscape) 0.dp else 16.dp,
                 )
-                .pointerInput(doubleClickLatency, longPressLatency) {
+                .pointerInput(doubleClickLatency, longPressLatency, state.matchWinner) {
                     detectTapGestures(
                         onTap = {
                             if (state.matchWinner == null) {
