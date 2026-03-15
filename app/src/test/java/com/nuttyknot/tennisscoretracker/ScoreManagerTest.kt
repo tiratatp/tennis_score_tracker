@@ -189,4 +189,110 @@ class ScoreManagerTest {
         assertNull(state().setWinner) // Should be null when match is won
         assertEquals("Player 1", state().matchWinner)
     }
+
+    @Test
+    fun `test undo restores previous state`() {
+        scoreManager.incrementUserScore()
+        assertEquals(PlayerScore.Fifteen, state().userScore)
+
+        scoreManager.incrementUserScore()
+        assertEquals(PlayerScore.Thirty, state().userScore)
+
+        scoreManager.undo()
+        assertEquals(PlayerScore.Fifteen, state().userScore)
+
+        scoreManager.undo()
+        assertEquals(PlayerScore.Love, state().userScore)
+    }
+
+    @Test
+    fun `test undo on empty history does nothing`() {
+        val stateBefore = state()
+        scoreManager.undo()
+        assertEquals(stateBefore.userScore, state().userScore)
+        assertEquals(stateBefore.opponentScore, state().opponentScore)
+    }
+
+    @Test
+    fun `test reset clears to initial state`() {
+        // Play some points
+        repeat(3) { scoreManager.incrementUserScore() }
+        repeat(2) { scoreManager.incrementOpponentScore() }
+
+        scoreManager.reset()
+
+        assertEquals(PlayerScore.Love, state().userScore)
+        assertEquals(PlayerScore.Love, state().opponentScore)
+        assertEquals(0, state().userGames)
+        assertEquals(0, state().opponentGames)
+        assertEquals(0, state().userSets)
+        assertEquals(0, state().opponentSets)
+        assertEquals("Player 1", state().userName)
+        assertEquals("Player 2", state().opponentName)
+    }
+
+    @Test
+    fun `test server alternates each game`() {
+        val initialServer = state().isUserServing
+
+        // User wins first game
+        repeat(4) { scoreManager.incrementUserScore() }
+        assertEquals(!initialServer, state().isUserServing)
+
+        // Opponent wins second game
+        repeat(4) { scoreManager.incrementOpponentScore() }
+        assertEquals(initialServer, state().isUserServing)
+    }
+
+    @Test
+    fun `test scoring blocked after match won`() {
+        // User wins match (2 sets of 6-0)
+        repeat(6) { repeat(4) { scoreManager.incrementUserScore() } }
+        scoreManager.startNextSet()
+        repeat(6) { repeat(4) { scoreManager.incrementUserScore() } }
+
+        assertEquals("Player 1", state().matchWinner)
+        val stateAfterWin = state()
+
+        // Attempt to score more points
+        scoreManager.incrementUserScore()
+        scoreManager.incrementOpponentScore()
+
+        assertEquals(stateAfterWin.userScore, state().userScore)
+        assertEquals(stateAfterWin.opponentScore, state().opponentScore)
+        assertEquals(stateAfterWin.userGames, state().userGames)
+    }
+
+    @Test
+    fun `test extended tiebreak past 6-6`() {
+        // Both reach 6-6 in games
+        repeat(6) {
+            repeat(4) { scoreManager.incrementUserScore() }
+            repeat(4) { scoreManager.incrementOpponentScore() }
+        }
+
+        assertTrue(state().userScore is PlayerScore.TiebreakScore)
+
+        // Reach 6-6 in tiebreak points
+        repeat(6) {
+            scoreManager.incrementUserScore()
+            scoreManager.incrementOpponentScore()
+        }
+        assertEquals(6, (state().userScore as PlayerScore.TiebreakScore).points)
+        assertEquals(6, (state().opponentScore as PlayerScore.TiebreakScore).points)
+        assertNull(state().setWinner) // Not won yet, need 2-point lead
+
+        // Reach 7-7
+        scoreManager.incrementUserScore()
+        scoreManager.incrementOpponentScore()
+        assertNull(state().setWinner)
+
+        // User wins 9-7
+        scoreManager.incrementUserScore()
+        assertNull(state().setWinner)
+        scoreManager.incrementUserScore()
+        assertEquals("Player 1", state().setWinner)
+        assertEquals(7, state().userGames)
+        assertEquals(6, state().opponentGames)
+    }
 }

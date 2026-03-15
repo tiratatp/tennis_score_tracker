@@ -1,6 +1,7 @@
 package com.nuttyknot.tennisscoretracker
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TennisScoreStateTest {
@@ -19,8 +20,8 @@ class TennisScoreStateTest {
             TennisMatchState(
                 userScore = PlayerScore.Forty,
                 opponentScore = PlayerScore.Forty,
-                isDeuce = true,
             )
+        assertTrue(state.isDeuce)
         assertEquals("Deuce", generateAnnouncement(state))
 
         state =

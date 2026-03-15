@@ -24,7 +24,6 @@ data class TennisMatchState(
     val opponentGames: Int = 0,
     val userSets: Int = 0,
     val opponentSets: Int = 0,
-    val isDeuce: Boolean = false,
     val isUserServing: Boolean = true,
     val userName: String = "",
     val opponentName: String = "",
@@ -36,6 +35,9 @@ data class TennisMatchState(
     val isNewSet: Boolean = false,
     val announcement: String? = null,
 ) {
+    val isDeuce: Boolean
+        get() = userScore == PlayerScore.Forty && opponentScore == PlayerScore.Forty
+
     val isScoreZero: Boolean
         get() =
             userScore == PlayerScore.Love &&
