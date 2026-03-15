@@ -13,7 +13,7 @@ class ScoreManagerTest {
     @Before
     fun setup() {
         scoreManager = ScoreManager()
-        scoreManager.updateNames("Player 1", "Player 2")
+        scoreManager.updateMatchParameters(userName = "Player 1", opponentName = "Player 2")
     }
 
     private fun state() = scoreManager.matchState.value

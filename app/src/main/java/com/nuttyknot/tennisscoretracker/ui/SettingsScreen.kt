@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuBoxScope
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -252,13 +253,16 @@ private fun PlayerSettings(data: PlayerSettingsData) {
         value = data.userName,
         onValueChange = data.onUserNameChange,
         description = "Your name for announcements.",
-        keyboardType = KeyboardType.Text,
-        validate = { v ->
-            when {
-                v.length > 30 -> "Name must be 30 characters or less"
-                else -> null
-            }
-        },
+        config =
+            SettingsItemConfig(
+                keyboardType = KeyboardType.Text,
+                validate = { v ->
+                    when {
+                        v.length > 30 -> "Name must be 30 characters or less"
+                        else -> null
+                    }
+                },
+            ),
     )
 
     SettingsItem(
@@ -266,13 +270,16 @@ private fun PlayerSettings(data: PlayerSettingsData) {
         value = data.opponentName,
         onValueChange = data.onOpponentNameChange,
         description = "Opponent's name for announcements.",
-        keyboardType = KeyboardType.Text,
-        validate = { v ->
-            when {
-                v.length > 30 -> "Name must be 30 characters or less"
-                else -> null
-            }
-        },
+        config =
+            SettingsItemConfig(
+                keyboardType = KeyboardType.Text,
+                validate = { v ->
+                    when {
+                        v.length > 30 -> "Name must be 30 characters or less"
+                        else -> null
+                    }
+                },
+            ),
     )
 
     SettingsToggle(
@@ -295,16 +302,19 @@ private fun AppSettings(data: AppSettingsData) {
         value = data.currentDoubleClick.toString(),
         onValueChange = data.onDoubleClickChange,
         description = "Max time window for a double click. Default is 300.",
-        validate = { v ->
-            val num = v.toLongOrNull()
-            when {
-                v.isBlank() -> "Latency is required"
-                num == null -> "Must be a valid number"
-                num < 100 -> "Must be at least 100 ms"
-                num > 1000 -> "Must be 1000 ms or less"
-                else -> null
-            }
-        },
+        config =
+            SettingsItemConfig(
+                validate = { v ->
+                    val num = v.toLongOrNull()
+                    when {
+                        v.isBlank() -> "Latency is required"
+                        num == null -> "Must be a valid number"
+                        num < 100 -> "Must be at least 100 ms"
+                        num > 1000 -> "Must be 1000 ms or less"
+                        else -> null
+                    }
+                },
+            ),
     )
 
     SettingsItem(
@@ -312,18 +322,22 @@ private fun AppSettings(data: AppSettingsData) {
         value = data.currentLongPress.toString(),
         onValueChange = data.onLongPressChange,
         description = "Min time window to trigger long press. Default is 1000.",
-        keyboardType = KeyboardType.Number,
-        validate = { v ->
-            val num = v.toLongOrNull()
-            when {
-                v.isBlank() -> "Latency is required"
-                num == null -> "Must be a valid number"
-                num < 300 -> "Must be at least 300 ms"
-                num > 3000 -> "Must be 3000 ms or less"
-                num <= data.currentDoubleClick -> "Must be greater than double click latency (${data.currentDoubleClick} ms)"
-                else -> null
-            }
-        },
+        config =
+            SettingsItemConfig(
+                keyboardType = KeyboardType.Number,
+                validate = { v ->
+                    val num = v.toLongOrNull()
+                    when {
+                        v.isBlank() -> "Latency is required"
+                        num == null -> "Must be a valid number"
+                        num < 300 -> "Must be at least 300 ms"
+                        num > 3000 -> "Must be 3000 ms or less"
+                        num <= data.currentDoubleClick ->
+                            "Must be greater than double click latency (${data.currentDoubleClick} ms)"
+                        else -> null
+                    }
+                },
+            ),
     )
 }
 
@@ -359,43 +373,12 @@ private fun KeycodeDropdown(
                     ),
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
             )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-            ) {
-                var lastCategory = ""
-                KEYCODE_OPTIONS.forEach { option ->
-                    if (option.category != lastCategory) {
-                        lastCategory = option.category
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = option.category,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.primary,
-                                )
-                            },
-                            onClick = {},
-                            enabled = false,
-                        )
-                    }
-                    DropdownMenuItem(
-                        text = { Text("${option.name} (${option.code})") },
-                        onClick = {
-                            onKeycodeChange(option.code)
-                            expanded = false
-                        },
-                        colors =
-                            MenuDefaults.itemColors(
-                                textColor =
-                                    if (option.code == currentKeycode) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurface
-                                    },
-                            ),
-                    )
-                }
+            if (expanded) {
+                KeycodeMenu(
+                    currentKeycode = currentKeycode,
+                    onKeycodeChange = onKeycodeChange,
+                    onDismiss = { expanded = false },
+                )
             }
         }
         Spacer(modifier = Modifier.height(2.dp))
@@ -408,17 +391,64 @@ private fun KeycodeDropdown(
 }
 
 @Suppress("FunctionName")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExposedDropdownMenuBoxScope.KeycodeMenu(
+    currentKeycode: Int,
+    onKeycodeChange: (Int) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ExposedDropdownMenu(
+        expanded = true,
+        onDismissRequest = onDismiss,
+    ) {
+        var lastCategory = ""
+        KEYCODE_OPTIONS.forEach { option ->
+            if (option.category != lastCategory) {
+                lastCategory = option.category
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = lastCategory,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    onClick = {},
+                    enabled = false,
+                )
+            }
+            DropdownMenuItem(
+                text = { Text("${option.name} (${option.code})") },
+                onClick = {
+                    onKeycodeChange(option.code)
+                    onDismiss()
+                },
+                colors =
+                    MenuDefaults.itemColors(
+                        textColor =
+                            if (option.code == currentKeycode) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
+                    ),
+            )
+        }
+    }
+}
+
+@Suppress("FunctionName")
 @Composable
 fun SettingsItem(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
     description: String,
-    keyboardType: KeyboardType = KeyboardType.Number,
-    validate: ((String) -> String?)? = null,
+    config: SettingsItemConfig = SettingsItemConfig(),
 ) {
     var localValue by remember(value) { mutableStateOf(value) }
-    val errorMessage = validate?.invoke(localValue)
+    val errorMessage = config.validate?.invoke(localValue)
     val hasError = errorMessage != null
     Column {
         Text(text = label, color = White, style = MaterialTheme.typography.titleMedium)
@@ -427,13 +457,13 @@ fun SettingsItem(
             value = localValue,
             onValueChange = { newValue ->
                 localValue = newValue
-                val isValid = validate?.invoke(newValue) == null
+                val isValid = config.validate?.invoke(newValue) == null
                 if (isValid) {
                     onValueChange(newValue)
                 }
             },
             isError = hasError,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            keyboardOptions = KeyboardOptions(keyboardType = config.keyboardType),
             colors =
                 OutlinedTextFieldDefaults.colors(
                     focusedTextColor = White,
@@ -461,6 +491,11 @@ fun SettingsItem(
         )
     }
 }
+
+data class SettingsItemConfig(
+    val keyboardType: KeyboardType = KeyboardType.Number,
+    val validate: ((String) -> String?)? = null,
+)
 
 @Suppress("FunctionName")
 @Composable

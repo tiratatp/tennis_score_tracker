@@ -96,12 +96,12 @@ class MainActivity : ComponentActivity() {
                 settingsManager.userNameFlow,
                 settingsManager.opponentNameFlow,
             ) { user, opponent -> user to opponent }.collectLatest { (user, opponent) ->
-                scoreManager.updateNames(user, opponent)
+                scoreManager.updateMatchParameters(userName = user, opponentName = opponent)
             }
         }
         lifecycleScope.launch {
             settingsManager.initialServerIsUserFlow.collectLatest { isUser ->
-                scoreManager.updateInitialServer(isUser)
+                scoreManager.updateMatchParameters(initialServerIsUser = isUser)
             }
         }
     }

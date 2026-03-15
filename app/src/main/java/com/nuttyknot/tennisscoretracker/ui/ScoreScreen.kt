@@ -53,6 +53,7 @@ private object ScoreScreenConstants {
     val SERVING_DOT_SPACING = 16.dp
     val VERTICAL_SPACING_LARGE = 32.dp
     val VERTICAL_SPACING_MEDIUM = 16.dp
+    const val LANDSCAPE_MAX_SAFE_SIZE_FACTOR = 2.5f
 }
 
 @Suppress("FunctionName")
@@ -139,7 +140,9 @@ private fun LandscapeScoreContent(
     scoreManager: ScoreManager,
 ) {
     val rawSize = maxHeight / ScoreScreenConstants.LANDSCAPE_TEXT_SIZE_RATIO.toFloat()
-    val maxSafeSize = (maxWidth - ScoreScreenConstants.MIDDLE_COLUMN_WIDTH.value) / 2.5f
+    val maxSafeSize =
+        (maxWidth - ScoreScreenConstants.MIDDLE_COLUMN_WIDTH.value) /
+            ScoreScreenConstants.LANDSCAPE_MAX_SAFE_SIZE_FACTOR
     val mainTextSize = minOf(rawSize, maxSafeSize).sp
     Row(
         modifier = Modifier.fillMaxSize(),
@@ -254,90 +257,110 @@ private fun ScoreColumn(
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     if (isLandscape) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = data.score,
-                color = color,
-                fontSize = mainTextSize,
-                fontWeight = FontWeight.ExtraBold,
-                maxLines = 1,
-                softWrap = false,
-            )
-
-            if (data.isServing) {
-                Text(
-                    text = "●",
-                    color = color,
-                    fontSize = ScoreScreenConstants.INDICATOR_SIZE,
-                    modifier =
-                        Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 16.dp),
-                )
-            }
-        }
+        LandscapeScoreColumn(data, mainTextSize, color)
     } else {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-            // We'll overlay the indicators relative to the Box's edges while keeping
-            // the core text perfectly centered in its own layer.
+        PortraitScoreColumn(data, mainTextSize, color)
+    }
+}
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
+@Suppress("FunctionName")
+@Composable
+private fun LandscapeScoreColumn(
+    data: ScoreDisplayData,
+    mainTextSize: androidx.compose.ui.unit.TextUnit,
+    color: androidx.compose.ui.graphics.Color,
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = data.score,
+            color = color,
+            fontSize = mainTextSize,
+            fontWeight = FontWeight.ExtraBold,
+            maxLines = 1,
+            softWrap = false,
+        )
+
+        if (data.isServing) {
+            Text(
+                text = "●",
+                color = color,
+                fontSize = ScoreScreenConstants.INDICATOR_SIZE,
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp),
+            )
+        }
+    }
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun PortraitScoreColumn(
+    data: ScoreDisplayData,
+    mainTextSize: androidx.compose.ui.unit.TextUnit,
+    color: androidx.compose.ui.graphics.Color,
+) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+        // We'll overlay the indicators relative to the Box's edges while keeping
+        // the core text perfectly centered in its own layer.
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterEnd,
             ) {
-                Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.CenterEnd,
-                ) {
-                    if (data.isServing && !data.isUser) {
-                        Text(
-                            text = "●",
-                            color = color,
-                            fontSize = ScoreScreenConstants.INDICATOR_SIZE,
-                            modifier = Modifier.padding(end = ScoreScreenConstants.SERVING_DOT_SPACING),
-                        )
-                    }
-                }
-
-                // Transparent ghost text to keep the row mathematically partitioned
-                // with exactly the same dimensions as the main text
-                Text(
-                    text = data.score,
-                    color = androidx.compose.ui.graphics.Color.Transparent,
-                    fontSize = mainTextSize,
-                    fontWeight = FontWeight.ExtraBold,
-                    maxLines = 1,
-                    softWrap = false,
-                )
-
-                Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.CenterStart,
-                ) {
-                    if (data.isServing && data.isUser) {
-                        Text(
-                            text = "●",
-                            color = color,
-                            fontSize = ScoreScreenConstants.INDICATOR_SIZE,
-                            modifier = Modifier.padding(start = ScoreScreenConstants.SERVING_DOT_SPACING),
-                        )
-                    }
+                if (data.isServing && !data.isUser) {
+                    Text(
+                        text = "●",
+                        color = color,
+                        fontSize = ScoreScreenConstants.INDICATOR_SIZE,
+                        modifier = Modifier.padding(end = ScoreScreenConstants.SERVING_DOT_SPACING),
+                    )
                 }
             }
 
-            // Actual score text, perfectly centered
+            // Transparent ghost text to keep the row mathematically partitioned
+            // with exactly the same dimensions as the main text
             Text(
                 text = data.score,
-                color = color,
+                color = androidx.compose.ui.graphics.Color.Transparent,
                 fontSize = mainTextSize,
                 fontWeight = FontWeight.ExtraBold,
                 maxLines = 1,
                 softWrap = false,
             )
+
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                if (data.isServing && data.isUser) {
+                    Text(
+                        text = "●",
+                        color = color,
+                        fontSize = ScoreScreenConstants.INDICATOR_SIZE,
+                        modifier = Modifier.padding(start = ScoreScreenConstants.SERVING_DOT_SPACING),
+                    )
+                }
+            }
         }
+
+        // Actual score text, perfectly centered
+        Text(
+            text = data.score,
+            color = color,
+            fontSize = mainTextSize,
+            fontWeight = FontWeight.ExtraBold,
+            maxLines = 1,
+            softWrap = false,
+        )
     }
 }
 

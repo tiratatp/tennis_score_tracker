@@ -12,10 +12,23 @@ captures/
 # Local configuration
 local.properties
 
-# IntelliJ / Android Studio
+# VSCode
+.vscode/
+
+# IntelliJ
+*.iml
 .idea/
-*.iws
-*.ipr
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
+
+# Android Studio generated files and folders
+captures/
+.externalNativeBuild/
+.cxx/
+*.aab
+*.apk
+output-metadata.json
 
 # OS files
 .DS_Store
@@ -27,3 +40,16 @@ Thumbs.db
 
 # Proguard
 proguard/
+
+# Log/OS Files
+*.log
+
+# Keystore files
+*.jks
+*.keystore
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+
+# Android Profiling
+*.hprof

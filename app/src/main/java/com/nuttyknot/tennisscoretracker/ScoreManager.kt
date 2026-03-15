@@ -10,6 +10,11 @@ private object ScoringConstants {
     const val GAMES_TO_WIN_SET_LONG = 7
     const val GAME_DIFFERENCE_FOR_SET = 2
     const val SETS_TO_WIN_MATCH = 2
+    const val TIEBREAK_WIN_THRESHOLD = 7
+    const val SERVER_ROTATION_TWO = 2
+    const val SERVER_ROTATION_FOUR = 4
+    const val TIEBREAK_SERVER_ROTATE_0 = 0
+    const val TIEBREAK_SERVER_ROTATE_3 = 3
 }
 
 class ScoreManager {
@@ -23,38 +28,27 @@ class ScoreManager {
     private var currentOpponentName = ""
     private var initialServerIsUser = true
 
-    fun updateNames(
-        user: String,
-        opponent: String,
+    fun updateMatchParameters(
+        userName: String? = null,
+        opponentName: String? = null,
+        initialServerIsUser: Boolean? = null,
     ) {
-        currentUserName = user
-        currentOpponentName = opponent
-        _matchState.update {
-            it.copy(
-                userName = user,
-                opponentName = opponent,
+        userName?.let { currentUserName = it }
+        opponentName?.let { currentOpponentName = it }
+        initialServerIsUser?.let { this.initialServerIsUser = it }
+
+        _matchState.update { currentState ->
+            val canUpdateServer = canUpdateInitialServer() && initialServerIsUser != null
+            currentState.copy(
+                userName = userName ?: currentState.userName,
+                opponentName = opponentName ?: currentState.opponentName,
+                isUserServing = if (canUpdateServer) initialServerIsUser!! else currentState.isUserServing,
                 gameWinner = null,
                 setWinner = null,
                 matchWinner = null,
                 isNewSet = false,
                 announcement = null,
             )
-        }
-    }
-
-    fun updateInitialServer(isUser: Boolean) {
-        initialServerIsUser = isUser
-        if (canUpdateInitialServer()) {
-            _matchState.update {
-                it.copy(
-                    isUserServing = isUser,
-                    gameWinner = null,
-                    setWinner = null,
-                    matchWinner = null,
-                    isNewSet = false,
-                    announcement = null,
-                )
-            }
         }
     }
 
@@ -129,12 +123,14 @@ class ScoreManager {
             val otherPlayerScore = if (userScored) baseState.opponentScore else baseState.userScore
 
             return when {
-                baseState.userGames == 6 && baseState.opponentGames == 6 -> handleTiebreakScoring(baseState, userScored)
-                baseState.isDeuce -> handleDeuceScoring(baseState, userScored)
+                baseState.userGames == ScoringConstants.GAMES_TO_WIN_SET &&
+                    baseState.opponentGames == ScoringConstants.GAMES_TO_WIN_SET ->
+                    handleTiebreakScoring(baseState, userScored)
+                baseState.isDeuce -> ScoringLogic.handleDeuceScoring(baseState, userScored)
                 scoringPlayerScore is PlayerScore.Advantage -> winGame(baseState, userScored)
-                otherPlayerScore is PlayerScore.Advantage -> handleBackToDeuce(baseState)
+                otherPlayerScore is PlayerScore.Advantage -> ScoringLogic.handleBackToDeuce(baseState)
                 scoringPlayerScore == PlayerScore.Forty -> winGame(baseState, userScored)
-                else -> handleRegularScoring(baseState, userScored, scoringPlayerScore)
+                else -> ScoringLogic.handleRegularScoring(baseState, userScored, scoringPlayerScore)
             }
         }
 
@@ -158,12 +154,15 @@ class ScoreManager {
             val newOppPoints = if (userScored) oppCurrent else oppCurrent + 1
 
             val isTiebreakWon =
-                (newUserPoints >= 7 || newOppPoints >= 7) &&
+                (
+                    newUserPoints >= ScoringConstants.TIEBREAK_WIN_THRESHOLD ||
+                        newOppPoints >= ScoringConstants.TIEBREAK_WIN_THRESHOLD
+                ) &&
                     kotlin.math.abs(newUserPoints - newOppPoints) >= ScoringConstants.GAME_DIFFERENCE_FOR_SET
 
             val totalOldPoints = userCurrent + oppCurrent
 
-            if (isTiebreakWon) {
+            return if (isTiebreakWon) {
                 val winnerName =
                     if (newUserPoints > newOppPoints) {
                         state.userName.ifEmpty { "User" }
@@ -171,87 +170,21 @@ class ScoreManager {
                         state.opponentName.ifEmpty { "Opponent" }
                     }
 
-                val userGamesFinal = if (newUserPoints > newOppPoints) 7 else 6
-                val oppGamesFinal = if (newUserPoints > newOppPoints) 6 else 7
-
-                val firstServer =
-                    if (totalOldPoints % 4 == 0 || totalOldPoints % 4 == 3) {
-                        state.isUserServing
-                    } else {
-                        !state.isUserServing
-                    }
-
-                return handleSetWin(
-                    state.copy(isUserServing = firstServer),
-                    userGamesFinal,
-                    oppGamesFinal,
-                    newUserPoints > newOppPoints,
+                handleTiebreakWin(
+                    state,
+                    newUserPoints,
+                    newOppPoints,
+                    totalOldPoints,
                     winnerName,
                 )
             } else {
-                val nextState =
-                    state.copy(
-                        userScore = PlayerScore.TiebreakScore(newUserPoints),
-                        opponentScore = PlayerScore.TiebreakScore(newOppPoints),
-                        isUserServing = if ((totalOldPoints + 1) % 2 != 0) !state.isUserServing else state.isUserServing,
-                    )
-                return nextState.copy(announcement = generateAnnouncement(nextState))
-            }
-        }
-
-        private fun handleDeuceScoring(
-            state: TennisMatchState,
-            userScored: Boolean,
-        ): TennisMatchState {
-            val nextState =
-                if (userScored) {
-                    state.copy(userScore = PlayerScore.Advantage, isDeuce = false)
-                } else {
-                    state.copy(opponentScore = PlayerScore.Advantage, isDeuce = false)
-                }
-            return nextState.copy(announcement = generateAnnouncement(nextState))
-        }
-
-        private fun handleBackToDeuce(state: TennisMatchState): TennisMatchState {
-            val nextState =
-                state.copy(
-                    userScore = PlayerScore.Forty,
-                    opponentScore = PlayerScore.Forty,
-                    isDeuce = true,
+                handleTiebreakContinue(
+                    state,
+                    newUserPoints,
+                    newOppPoints,
+                    totalOldPoints,
                 )
-            return nextState.copy(announcement = generateAnnouncement(nextState))
-        }
-
-        private fun handleRegularScoring(
-            state: TennisMatchState,
-            userScored: Boolean,
-            scoringPlayerScore: PlayerScore,
-        ): TennisMatchState {
-            val nextScore =
-                when (scoringPlayerScore) {
-                    PlayerScore.Love -> PlayerScore.Fifteen
-                    PlayerScore.Fifteen -> PlayerScore.Thirty
-                    PlayerScore.Thirty -> PlayerScore.Forty
-                    else -> scoringPlayerScore
-                }
-
-            val newState =
-                if (userScored) {
-                    state.copy(userScore = nextScore)
-                } else {
-                    state.copy(opponentScore = nextScore)
-                }
-
-            val finalState =
-                if (newState.userScore == PlayerScore.Forty &&
-                    newState.opponentScore == PlayerScore.Forty
-                ) {
-                    newState.copy(isDeuce = true)
-                } else {
-                    newState
-                }
-
-            return finalState.copy(announcement = generateAnnouncement(finalState))
+            }
         }
 
         private fun winGame(
@@ -286,7 +219,9 @@ class ScoreManager {
                         winnerName,
                     )
                 else -> {
-                    val isNextTiebreak = userGamesForCheck == 6 && opponentGamesForCheck == 6
+                    val isNextTiebreak =
+                        userGamesForCheck == ScoringConstants.GAMES_TO_WIN_SET &&
+                            opponentGamesForCheck == ScoringConstants.GAMES_TO_WIN_SET
                     val initialScore = if (isNextTiebreak) PlayerScore.TiebreakScore(0) else PlayerScore.Love
 
                     val gameWonState =
@@ -330,14 +265,139 @@ class ScoreManager {
 
             val nextState =
                 currentState.copy(
-                    userScore = PlayerScore.Love, opponentScore = PlayerScore.Love,
-                    userGames = userGames, opponentGames = opponentGames,
-                    userSets = newUserSets, opponentSets = newOpponentSets,
-                    setHistory = newSetHistory, matchWinner = if (isMatchWon) winnerName else null,
-                    setWinner = if (!isMatchWon) winnerName else null, isNewSet = !isMatchWon,
+                    userScore = PlayerScore.Love,
+                    opponentScore = PlayerScore.Love,
+                    userGames = userGames,
+                    opponentGames = opponentGames,
+                    userSets = newUserSets,
+                    opponentSets = newOpponentSets,
+                    setHistory = newSetHistory,
+                    matchWinner = if (isMatchWon) winnerName else null,
+                    setWinner = if (!isMatchWon) winnerName else null,
+                    isNewSet = !isMatchWon,
                     isUserServing = !currentState.isUserServing,
                 )
             return nextState.copy(announcement = generateAnnouncement(nextState))
+        }
+
+        private fun handleTiebreakWin(
+            state: TennisMatchState,
+            newUserPoints: Int,
+            newOppPoints: Int,
+            totalOldPoints: Int,
+            winnerName: String,
+        ): TennisMatchState {
+            val userGamesFinal =
+                if (newUserPoints > newOppPoints) {
+                    ScoringConstants.GAMES_TO_WIN_SET_LONG
+                } else {
+                    ScoringConstants.GAMES_TO_WIN_SET
+                }
+            val oppGamesFinal =
+                if (newUserPoints > newOppPoints) {
+                    ScoringConstants.GAMES_TO_WIN_SET
+                } else {
+                    ScoringConstants.GAMES_TO_WIN_SET_LONG
+                }
+
+            val firstServer =
+                if (
+                    totalOldPoints % ScoringConstants.SERVER_ROTATION_FOUR ==
+                    ScoringConstants.TIEBREAK_SERVER_ROTATE_0 ||
+                    totalOldPoints % ScoringConstants.SERVER_ROTATION_FOUR ==
+                    ScoringConstants.TIEBREAK_SERVER_ROTATE_3
+                ) {
+                    state.isUserServing
+                } else {
+                    !state.isUserServing
+                }
+
+            return handleSetWin(
+                state.copy(isUserServing = firstServer),
+                userGamesFinal,
+                oppGamesFinal,
+                newUserPoints > newOppPoints,
+                winnerName,
+            )
+        }
+
+        private fun handleTiebreakContinue(
+            state: TennisMatchState,
+            newUserPoints: Int,
+            newOppPoints: Int,
+            totalOldPoints: Int,
+        ): TennisMatchState {
+            val nextState =
+                state.copy(
+                    userScore = PlayerScore.TiebreakScore(newUserPoints),
+                    opponentScore = PlayerScore.TiebreakScore(newOppPoints),
+                    isUserServing =
+                        if (
+                            (totalOldPoints + 1) % ScoringConstants.SERVER_ROTATION_TWO != 0
+                        ) {
+                            !state.isUserServing
+                        } else {
+                            state.isUserServing
+                        },
+                )
+            return nextState.copy(announcement = generateAnnouncement(nextState))
+        }
+    }
+
+    private object ScoringLogic {
+        fun handleDeuceScoring(
+            state: TennisMatchState,
+            userScored: Boolean,
+        ): TennisMatchState {
+            val nextState =
+                if (userScored) {
+                    state.copy(userScore = PlayerScore.Advantage, isDeuce = false)
+                } else {
+                    state.copy(opponentScore = PlayerScore.Advantage, isDeuce = false)
+                }
+            return nextState.copy(announcement = generateAnnouncement(nextState))
+        }
+
+        fun handleBackToDeuce(state: TennisMatchState): TennisMatchState {
+            val nextState =
+                state.copy(
+                    userScore = PlayerScore.Forty,
+                    opponentScore = PlayerScore.Forty,
+                    isDeuce = true,
+                )
+            return nextState.copy(announcement = generateAnnouncement(nextState))
+        }
+
+        fun handleRegularScoring(
+            state: TennisMatchState,
+            userScored: Boolean,
+            scoringPlayerScore: PlayerScore,
+        ): TennisMatchState {
+            val nextScore =
+                when (scoringPlayerScore) {
+                    PlayerScore.Love -> PlayerScore.Fifteen
+                    PlayerScore.Fifteen -> PlayerScore.Thirty
+                    PlayerScore.Thirty -> PlayerScore.Forty
+                    else -> scoringPlayerScore
+                }
+
+            val newState =
+                if (userScored) {
+                    state.copy(userScore = nextScore)
+                } else {
+                    state.copy(opponentScore = nextScore)
+                }
+
+            val finalState =
+                if (newState.userScore == PlayerScore.Forty &&
+                    newState.opponentScore == PlayerScore.Forty
+                ) {
+                    newState.copy(isDeuce = true)
+                } else {
+                    newState
+                }
+
+            return finalState.copy(announcement = generateAnnouncement(finalState))
         }
     }
 }

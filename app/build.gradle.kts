@@ -84,6 +84,6 @@ tasks.register<Exec>("run") {
 // Ensure tests and linters run before the app is installed for debugging
 tasks.whenTaskAdded {
     if (name == "installDebug") {
-        dependsOn("testDebugUnitTest", "ktlintCheck", "lintDebug")
+        dependsOn("testDebugUnitTest", "ktlintCheck", "lintDebug", "detekt")
     }
 }
