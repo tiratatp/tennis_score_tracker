@@ -1,0 +1,28 @@
+# Built artifacts
+*.iml
+*.apk
+*.ap_
+*.aab
+
+# Gradle
+.gradle/
+build/
+captures/
+
+# Local configuration
+local.properties
+
+# IntelliJ / Android Studio
+.idea/
+*.iws
+*.ipr
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Kotlin
+*.class
+
+# Proguard
+proguard/
