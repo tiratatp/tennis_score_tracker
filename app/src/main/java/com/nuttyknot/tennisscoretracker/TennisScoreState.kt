@@ -9,7 +9,7 @@ sealed class PlayerScore(val display: String, val tts: String = display) {
 
     object Forty : PlayerScore("40")
 
-    object Advantage : PlayerScore("Ad", "Advantage")
+    object Advantage : PlayerScore("AD", "Advantage")
 
     data class TiebreakScore(val points: Int) :
         PlayerScore(points.toString(), if (points == 0) "Zero" else points.toString())

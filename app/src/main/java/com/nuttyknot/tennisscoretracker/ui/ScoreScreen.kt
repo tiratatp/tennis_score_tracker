@@ -103,7 +103,10 @@ private fun ScoreScreenContent(
             Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(
+                    horizontal = 16.dp,
+                    vertical = if (isLandscape) 0.dp else 16.dp,
+                )
                 .pointerInput(doubleClickLatency, longPressLatency) {
                     detectTapGestures(
                         onTap = {
@@ -168,13 +171,13 @@ private fun LandscapeScoreContent(
     val mainTextSize = minOf(rawSize, maxSafeSize).sp
     Row(
         modifier = Modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // User Score (Left)
         Box(
             modifier = Modifier.weight(1f).fillMaxHeight(),
-            contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.CenterStart,
         ) {
             ScoreColumn(
                 data =
@@ -186,6 +189,7 @@ private fun LandscapeScoreContent(
                     ),
                 mainTextSize = mainTextSize,
                 color = Yellow,
+                alignment = Alignment.CenterStart,
             )
         }
 
@@ -195,7 +199,7 @@ private fun LandscapeScoreContent(
         // Opponent Score (Right)
         Box(
             modifier = Modifier.weight(1f).fillMaxHeight(),
-            contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.CenterEnd,
         ) {
             ScoreColumn(
                 data =
@@ -206,6 +210,7 @@ private fun LandscapeScoreContent(
                     ),
                 mainTextSize = mainTextSize,
                 color = White,
+                alignment = Alignment.CenterEnd,
             )
         }
     }

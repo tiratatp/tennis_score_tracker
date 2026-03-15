@@ -41,6 +41,35 @@ class TennisScoreStateTest {
     }
 
     @Test
+    fun testAdvantageDisplay() {
+        assertEquals("AD", PlayerScore.Advantage.display)
+        assertEquals("Advantage", PlayerScore.Advantage.tts)
+    }
+
+    @Test
+    fun testAdvantageAnnouncementsWithoutNames() {
+        var state =
+            TennisMatchState(
+                userScore = PlayerScore.Advantage,
+                opponentScore = PlayerScore.Forty,
+                isUserServing = true,
+                userName = "",
+            )
+        // Note: The user explicitly asked NOT to change announcement text,
+        // so it should remain "Ad-In" even though display is "AD"
+        assertEquals("Ad-In", generateAnnouncement(state))
+
+        state =
+            TennisMatchState(
+                userScore = PlayerScore.Forty,
+                opponentScore = PlayerScore.Advantage,
+                isUserServing = true,
+                opponentName = "",
+            )
+        assertEquals("Ad-Out", generateAnnouncement(state))
+    }
+
+    @Test
     fun testServerFirstRule() {
         // Opponent serving, Receiver (User) wins first point
         var state =

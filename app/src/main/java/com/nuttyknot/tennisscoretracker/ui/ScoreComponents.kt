@@ -5,11 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
@@ -29,18 +30,37 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nuttyknot.tennisscoretracker.R
 import com.nuttyknot.tennisscoretracker.TennisMatchState
 import com.nuttyknot.tennisscoretracker.ui.theme.Black
 import com.nuttyknot.tennisscoretracker.ui.theme.White
 import com.nuttyknot.tennisscoretracker.ui.theme.Yellow
 
 object ScoreScreenConstants {
-    const val LANDSCAPE_TEXT_SIZE_RATIO = 1.0
+    private val fontProvider =
+        GoogleFont.Provider(
+            providerAuthority = "com.google.android.gms.fonts",
+            providerPackage = "com.google.android.gms",
+            certificates = R.array.com_google_android_gms_fonts_certs,
+        )
+
+    private val fontName = GoogleFont("JetBrains Mono")
+
+    val JetBrainsMonoFamily =
+        FontFamily(
+            Font(googleFont = fontName, fontProvider = fontProvider, weight = FontWeight.ExtraBold),
+            Font(googleFont = fontName, fontProvider = fontProvider, weight = FontWeight.Black),
+        )
+
+    const val LANDSCAPE_TEXT_SIZE_RATIO = 1.5
     const val PORTRAIT_TEXT_SIZE_RATIO = 3.0
     val MIDDLE_COLUMN_WIDTH = 180.dp
     val STATUS_TEXT_SIZE_LANDSCAPE = 22.sp
@@ -170,12 +190,13 @@ fun ScoreColumn(
     data: ScoreDisplayData,
     mainTextSize: TextUnit,
     color: Color,
+    alignment: Alignment = Alignment.Center,
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     if (isLandscape) {
-        LandscapeScoreColumn(data, mainTextSize, color)
+        LandscapeScoreColumn(data, mainTextSize, color, alignment)
     } else {
         PortraitScoreColumn(data, mainTextSize, color)
     }
@@ -187,30 +208,46 @@ private fun LandscapeScoreColumn(
     data: ScoreDisplayData,
     mainTextSize: TextUnit,
     color: Color,
+    alignment: Alignment,
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = data.score,
-            color = color,
-            fontSize = mainTextSize,
-            fontWeight = FontWeight.ExtraBold,
-            maxLines = 1,
-            softWrap = false,
-        )
+    val finalAlignment = if (data.score == "0") Alignment.Center else alignment
 
-        if (data.isServing) {
+    Box(
+        modifier = Modifier.fillMaxHeight().fillMaxWidth(),
+        contentAlignment = finalAlignment,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.wrapContentWidth().fillMaxHeight(),
+        ) {
+            // Top spacer to push text to center
+            Spacer(modifier = Modifier.weight(1f))
+
             Text(
-                text = "●",
+                text = data.score,
                 color = color,
-                fontSize = ScoreScreenConstants.INDICATOR_SIZE,
-                modifier =
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 16.dp),
+                fontFamily = ScoreScreenConstants.JetBrainsMonoFamily,
+                fontSize = mainTextSize,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1,
+                softWrap = false,
+                modifier = Modifier.wrapContentWidth(),
             )
+
+            // Bottom area for serving dot, also weighted to keep text centered
+            Box(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentAlignment = Alignment.TopCenter,
+            ) {
+                if (data.isServing) {
+                    Text(
+                        text = "●",
+                        color = color,
+                        fontSize = ScoreScreenConstants.INDICATOR_SIZE,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
+            }
         }
     }
 }
@@ -245,6 +282,7 @@ private fun PortraitScoreColumn(
             Text(
                 text = data.score,
                 color = Color.Transparent,
+                fontFamily = ScoreScreenConstants.JetBrainsMonoFamily,
                 fontSize = mainTextSize,
                 fontWeight = FontWeight.ExtraBold,
                 maxLines = 1,
@@ -270,6 +308,7 @@ private fun PortraitScoreColumn(
         Text(
             text = data.score,
             color = color,
+            fontFamily = ScoreScreenConstants.JetBrainsMonoFamily,
             fontSize = mainTextSize,
             fontWeight = FontWeight.ExtraBold,
             maxLines = 1,
