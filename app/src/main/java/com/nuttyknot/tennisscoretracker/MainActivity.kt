@@ -16,10 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.nuttyknot.tennisscoretracker.ui.TennisAppNavigation
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
@@ -43,8 +46,10 @@ class MainActivity : ComponentActivity() {
         observeSettings()
 
         lifecycleScope.launch {
-            scoreManager.matchState.drop(1).collectLatest { state ->
-                state.announcement?.let { ttsManager.announce(it) }
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                scoreManager.matchState.drop(1).collectLatest { state ->
+                    state.announcement?.let { ttsManager.announce(it) }
+                }
             }
         }
 
@@ -82,31 +87,41 @@ class MainActivity : ComponentActivity() {
 
     private fun observeSettings() {
         lifecycleScope.launch {
-            settingsManager.keycodeFlow.collectLatest { keycode ->
-                keyEventManager.targetKeyCode = keycode
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsManager.keycodeFlow.collectLatest { keycode ->
+                    keyEventManager.targetKeyCode = keycode
+                }
             }
         }
         lifecycleScope.launch {
-            settingsManager.doubleClickLatencyFlow.collectLatest { latency ->
-                keyEventManager.doubleClickLatency = latency
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsManager.doubleClickLatencyFlow.collectLatest { latency ->
+                    keyEventManager.doubleClickLatency = latency
+                }
             }
         }
         lifecycleScope.launch {
-            settingsManager.longPressLatencyFlow.collectLatest { latency ->
-                keyEventManager.longPressLatency = latency
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsManager.longPressLatencyFlow.collectLatest { latency ->
+                    keyEventManager.longPressLatency = latency
+                }
             }
         }
         lifecycleScope.launch {
-            kotlinx.coroutines.flow.combine(
-                settingsManager.userNameFlow,
-                settingsManager.opponentNameFlow,
-            ) { user, opponent -> user to opponent }.collectLatest { (user, opponent) ->
-                scoreManager.updateMatchParameters(userName = user, opponentName = opponent)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                combine(
+                    settingsManager.userNameFlow,
+                    settingsManager.opponentNameFlow,
+                ) { user, opponent -> user to opponent }.collectLatest { (user, opponent) ->
+                    scoreManager.updateMatchParameters(userName = user, opponentName = opponent)
+                }
             }
         }
         lifecycleScope.launch {
-            settingsManager.initialServerIsUserFlow.collectLatest { isUser ->
-                scoreManager.updateMatchParameters(initialServerIsUser = isUser)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsManager.initialServerIsUserFlow.collectLatest { isUser ->
+                    scoreManager.updateMatchParameters(initialServerIsUser = isUser)
+                }
             }
         }
     }
@@ -129,7 +144,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         ttsManager.shutdown()
+        super.onDestroy()
     }
 }
