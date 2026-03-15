@@ -69,7 +69,7 @@ fun ScoreScreen(
 
             if (isLandscape) {
                 // Landscape Layout: Side-by-Side
-                val mainTextSize = (maxHeight.value / 1.5).sp
+                val mainTextSize = (maxHeight.value / 1.1).sp
                 Row(
                     modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
@@ -80,16 +80,16 @@ fun ScoreScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(text = "OPPONENT", color = White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(text = "OPPONENT", color = White.copy(alpha = 0.7f), fontSize = 24.sp, fontWeight = FontWeight.Bold)
                         Text(text = state.opponentScore.display, color = White, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold)
                     }
 
                     // Game Status (Middle)
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.width(150.dp)
+                        modifier = Modifier.width(180.dp)
                     ) {
-                        Text(text = gameStatus, color = Yellow, fontSize = 16.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
+                        Text(text = gameStatus, color = Yellow, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     }
 
                     // User Score (Right)
@@ -98,33 +98,31 @@ fun ScoreScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(text = state.userScore.display, color = Yellow, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold)
-                        Text(text = "YOU", color = Yellow, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(text = "YOU", color = Yellow.copy(alpha = 0.7f), fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             } else {
                 // Portrait Layout: Vertical Stack
-                val mainTextSize = (maxHeight.value / 6).sp
+                val mainTextSize = (maxHeight.value / 3.5).sp
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
                     // Opponent Score
-                    Text(text = "OPPONENT", color = White, fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "OPPONENT", color = White.copy(alpha = 0.7f), fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     Text(text = state.opponentScore.display, color = White, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
 
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Game Status
-                    Text(text = gameStatus, color = Yellow, fontSize = 20.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
+                    Text(text = gameStatus, color = Yellow, fontSize = 28.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // User Score
                     Text(text = state.userScore.display, color = Yellow, fontSize = mainTextSize, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "YOU", color = Yellow, fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    Text(text = "YOU", color = Yellow.copy(alpha = 0.7f), fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                 }
             }
         }
