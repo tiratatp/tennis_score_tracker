@@ -125,9 +125,9 @@ class SettingsManager(private val context: Context) {
     }
 }
 
-enum class AppTheme(val displayName: String) {
-    GRAND_SLAM("The Grand Slam (Yellow & White)"),
-    MIAMI_NIGHT("Miami Night (Cyan & Magenta)"),
-    COLORBLIND_SAFE("Colorblind Safe (Orange & Blue)"),
-    SKY_BLUE("Sky Blue (Blue & White)"),
+enum class AppTheme(val displayName: String, val aliasName: String) {
+    GRAND_SLAM("The Grand Slam (Yellow & White)", ".MainActivityGrandSlam"),
+    MIAMI_NIGHT("Miami Night (Cyan & Magenta)", ".MainActivityMiamiNight"),
+    COLORBLIND_SAFE("Colorblind Safe (Orange & Blue)", ".MainActivityColorblindSafe"),
+    SKY_BLUE("Sky Blue (Blue & White)", ".MainActivitySkyBlue"),
 }

@@ -1,6 +1,8 @@
 package com.nuttyknot.tennisscoretracker
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.WindowManager
@@ -31,6 +33,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var settingsManager: SettingsManager
     private lateinit var ttsManager: TtsManager
     private lateinit var keyEventManager: KeyEventManager
+    private var pendingTheme: AppTheme? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,6 +127,33 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsManager.appThemeFlow.collectLatest { theme ->
+                    pendingTheme = theme
+                }
+            }
+        }
+    }
+
+    private fun updateLauncherIcon(activeTheme: AppTheme) {
+        val pm = packageManager
+        for (theme in AppTheme.entries) {
+            val componentName = ComponentName(this, "$packageName${theme.aliasName}")
+            val newState =
+                if (theme == activeTheme) {
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                } else {
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                }
+            if (pm.getComponentEnabledSetting(componentName) != newState) {
+                pm.setComponentEnabledSetting(
+                    componentName,
+                    newState,
+                    PackageManager.DONT_KILL_APP,
+                )
+            }
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -141,6 +171,14 @@ class MainActivity : ComponentActivity() {
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+    }
+
+    override fun onStop() {
+        super.onStop()
+        pendingTheme?.let { theme ->
+            updateLauncherIcon(theme)
+            pendingTheme = null
+        }
     }
 
     override fun onDestroy() {
