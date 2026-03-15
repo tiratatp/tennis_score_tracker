@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.map
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class SettingsManager(private val context: Context) {
-
     companion object {
         val KEYCODE = intPreferencesKey("keycode")
         val DOUBLE_CLICK_LATENCY = longPreferencesKey("double_click_latency")
@@ -32,29 +31,35 @@ class SettingsManager(private val context: Context) {
         const val DEFAULT_INITIAL_SERVER_IS_USER = true
     }
 
-    val keycodeFlow: Flow<Int> = context.dataStore.data.map { preferences ->
-        preferences[KEYCODE] ?: DEFAULT_KEYCODE
-    }
+    val keycodeFlow: Flow<Int> =
+        context.dataStore.data.map { preferences ->
+            preferences[KEYCODE] ?: DEFAULT_KEYCODE
+        }
 
-    val doubleClickLatencyFlow: Flow<Long> = context.dataStore.data.map { preferences ->
-        preferences[DOUBLE_CLICK_LATENCY] ?: DEFAULT_DOUBLE_CLICK_LATENCY
-    }
+    val doubleClickLatencyFlow: Flow<Long> =
+        context.dataStore.data.map { preferences ->
+            preferences[DOUBLE_CLICK_LATENCY] ?: DEFAULT_DOUBLE_CLICK_LATENCY
+        }
 
-    val longPressLatencyFlow: Flow<Long> = context.dataStore.data.map { preferences ->
-        preferences[LONG_PRESS_LATENCY] ?: DEFAULT_LONG_PRESS_LATENCY
-    }
+    val longPressLatencyFlow: Flow<Long> =
+        context.dataStore.data.map { preferences ->
+            preferences[LONG_PRESS_LATENCY] ?: DEFAULT_LONG_PRESS_LATENCY
+        }
 
-    val userNameFlow: Flow<String> = context.dataStore.data.map { preferences ->
-        preferences[USER_NAME] ?: DEFAULT_USER_NAME
-    }
+    val userNameFlow: Flow<String> =
+        context.dataStore.data.map { preferences ->
+            preferences[USER_NAME] ?: DEFAULT_USER_NAME
+        }
 
-    val opponentNameFlow: Flow<String> = context.dataStore.data.map { preferences ->
-        preferences[OPPONENT_NAME] ?: DEFAULT_OPPONENT_NAME
-    }
+    val opponentNameFlow: Flow<String> =
+        context.dataStore.data.map { preferences ->
+            preferences[OPPONENT_NAME] ?: DEFAULT_OPPONENT_NAME
+        }
 
-    val initialServerIsUserFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
-        preferences[INITIAL_SERVER_IS_USER] ?: DEFAULT_INITIAL_SERVER_IS_USER
-    }
+    val initialServerIsUserFlow: Flow<Boolean> =
+        context.dataStore.data.map { preferences ->
+            preferences[INITIAL_SERVER_IS_USER] ?: DEFAULT_INITIAL_SERVER_IS_USER
+        }
 
     suspend fun updateKeycode(keycode: Int) {
         context.dataStore.edit { preferences ->

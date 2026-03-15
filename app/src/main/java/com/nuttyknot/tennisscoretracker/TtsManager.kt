@@ -9,14 +9,14 @@ class TtsManager(context: Context) {
     private var isInitialized = false
 
     init {
-        tts = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                tts?.language = Locale.US
-                isInitialized = true
+        tts =
+            TextToSpeech(context) { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    tts?.language = Locale.US
+                    isInitialized = true
+                }
             }
-        }
     }
-
 
     fun announce(text: String) {
         if (isInitialized) {

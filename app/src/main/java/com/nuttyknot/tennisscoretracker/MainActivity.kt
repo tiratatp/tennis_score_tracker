@@ -6,13 +6,13 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.nuttyknot.tennisscoretracker.ui.TennisAppNavigation
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-
     private lateinit var scoreManager: ScoreManager
     private lateinit var settingsManager: SettingsManager
     private lateinit var ttsManager: TtsManager
@@ -29,7 +28,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         // Keep Screen On
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -37,17 +36,45 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         hideSystemBars()
 
+        initializeManagers()
+        observeSettings()
+
+        lifecycleScope.launch {
+            scoreManager.matchState.drop(1).collectLatest { state ->
+                state.announcement?.let { ttsManager.announce(it) }
+            }
+        }
+
+        setContent {
+            TennisScoreTrackerTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                ) {
+                    TennisAppNavigation(
+                        scoreManager = scoreManager,
+                        settingsManager = settingsManager,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun initializeManagers() {
         scoreManager = ScoreManager()
         settingsManager = SettingsManager(this)
         ttsManager = TtsManager(this)
 
-        keyEventManager = KeyEventManager(
-            scope = lifecycleScope,
-            onSingleClick = { scoreManager.incrementUserScore() },
-            onDoubleClick = { scoreManager.incrementOpponentScore() },
-            onLongPress = { scoreManager.undo() }
-        )
+        keyEventManager =
+            KeyEventManager(
+                scope = lifecycleScope,
+                onSingleClick = { scoreManager.incrementUserScore() },
+                onDoubleClick = { scoreManager.incrementOpponentScore() },
+                onLongPress = { scoreManager.undo() },
+            )
+    }
 
+    private fun observeSettings() {
         lifecycleScope.launch {
             settingsManager.keycodeFlow.collectLatest { keycode ->
                 keyEventManager.targetKeyCode = keycode
@@ -66,7 +93,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             kotlinx.coroutines.flow.combine(
                 settingsManager.userNameFlow,
-                settingsManager.opponentNameFlow
+                settingsManager.opponentNameFlow,
             ) { user, opponent -> user to opponent }.collectLatest { (user, opponent) ->
                 scoreManager.updateNames(user, opponent)
             }
@@ -76,39 +103,16 @@ class MainActivity : ComponentActivity() {
                 scoreManager.updateInitialServer(isUser)
             }
         }
-
-        lifecycleScope.launch {
-            scoreManager.matchState.drop(1).collectLatest { state ->
-                state.announcement?.let { ttsManager.announce(it) }
-            }
-        }
-
-        setContent {
-            TennisScoreTrackerTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    TennisAppNavigation(
-                        scoreManager = scoreManager,
-                        settingsManager = settingsManager
-                    )
-                }
-            }
-        }
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        if (event.action == KeyEvent.ACTION_DOWN) {
-            if (keyEventManager.onKeyDown(event.keyCode, event)) {
-                return true
+        val handled =
+            when (event.action) {
+                KeyEvent.ACTION_DOWN -> keyEventManager.onKeyDown(event.keyCode, event)
+                KeyEvent.ACTION_UP -> keyEventManager.onKeyUp(event.keyCode)
+                else -> false
             }
-        } else if (event.action == KeyEvent.ACTION_UP) {
-            if (keyEventManager.onKeyUp(event.keyCode)) {
-                return true
-            }
-        }
-        return super.dispatchKeyEvent(event)
+        return if (handled) true else super.dispatchKeyEvent(event)
     }
 
     private fun hideSystemBars() {

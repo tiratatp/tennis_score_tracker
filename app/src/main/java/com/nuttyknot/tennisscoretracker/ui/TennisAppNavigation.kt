@@ -8,31 +8,27 @@ import androidx.navigation.compose.rememberNavController
 import com.nuttyknot.tennisscoretracker.ScoreManager
 import com.nuttyknot.tennisscoretracker.SettingsManager
 
-object Routes {
-    const val SCORE_SCREEN = "score"
-    const val SETTINGS_SCREEN = "settings"
-}
-
+@Suppress("FunctionNaming", "ktlint:standard:function-naming")
 @Composable
 fun TennisAppNavigation(
     navController: NavHostController = rememberNavController(),
     scoreManager: ScoreManager,
-    settingsManager: SettingsManager
+    settingsManager: SettingsManager,
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.SCORE_SCREEN
+        startDestination = Routes.SCORE_SCREEN,
     ) {
         composable(Routes.SCORE_SCREEN) {
             ScoreScreen(
                 scoreManager = scoreManager,
-                onNavigateToSettings = { navController.navigate(Routes.SETTINGS_SCREEN) }
+                onNavigateToSettings = { navController.navigate(Routes.SETTINGS_SCREEN) },
             )
         }
         composable(Routes.SETTINGS_SCREEN) {
             SettingsScreen(
                 settingsManager = settingsManager,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
             )
         }
     }
