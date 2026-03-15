@@ -33,3 +33,15 @@ A Native Android application built with Kotlin and Jetpack Compose designed to t
 ```bash
 ./gradlew ktlintCheck detekt
 ```
+
+## How to Install on Your Device
+To install the application on your physical Android device, follow these steps:
+
+1. **Enable Developer Options**: On your Android device, go to `Settings > About phone` and tap `Build number` seven times.
+2. **Enable USB Debugging**: Go to `Settings > System > Developer options` and enable `USB debugging`.
+3. **Connect Device**: Connect your device to your computer via USB.
+4. **Install via Gradle**: Run the following command in your terminal:
+```bash
+./gradlew installDebug
+```
+Alternatively, you can find the generated APK at `app/build/outputs/apk/debug/app-debug.apk` and transfer it manually to your device.
