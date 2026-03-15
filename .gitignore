@@ -23,6 +23,7 @@ Thumbs.db
 
 # Kotlin
 *.class
+.kotlin/
 
 # Proguard
 proguard/
