@@ -3,14 +3,10 @@ package com.nuttyknot.tennisscoretracker.ui.score
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,15 +20,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
-import com.nuttyknot.tennisscoretracker.TennisMatchState
 
 @Suppress("FunctionName")
 @Composable
-fun StatusColumn(
-    state: TennisMatchState,
-    gameStatus: String,
-    scoreManager: com.nuttyknot.tennisscoretracker.ScoreManager,
-) {
+fun StatusColumn(gameStatus: String) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val fontSize =
@@ -58,19 +49,6 @@ fun StatusColumn(
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
-        if (state.isNewSet && state.matchWinner == null) {
-            Spacer(modifier = Modifier.height(ScoreScreenConstants.VERTICAL_SPACING_MEDIUM))
-            Button(
-                onClick = { scoreManager.startNextSet() },
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),
-            ) {
-                Text("START NEXT SET")
-            }
-        }
     }
 }
 

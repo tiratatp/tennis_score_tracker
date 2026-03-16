@@ -127,9 +127,9 @@ private fun ScoreScreenContent(
         val gameStatus = formatGameStatus(state)
 
         if (isLandscape) {
-            LandscapeScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, scoreManager)
+            LandscapeScoreContent(state, gameStatus, maxHeight.value, maxWidth.value)
         } else {
-            PortraitScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, scoreManager)
+            PortraitScoreContent(state, gameStatus, maxHeight.value, maxWidth.value)
         }
     }
 }
@@ -154,7 +154,6 @@ private fun LandscapeScoreContent(
     gameStatus: String,
     maxHeight: Float,
     maxWidth: Float,
-    scoreManager: ScoreManager,
 ) {
     val rawSize = maxHeight / ScoreScreenConstants.LANDSCAPE_TEXT_SIZE_RATIO.toFloat()
     val maxSafeSize =
@@ -184,7 +183,7 @@ private fun LandscapeScoreContent(
         }
 
         // Game Status (Middle)
-        StatusColumn(state = state, gameStatus = gameStatus, scoreManager = scoreManager)
+        StatusColumn(gameStatus = gameStatus)
 
         // Opponent Score (Right)
         Box(
@@ -212,7 +211,6 @@ private fun PortraitScoreContent(
     gameStatus: String,
     maxHeight: Float,
     maxWidth: Float,
-    scoreManager: ScoreManager,
 ) {
     val rawSize = maxHeight / ScoreScreenConstants.PORTRAIT_TEXT_SIZE_RATIO.toFloat()
     val maxSafeSize = maxWidth / ScoreScreenConstants.PORTRAIT_MAX_SAFE_SIZE_FACTOR
@@ -239,7 +237,7 @@ private fun PortraitScoreContent(
         }
 
         // Game Status
-        StatusColumn(state = state, gameStatus = gameStatus, scoreManager = scoreManager)
+        StatusColumn(gameStatus = gameStatus)
 
         // Opponent Score (Bottom)
         Box(
