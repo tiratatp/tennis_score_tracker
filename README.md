@@ -26,6 +26,9 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
 <p align="center">
   <img src="screenshots/help.png" width="300" alt="Help screen">
 </p>
+<p align="center">
+  <img src="screenshots/watch.jpeg" width="200" alt="Wear OS watch app">
+</p>
 
 ## How to Install
 
