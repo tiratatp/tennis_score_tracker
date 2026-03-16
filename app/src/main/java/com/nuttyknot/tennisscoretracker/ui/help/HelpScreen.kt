@@ -120,22 +120,21 @@ private fun ScoringGestures() {
     HelpSection(
         title = "Scoring Gestures",
         description =
-            "These gestures work both on-screen (tap) and with a hardware/Bluetooth button.",
+            "Tap on either player's score area to award a point.",
     )
 
     GestureItem(
         icon = Icons.Default.KeyboardArrowUp,
-        label = "Tap / Click",
-        action = "Increase User Score",
-        description = "Tap once to give yourself a point.",
+        label = "Tap Your Score",
+        action = "Increase Your Score",
+        description = "Tap on your score to give yourself a point.",
     )
 
     GestureItem(
         icon = Icons.Default.KeyboardArrowUp,
-        label = "Double Tap / Click",
-        action = "Increase Opponent Score",
-        description = "Double tap to give the opponent a point.",
-        isDouble = true,
+        label = "Tap Opponent Score",
+        action = "Increase Opponent's Score",
+        description = "Tap on the opponent's score to give them a point.",
     )
 
     GestureItem(
@@ -153,7 +152,12 @@ private fun ScoringGestures() {
 private fun HardwareButtons() {
     HelpSection(
         title = "Hardware Buttons",
-        description = "Use a Bluetooth remote so you can score without touching the screen.",
+        description =
+            "Use a Bluetooth remote with click, double-click, and long-press to score hands-free.",
+    )
+
+    InfoRow(
+        text = "Click = your point, double-click = opponent's point, long-press = undo.",
     )
 
     InfoRow(

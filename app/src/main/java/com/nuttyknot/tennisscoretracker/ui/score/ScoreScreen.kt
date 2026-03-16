@@ -1,7 +1,10 @@
 package com.nuttyknot.tennisscoretracker.ui.score
 
 import android.content.res.Configuration
-import androidx.compose.foundation.gestures.detectTapGestures
+import android.view.HapticFeedbackConstants
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -9,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -17,12 +21,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -31,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nuttyknot.tennisscoretracker.MatchFormat
 import com.nuttyknot.tennisscoretracker.ScoreModel
-import com.nuttyknot.tennisscoretracker.SettingsManager
 import com.nuttyknot.tennisscoretracker.TennisMatchState
 
 // Constants moved to ScoreComponents.kt
@@ -41,17 +45,11 @@ import com.nuttyknot.tennisscoretracker.TennisMatchState
 @Composable
 fun ScoreScreen(
     scoreModel: ScoreModel,
-    settingsManager: SettingsManager,
     onNavigateToSettings: () -> Unit,
     onNavigateToHelp: () -> Unit,
     onNavigateToSummary: () -> Unit = {},
 ) {
     val state by scoreModel.matchState.collectAsState()
-
-    val doubleClickLatency by settingsManager.doubleClickLatencyFlow
-        .collectAsState(initial = SettingsManager.DEFAULT_DOUBLE_CLICK_LATENCY)
-    val longPressLatency by settingsManager.longPressLatencyFlow
-        .collectAsState(initial = SettingsManager.DEFAULT_LONG_PRESS_LATENCY)
 
     var showResetDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -83,21 +81,17 @@ fun ScoreScreen(
         ScoreScreenContent(
             state = state,
             scoreModel = scoreModel,
-            doubleClickLatency = doubleClickLatency,
-            longPressLatency = longPressLatency,
             paddingValues = paddingValues,
             onNavigateToSummary = onNavigateToSummary,
         )
     }
 }
 
-@Suppress("FunctionName", "LongParameterList")
+@Suppress("FunctionName")
 @Composable
 private fun ScoreScreenContent(
     state: TennisMatchState,
     scoreModel: ScoreModel,
-    doubleClickLatency: Long,
-    longPressLatency: Long,
     paddingValues: androidx.compose.foundation.layout.PaddingValues,
     onNavigateToSummary: () -> Unit,
 ) {
@@ -112,24 +106,7 @@ private fun ScoreScreenContent(
                 .padding(
                     horizontal = 16.dp,
                     vertical = if (isLandscape) 0.dp else 16.dp,
-                )
-                .pointerInput(doubleClickLatency, longPressLatency, state.matchWinner) {
-                    detectTapGestures(
-                        onTap = {
-                            if (state.matchWinner == null) {
-                                scoreModel.incrementUserScore()
-                            }
-                        },
-                        onDoubleTap = {
-                            if (state.matchWinner == null) {
-                                scoreModel.incrementOpponentScore()
-                            }
-                        },
-                        onLongPress = {
-                            scoreModel.undo()
-                        },
-                    )
-                },
+                ),
     ) {
         val gameStatus = formatGameStatus(state)
 
@@ -138,6 +115,14 @@ private fun ScoreScreenContent(
         } else {
             PortraitScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, onNavigateToSummary)
         }
+
+        TapZones(
+            isLandscape = isLandscape,
+            matchWinner = state.matchWinner,
+            onUserScored = { scoreModel.incrementUserScore() },
+            onOpponentScored = { scoreModel.incrementOpponentScore() },
+            onUndo = { scoreModel.undo() },
+        )
     }
 }
 
@@ -282,6 +267,66 @@ private fun PortraitScoreContent(
                     ),
                 mainTextSize = mainTextSize,
                 color = MaterialTheme.colorScheme.secondary,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Suppress("FunctionName", "LongParameterList")
+@Composable
+private fun TapZones(
+    isLandscape: Boolean,
+    matchWinner: String?,
+    onUserScored: () -> Unit,
+    onOpponentScored: () -> Unit,
+    onUndo: () -> Unit,
+) {
+    val view = LocalView.current
+
+    @Composable
+    fun TapZone(
+        onClick: () -> Unit,
+        modifier: Modifier,
+    ) {
+        Box(
+            modifier =
+                modifier
+                    .combinedClickable(
+                        onClick = {
+                            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                            onClick()
+                        },
+                        onLongClick = {
+                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                            onUndo()
+                        },
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                    ),
+        )
+    }
+
+    if (isLandscape) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            TapZone(
+                onClick = { if (matchWinner == null) onUserScored() },
+                modifier = Modifier.fillMaxHeight().weight(1f),
+            )
+            TapZone(
+                onClick = { if (matchWinner == null) onOpponentScored() },
+                modifier = Modifier.fillMaxHeight().weight(1f),
+            )
+        }
+    } else {
+        Column(modifier = Modifier.fillMaxSize()) {
+            TapZone(
+                onClick = { if (matchWinner == null) onUserScored() },
+                modifier = Modifier.fillMaxWidth().weight(1f),
+            )
+            TapZone(
+                onClick = { if (matchWinner == null) onOpponentScored() },
+                modifier = Modifier.fillMaxWidth().weight(1f),
             )
         }
     }

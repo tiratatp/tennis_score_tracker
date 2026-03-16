@@ -76,7 +76,6 @@ private fun TennisNavHost(
         composable(Routes.SCORE_SCREEN) {
             ScoreScreen(
                 scoreModel = scoreModel,
-                settingsManager = settingsManager,
                 onNavigateToSettings = { navController.navigate(Routes.SETTINGS_SCREEN) },
                 onNavigateToHelp = { navController.navigate(Routes.HELP_SCREEN) },
                 onNavigateToSummary = {
