@@ -20,8 +20,8 @@ object ScoreScreenConstants {
 
     val JetBrainsMonoFamily =
         FontFamily(
+            Font(googleFont = fontName, fontProvider = fontProvider, weight = FontWeight.Bold),
             Font(googleFont = fontName, fontProvider = fontProvider, weight = FontWeight.ExtraBold),
-            Font(googleFont = fontName, fontProvider = fontProvider, weight = FontWeight.Black),
         )
 
     const val LANDSCAPE_TEXT_SIZE_RATIO = 1.3

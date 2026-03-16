@@ -117,7 +117,7 @@ private fun ScoreScreenContent(
     }
 }
 
-private fun getStatusText(state: TennisMatchState): String? {
+internal fun getStatusText(state: TennisMatchState): String? {
     return when {
         state.matchWinner != null -> "MATCH OVER"
         state.setWinner != null -> "SET OVER"
@@ -129,7 +129,7 @@ private fun getStatusText(state: TennisMatchState): String? {
 
 @Suppress("FunctionName")
 @Composable
-private fun LandscapeScoreContent(
+internal fun LandscapeScoreContent(
     state: TennisMatchState,
     maxHeight: Float,
     maxWidth: Float,
@@ -198,7 +198,7 @@ private fun LandscapeScoreContent(
 
 @Suppress("FunctionName")
 @Composable
-private fun PortraitScoreContent(
+internal fun PortraitScoreContent(
     state: TennisMatchState,
     maxHeight: Float,
     maxWidth: Float,

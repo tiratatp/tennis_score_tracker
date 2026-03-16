@@ -102,12 +102,15 @@ For local release builds, set the environment variables `KEYSTORE_FILE`, `KEYSTO
 ### Build Commands
 
 ```bash
-./gradlew assembleDebug          # Build debug APK
-./gradlew testDebugUnitTest      # Run unit tests
-./gradlew ktlintCheck detekt     # Run linters (ktlint + detekt)
-./gradlew installDebug           # Install on device (also runs tests + linters)
-./gradlew :wear:assembleDebug    # Build wear APK
-./gradlew :wear:installDebug     # Install wear app on watch
+./gradlew assembleDebug              # Build debug APK
+./gradlew testDebugUnitTest          # Run unit tests
+./gradlew ktlintCheck detekt         # Run linters (ktlint + detekt)
+./gradlew installDebug               # Install on device (also runs tests + linters)
+./gradlew :wear:assembleDebug        # Build wear APK
+./gradlew :wear:installDebug         # Install wear app on watch
+./gradlew :app:recordPaparazziDebug  # Update screenshot snapshots after UI changes
+./gradlew :app:verifyPaparazziDebug  # Verify snapshots match (used in CI)
+./gradlew :app:updateReadmeScreenshots  # Copy snapshots to screenshots/ for README
 ```
 
 </details>

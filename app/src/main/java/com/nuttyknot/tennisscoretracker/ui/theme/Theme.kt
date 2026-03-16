@@ -74,8 +74,7 @@ fun TennisScoreTrackerTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            val activity = view.context as ComponentActivity
-            activity.enableEdgeToEdge(
+            (view.context as? ComponentActivity)?.enableEdgeToEdge(
                 statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
                 navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
             )

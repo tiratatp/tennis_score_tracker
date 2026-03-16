@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.20" apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2" apply false
+    id("app.cash.paparazzi") version "1.3.5" apply false
 }
 
 tasks.register<Copy>("installGitHook") {

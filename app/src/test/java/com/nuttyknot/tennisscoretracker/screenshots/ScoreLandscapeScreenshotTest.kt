@@ -1,0 +1,46 @@
+package com.nuttyknot.tennisscoretracker.screenshots
+
+import app.cash.paparazzi.DeviceConfig
+import app.cash.paparazzi.Paparazzi
+import com.android.ide.common.rendering.api.SessionParams
+import com.android.resources.ScreenOrientation
+import com.nuttyknot.tennisscoretracker.AppTheme
+import com.nuttyknot.tennisscoretracker.PlayerScore
+import com.nuttyknot.tennisscoretracker.TennisMatchState
+import com.nuttyknot.tennisscoretracker.ui.score.ScoreScreenPreview
+import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
+import org.junit.Rule
+import org.junit.Test
+
+// 2003 Wimbledon Final: Serena d. Venus Williams 4-6, 6-4, 6-2
+class ScoreLandscapeScreenshotTest {
+    @get:Rule
+    val paparazzi =
+        Paparazzi(
+            deviceConfig = DeviceConfig.PIXEL_6.copy(orientation = ScreenOrientation.LANDSCAPE),
+            theme = "android:Theme.Material.NoActionBar.Fullscreen",
+            renderingMode = SessionParams.RenderingMode.NORMAL,
+        )
+
+    @Test
+    fun main() {
+        val state =
+            TennisMatchState(
+                userScore = PlayerScore.Forty,
+                opponentScore = PlayerScore.Love,
+                userGames = 6,
+                opponentGames = 2,
+                userSets = 1,
+                opponentSets = 1,
+                setHistory = listOf(4 to 6, 6 to 4),
+                isUserServing = true,
+                userName = "Serena",
+                opponentName = "Venus",
+            )
+        paparazzi.snapshot("main") {
+            TennisScoreTrackerTheme(appTheme = AppTheme.SKY_BLUE) {
+                ScoreScreenPreview(state)
+            }
+        }
+    }
+}

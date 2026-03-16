@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("app.cash.paparazzi")
 }
 
 fun gitVersionCode(): Int {
@@ -99,6 +100,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui-text-google-fonts")
+
     implementation("androidx.navigation:navigation-compose:2.8.9")
 
     // DataStore Preferences
@@ -113,7 +115,6 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
 }
-
 tasks.register<Exec>("run") {
     dependsOn("installDebug")
     group = "application"
@@ -126,4 +127,17 @@ tasks.whenTaskAdded {
     if (name == "installDebug") {
         dependsOn("testDebugUnitTest", "ktlintCheck", "lintDebug", "detekt")
     }
+}
+
+tasks.register<Copy>("updateReadmeScreenshots") {
+    dependsOn("recordPaparazziDebug")
+    from("src/test/snapshots/images") {
+        include("*_main.png")
+        include("*_portrait.png")
+        include("*_help.png")
+        rename(".*_main\\.png", "main.png")
+        rename(".*_portrait\\.png", "portrait.png")
+        rename(".*_help\\.png", "help.png")
+    }
+    into("${rootProject.projectDir}/screenshots")
 }
