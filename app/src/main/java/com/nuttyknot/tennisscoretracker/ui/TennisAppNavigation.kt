@@ -72,6 +72,11 @@ private fun TennisNavHost(
                 settingsManager = settingsManager,
                 onNavigateToSettings = { navController.navigate(Routes.SETTINGS_SCREEN) },
                 onNavigateToHelp = { navController.navigate(Routes.HELP_SCREEN) },
+                onNavigateToSummary = {
+                    navController.navigate(Routes.MATCH_SUMMARY_SCREEN) {
+                        launchSingleTop = true
+                    }
+                },
             )
         }
         composable(Routes.SETTINGS_SCREEN) {

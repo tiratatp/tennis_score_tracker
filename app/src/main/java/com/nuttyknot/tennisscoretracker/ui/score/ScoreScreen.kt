@@ -40,6 +40,7 @@ fun ScoreScreen(
     settingsManager: SettingsManager,
     onNavigateToSettings: () -> Unit,
     onNavigateToHelp: () -> Unit,
+    onNavigateToSummary: () -> Unit = {},
 ) {
     val state by scoreModel.matchState.collectAsState()
 
@@ -81,11 +82,12 @@ fun ScoreScreen(
             doubleClickLatency = doubleClickLatency,
             longPressLatency = longPressLatency,
             paddingValues = paddingValues,
+            onNavigateToSummary = onNavigateToSummary,
         )
     }
 }
 
-@Suppress("FunctionName")
+@Suppress("FunctionName", "LongParameterList")
 @Composable
 private fun ScoreScreenContent(
     state: TennisMatchState,
@@ -93,6 +95,7 @@ private fun ScoreScreenContent(
     doubleClickLatency: Long,
     longPressLatency: Long,
     paddingValues: androidx.compose.foundation.layout.PaddingValues,
+    onNavigateToSummary: () -> Unit,
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -127,9 +130,9 @@ private fun ScoreScreenContent(
         val gameStatus = formatGameStatus(state)
 
         if (isLandscape) {
-            LandscapeScoreContent(state, gameStatus, maxHeight.value, maxWidth.value)
+            LandscapeScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, onNavigateToSummary)
         } else {
-            PortraitScoreContent(state, gameStatus, maxHeight.value, maxWidth.value)
+            PortraitScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, onNavigateToSummary)
         }
     }
 }
@@ -154,6 +157,7 @@ private fun LandscapeScoreContent(
     gameStatus: String,
     maxHeight: Float,
     maxWidth: Float,
+    onNavigateToSummary: () -> Unit,
 ) {
     val rawSize = maxHeight / ScoreScreenConstants.LANDSCAPE_TEXT_SIZE_RATIO.toFloat()
     val maxSafeSize =
@@ -183,7 +187,11 @@ private fun LandscapeScoreContent(
         }
 
         // Game Status (Middle)
-        StatusColumn(gameStatus = gameStatus)
+        StatusColumn(
+            gameStatus = gameStatus,
+            isMatchOver = state.matchWinner != null,
+            onViewSummary = onNavigateToSummary,
+        )
 
         // Opponent Score (Right)
         Box(
@@ -211,6 +219,7 @@ private fun PortraitScoreContent(
     gameStatus: String,
     maxHeight: Float,
     maxWidth: Float,
+    onNavigateToSummary: () -> Unit,
 ) {
     val rawSize = maxHeight / ScoreScreenConstants.PORTRAIT_TEXT_SIZE_RATIO.toFloat()
     val maxSafeSize = maxWidth / ScoreScreenConstants.PORTRAIT_MAX_SAFE_SIZE_FACTOR
@@ -237,7 +246,11 @@ private fun PortraitScoreContent(
         }
 
         // Game Status
-        StatusColumn(gameStatus = gameStatus)
+        StatusColumn(
+            gameStatus = gameStatus,
+            isMatchOver = state.matchWinner != null,
+            onViewSummary = onNavigateToSummary,
+        )
 
         // Opponent Score (Bottom)
         Box(

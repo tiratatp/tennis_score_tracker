@@ -3,10 +3,14 @@ package com.nuttyknot.tennisscoretracker.ui.score
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +27,11 @@ import androidx.compose.ui.unit.TextUnit
 
 @Suppress("FunctionName")
 @Composable
-fun StatusColumn(gameStatus: String) {
+fun StatusColumn(
+    gameStatus: String,
+    isMatchOver: Boolean = false,
+    onViewSummary: () -> Unit = {},
+) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val fontSize =
@@ -49,6 +57,19 @@ fun StatusColumn(gameStatus: String) {
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
+        if (isMatchOver) {
+            Spacer(modifier = Modifier.height(ScoreScreenConstants.VERTICAL_SPACING_MEDIUM))
+            Button(
+                onClick = onViewSummary,
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+            ) {
+                Text("Match Summary")
+            }
+        }
     }
 }
 
