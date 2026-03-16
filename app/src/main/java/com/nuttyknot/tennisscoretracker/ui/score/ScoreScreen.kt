@@ -28,17 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nuttyknot.tennisscoretracker.MatchFormat
 import com.nuttyknot.tennisscoretracker.ScoreModel
 import com.nuttyknot.tennisscoretracker.TennisMatchState
-
-// Constants moved to ScoreComponents.kt
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,12 +101,10 @@ private fun ScoreScreenContent(
                     vertical = if (isLandscape) 0.dp else 16.dp,
                 ),
     ) {
-        val gameStatus = formatGameStatus(state)
-
         if (isLandscape) {
-            LandscapeScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, onNavigateToSummary)
+            LandscapeScoreContent(state, maxHeight.value, maxWidth.value, onNavigateToSummary)
         } else {
-            PortraitScoreContent(state, gameStatus, maxHeight.value, maxWidth.value, onNavigateToSummary)
+            PortraitScoreContent(state, maxHeight.value, maxWidth.value, onNavigateToSummary)
         }
 
         TapZones(
@@ -126,29 +117,13 @@ private fun ScoreScreenContent(
     }
 }
 
-@Composable
-private fun formatGameStatus(state: TennisMatchState): AnnotatedString {
-    val primaryColor = MaterialTheme.colorScheme.primary
+private fun getStatusText(state: TennisMatchState): String? {
     return when {
-        state.matchWinner != null -> AnnotatedString("MATCH OVER")
-        state.setWinner != null -> AnnotatedString("SET OVER")
-        state.isMatchTiebreak -> AnnotatedString("MATCH TIEBREAK")
-        state.isDeuce -> AnnotatedString("DEUCE")
-        state.matchFormat == MatchFormat.FAST ->
-            AnnotatedString("${state.userGames}-${state.opponentGames}")
-        else ->
-            buildAnnotatedString {
-                val mutedColor = primaryColor.copy(alpha = 0.5f)
-                if (state.setHistory.isNotEmpty()) {
-                    withStyle(SpanStyle(color = mutedColor)) {
-                        append(state.setHistory.joinToString("  ") { "${it.first}-${it.second}" })
-                    }
-                    append("  ")
-                }
-                withStyle(SpanStyle(color = primaryColor)) {
-                    append("${state.userGames}-${state.opponentGames}")
-                }
-            }
+        state.matchWinner != null -> "MATCH OVER"
+        state.setWinner != null -> "SET OVER"
+        state.isMatchTiebreak -> "MATCH TIEBREAK"
+        state.isDeuce -> "DEUCE"
+        else -> null
     }
 }
 
@@ -156,7 +131,6 @@ private fun formatGameStatus(state: TennisMatchState): AnnotatedString {
 @Composable
 private fun LandscapeScoreContent(
     state: TennisMatchState,
-    gameStatus: AnnotatedString,
     maxHeight: Float,
     maxWidth: Float,
     onNavigateToSummary: () -> Unit,
@@ -189,11 +163,17 @@ private fun LandscapeScoreContent(
             )
         }
 
-        // Game Status (Middle)
-        StatusColumn(
-            gameStatus = gameStatus,
+        // Scoreboard Table (Middle)
+        ScoreboardTable(
+            userGames = state.userGames,
+            opponentGames = state.opponentGames,
+            setHistory = state.setHistory,
+            userColor = MaterialTheme.colorScheme.primary,
+            opponentColor = MaterialTheme.colorScheme.secondary,
             isMatchOver = state.matchWinner != null,
+            statusText = getStatusText(state),
             onViewSummary = onNavigateToSummary,
+            matchFormat = state.matchFormat,
         )
 
         // Opponent Score (Right)
@@ -220,7 +200,6 @@ private fun LandscapeScoreContent(
 @Composable
 private fun PortraitScoreContent(
     state: TennisMatchState,
-    gameStatus: AnnotatedString,
     maxHeight: Float,
     maxWidth: Float,
     onNavigateToSummary: () -> Unit,
@@ -243,18 +222,26 @@ private fun PortraitScoreContent(
                     ScoreDisplayData(
                         score = state.userScore.display,
                         isServing = state.isUserServing,
-                        name = state.userName.ifEmpty { "You" },
                     ),
                 mainTextSize = mainTextSize,
                 color = MaterialTheme.colorScheme.primary,
             )
         }
 
-        // Game Status
-        StatusColumn(
-            gameStatus = gameStatus,
+        // Scoreboard Table
+        ScoreboardTable(
+            userGames = state.userGames,
+            opponentGames = state.opponentGames,
+            setHistory = state.setHistory,
+            userColor = MaterialTheme.colorScheme.primary,
+            opponentColor = MaterialTheme.colorScheme.secondary,
             isMatchOver = state.matchWinner != null,
+            statusText = getStatusText(state),
             onViewSummary = onNavigateToSummary,
+            userName = state.userName.ifEmpty { "You" },
+            opponentName = state.opponentName.ifEmpty { "Opp" },
+            isUserServing = state.isUserServing,
+            matchFormat = state.matchFormat,
         )
 
         // Opponent Score (Bottom)
@@ -267,7 +254,6 @@ private fun PortraitScoreContent(
                     ScoreDisplayData(
                         score = state.opponentScore.display,
                         isServing = !state.isUserServing,
-                        name = state.opponentName.ifEmpty { "Opp" },
                     ),
                 mainTextSize = mainTextSize,
                 color = MaterialTheme.colorScheme.secondary,

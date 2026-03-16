@@ -1,5 +1,6 @@
 package com.nuttyknot.tennisscoretracker.wear
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +17,7 @@ import com.nuttyknot.tennisscoretracker.wear.ui.WearTheme
 class WearMainActivity : ComponentActivity() {
     private val viewModel: WearRemoteViewModel by viewModels()
     private var isAmbient by mutableStateOf(false)
+    private var showHelp by mutableStateOf(false)
 
     private val ambientCallback =
         object : AmbientLifecycleObserver.AmbientLifecycleCallback {
@@ -36,6 +38,9 @@ class WearMainActivity : ComponentActivity() {
         lifecycle.addObserver(AmbientLifecycleObserver(this, ambientCallback))
         viewModel.startListening()
 
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        showHelp = !prefs.getBoolean(KEY_HAS_SEEN_HELP, false)
+
         setContent {
             val scoreDisplay by viewModel.scoreDisplay.collectAsState()
             val isConnected by viewModel.isConnected.collectAsState()
@@ -45,11 +50,21 @@ class WearMainActivity : ComponentActivity() {
                     scoreDisplay = scoreDisplay,
                     isConnected = isConnected,
                     isAmbient = isAmbient,
+                    showHelp = showHelp,
+                    onDismissHelp = {
+                        showHelp = false
+                        prefs.edit().putBoolean(KEY_HAS_SEEN_HELP, true).apply()
+                    },
                     onUserScored = { viewModel.sendCommand(WearConstants.CMD_USER_SCORED) },
                     onOpponentScored = { viewModel.sendCommand(WearConstants.CMD_OPPONENT_SCORED) },
                     onUndo = { viewModel.sendCommand(WearConstants.CMD_UNDO) },
                 )
             }
         }
+    }
+
+    companion object {
+        private const val PREFS_NAME = "wear_tennis_prefs"
+        private const val KEY_HAS_SEEN_HELP = "has_seen_help"
     }
 }
