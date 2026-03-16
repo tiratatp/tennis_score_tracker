@@ -64,7 +64,7 @@ Multi-module Android app (app + shared + wear) built with Kotlin and Jetpack Com
 ### Project Structure
 
 - **Hardware Input**: `KeyEventManager` intercepts raw HID KeyEvent inputs and uses a coroutine-based temporal debouncing algorithm to distinguish single click, double click, and long press from one button
-- **Scoring Engine**: `ScoreManager` exposes match state via `StateFlow` — pure state transformations with no side effects
+- **Scoring Engine**: `ScoreModel` exposes match state via `StateFlow` — pure state transformations with no side effects
 - **Storage**: Jetpack Preferences DataStore for settings (key codes, latency thresholds, player names, theme)
 - **TTS**: UK English locale with umpire-style speech rate and pitch
 - **Wear OS Sync**: `WearSyncManager` in the phone app pushes match state to the watch via Wearable Data Layer API; receives scoring commands back via `MessageClient`

@@ -41,13 +41,14 @@ Multi-module Android app (app + shared + wear) built with Kotlin and Jetpack Com
 
 ### Testing
 
-Unit tests in `app/src/test/`: `ScoreModelTest.kt`, `TennisScoreStateTest.kt`, `KeyEventManagerTest.kt`. Uses JUnit 4 and `kotlinx-coroutines-test`.
+Unit tests in `app/src/test/` (`ScoreModelTest.kt`, `TennisScoreStateTest.kt`, `KeyEventManagerTest.kt`) and `shared/src/test/` (`WearScoreDisplayTest.kt`). Uses JUnit 4 and `kotlinx-coroutines-test`.
 
 ### Wear OS
 
 - **`shared/`** — Android library module with `WearConstants` (data paths/commands) and `WearScoreDisplay` (JSON-serializable score data class shared between phone and watch)
 - **`wear/`** — Standalone Wear OS app (min SDK 30, Compose Material3 for Wear). `WearMainActivity` with ambient mode, `WearRemoteViewModel` (DataClient listener + MessageClient sender), `WearScoreScreen` (tap left=user point, right=opponent, long-press=undo)
 - **`WearSyncManager.kt`** (in app module) — Pushes `TennisMatchState` to watch via Wearable Data Layer API, receives commands via `MessageClient`
+- **`WearDataListenerService.kt`** (in wear module) — Background service that receives data/messages from the phone app
 
 ## Rules
 
