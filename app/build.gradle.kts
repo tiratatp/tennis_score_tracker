@@ -24,6 +24,18 @@ android {
     namespace = "com.nuttyknot.tennisscoretracker"
     compileSdk = 35
 
+    val keystoreFilePath = System.getenv("KEYSTORE_FILE")
+    signingConfigs {
+        if (keystoreFilePath != null && file(keystoreFilePath).exists()) {
+            create("release") {
+                storeFile = file(keystoreFilePath)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+
     defaultConfig {
         applicationId = "com.nuttyknot.tennisscoretracker"
         minSdk = 26
@@ -44,6 +56,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            signingConfig = try {
+                signingConfigs.getByName("release")
+            } catch (_: UnknownDomainObjectException) {
+                signingConfigs.getByName("debug")
+            }
         }
     }
     compileOptions {

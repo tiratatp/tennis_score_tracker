@@ -64,6 +64,31 @@ Single-activity Android app built with Kotlin and Jetpack Compose. Scoring logic
 - **TTS**: UK English locale with umpire-style speech rate and pitch
 - **CI/CD**: GitHub Actions runs detekt, ktlint, unit tests, and assembleDebug on push/PR. Tagged pushes (`v*`) create GitHub Releases with the APK
 
+### Release Code Signing
+
+By default, release builds are signed with the debug keystore (installable via sideloading but not suitable for Play Store). To enable proper release signing:
+
+1. **Generate a keystore:**
+   ```bash
+   keytool -genkey -v -keystore release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias tennis-score-tracker
+   ```
+
+2. **Add GitHub repository secrets** (Settings → Secrets and variables → Actions):
+   | Secret | Value |
+   |--------|-------|
+   | `KEYSTORE_BASE64` | Base64-encoded keystore (`base64 -i release.jks \| pbcopy` on macOS) |
+   | `KEYSTORE_PASSWORD` | Keystore password |
+   | `KEY_ALIAS` | Key alias (e.g. `tennis-score-tracker`) |
+   | `KEY_PASSWORD` | Key password |
+
+3. **Push a tag** to trigger a signed release build:
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+For local release builds, set the environment variables `KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` before running `./gradlew assembleRelease`.
+
 ### Build Commands
 
 ```bash

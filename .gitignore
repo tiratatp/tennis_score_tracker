@@ -39,6 +39,7 @@ proguard/
 *.log
 
 # Keystore files
+keystore.properties
 *.jks
 *.keystore
 
