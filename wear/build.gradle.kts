@@ -4,6 +4,22 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+fun gitVersionCode(): Int {
+    val result =
+        providers.exec {
+            commandLine("git", "tag", "--list", "v*")
+        }.standardOutput.asText.get().trim()
+    return if (result.isEmpty()) 1 else result.lines().size
+}
+
+fun gitVersionName(): String {
+    val result =
+        providers.exec {
+            commandLine("git", "describe", "--tags", "--always")
+        }.standardOutput.asText.get().trim()
+    return result.removePrefix("v").ifEmpty { "0.1" }
+}
+
 android {
     namespace = "com.nuttyknot.tennisscoretracker.wear"
     compileSdk = 35
@@ -24,8 +40,8 @@ android {
         applicationId = "com.nuttyknot.tennisscoretracker"
         minSdk = 30
         targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = gitVersionCode()
+        versionName = gitVersionName()
     }
 
     buildTypes {
