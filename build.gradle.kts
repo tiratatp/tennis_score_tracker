@@ -7,6 +7,31 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2" apply false
 }
 
+tasks.register<Copy>("installGitHook") {
+    from("scripts/pre-commit")
+    into(".git/hooks")
+    filePermissions {
+        user {
+            read = true
+            write = true
+            execute = true
+        }
+        group {
+            read = true
+            execute = true
+        }
+        other {
+            read = true
+            execute = true
+        }
+    }
+}
+
+// Run installGitHook automatically on first build
+tasks.matching { it.name == "prepareKotlinBuildScriptModel" }.configureEach {
+    dependsOn("installGitHook")
+}
+
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
