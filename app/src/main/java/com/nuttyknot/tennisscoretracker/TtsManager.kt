@@ -7,6 +7,8 @@ import java.util.Locale
 
 class TtsManager(context: Context) {
     private var tts: TextToSpeech? = null
+
+    @Volatile
     private var isInitialized = false
 
     init {

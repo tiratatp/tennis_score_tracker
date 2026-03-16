@@ -88,11 +88,6 @@ class ScoreManager {
                 opponentName = opponentName ?: currentState.opponentName,
                 isUserServing = if (canUpdateServer) initialServerIsUser!! else currentState.isUserServing,
                 matchFormat = if (canUpdateFormat) matchFormat!! else currentState.matchFormat,
-                gameWinner = null,
-                setWinner = null,
-                matchWinner = null,
-                isNewSet = false,
-                announcement = null,
             )
         }
     }

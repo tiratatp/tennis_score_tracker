@@ -14,8 +14,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import com.nuttyknot.tennisscoretracker.ui.theme.Black
-import com.nuttyknot.tennisscoretracker.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("FunctionName")
@@ -76,9 +74,9 @@ fun ResetConfirmationDialog(
                     Text("CANCEL", color = MaterialTheme.colorScheme.onBackground)
                 }
             },
-            containerColor = Black,
-            titleContentColor = White,
-            textContentColor = White,
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurface,
         )
     }
 }

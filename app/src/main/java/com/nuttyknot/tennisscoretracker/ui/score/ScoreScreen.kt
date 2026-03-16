@@ -174,10 +174,8 @@ private fun LandscapeScoreContent(
             ScoreColumn(
                 data =
                     ScoreDisplayData(
-                        playerName = state.userName.ifEmpty { "YOU" },
                         score = state.userScore.display,
                         isServing = state.isUserServing,
-                        isUser = true,
                     ),
                 mainTextSize = mainTextSize,
                 color = MaterialTheme.colorScheme.primary,
@@ -196,7 +194,6 @@ private fun LandscapeScoreContent(
             ScoreColumn(
                 data =
                     ScoreDisplayData(
-                        playerName = state.opponentName.ifEmpty { "OPPONENT" },
                         score = state.opponentScore.display,
                         isServing = !state.isUserServing,
                     ),
@@ -233,10 +230,8 @@ private fun PortraitScoreContent(
             ScoreColumn(
                 data =
                     ScoreDisplayData(
-                        playerName = state.userName.ifEmpty { "YOU" },
                         score = state.userScore.display,
                         isServing = state.isUserServing,
-                        isUser = true,
                     ),
                 mainTextSize = mainTextSize,
                 color = MaterialTheme.colorScheme.primary,
@@ -254,7 +249,6 @@ private fun PortraitScoreContent(
             ScoreColumn(
                 data =
                     ScoreDisplayData(
-                        playerName = state.opponentName.ifEmpty { "OPPONENT" },
                         score = state.opponentScore.display,
                         isServing = !state.isUserServing,
                     ),

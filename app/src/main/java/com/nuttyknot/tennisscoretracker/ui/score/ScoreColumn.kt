@@ -164,8 +164,6 @@ private fun PortraitScoreColumn(
 }
 
 data class ScoreDisplayData(
-    val playerName: String,
     val score: String,
     val isServing: Boolean,
-    val isUser: Boolean = false,
 )
