@@ -26,11 +26,18 @@ fun TennisAppNavigation(
     navController: NavHostController = rememberNavController(),
     scoreModel: ScoreModel,
     settingsManager: SettingsManager,
+    onRouteChange: (String) -> Unit = {},
 ) {
     val hasSeenHelp by settingsManager.hasSeenHelpFlow.collectAsState(initial = true)
     val matchState by scoreModel.matchState.collectAsState()
     val scope = rememberCoroutineScope()
     var hasNavigatedToSummary by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntryFlow.collect { entry ->
+            entry.destination.route?.let { onRouteChange(it) }
+        }
+    }
 
     LaunchedEffect(hasSeenHelp) {
         if (!hasSeenHelp) {

@@ -10,11 +10,17 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 
 // Property delegate for DataStore
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
+@Suppress("TooManyFunctions")
 class SettingsManager(private val context: Context) {
     companion object {
         val KEYCODE = intPreferencesKey("keycode")
@@ -36,6 +42,24 @@ class SettingsManager(private val context: Context) {
         const val DEFAULT_HAS_SEEN_HELP = false
         val DEFAULT_APP_THEME = AppTheme.SKY_BLUE
         val DEFAULT_MATCH_FORMAT = MatchFormat.STANDARD
+    }
+
+    private val _isDetectingKeycode = MutableStateFlow(false)
+    val isDetectingKeycode: StateFlow<Boolean> = _isDetectingKeycode.asStateFlow()
+
+    private val _detectedKeycode = MutableSharedFlow<Int>(extraBufferCapacity = 1)
+    val detectedKeycode = _detectedKeycode.asSharedFlow()
+
+    fun startKeycodeDetection() {
+        _isDetectingKeycode.value = true
+    }
+
+    fun stopKeycodeDetection() {
+        _isDetectingKeycode.value = false
+    }
+
+    fun onKeycodeDetected(keycode: Int) {
+        _detectedKeycode.tryEmit(keycode)
     }
 
     val keycodeFlow: Flow<Int> =

@@ -22,6 +22,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.nuttyknot.tennisscoretracker.ui.Routes
 import com.nuttyknot.tennisscoretracker.ui.TennisAppNavigation
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var ttsManager: TtsManager
     private lateinit var keyEventManager: KeyEventManager
     private var pendingTheme: AppTheme? = null
+    private var isOnScoreScreen: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +71,9 @@ class MainActivity : ComponentActivity() {
                     TennisAppNavigation(
                         scoreModel = scoreModel,
                         settingsManager = settingsManager,
+                        onRouteChange = { route ->
+                            isOnScoreScreen = route == Routes.SCORE_SCREEN
+                        },
                     )
                 }
             }
@@ -166,9 +171,19 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         val handled =
-            when (event.action) {
-                KeyEvent.ACTION_DOWN -> keyEventManager.onKeyDown(event.keyCode, event)
-                KeyEvent.ACTION_UP -> keyEventManager.onKeyUp(event.keyCode)
+            when {
+                settingsManager.isDetectingKeycode.value -> {
+                    if (event.action == KeyEvent.ACTION_DOWN) {
+                        settingsManager.onKeycodeDetected(event.keyCode)
+                    }
+                    true
+                }
+                isOnScoreScreen ->
+                    when (event.action) {
+                        KeyEvent.ACTION_DOWN -> keyEventManager.onKeyDown(event.keyCode, event)
+                        KeyEvent.ACTION_UP -> keyEventManager.onKeyUp(event.keyCode)
+                        else -> false
+                    }
                 else -> false
             }
         return if (handled) true else super.dispatchKeyEvent(event)

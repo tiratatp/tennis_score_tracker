@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -13,6 +15,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -43,6 +46,9 @@ fun AppSettings(data: AppSettingsData) {
     KeycodeDropdown(
         currentKeycode = data.currentKeycode,
         onKeycodeChange = data.onKeycodeChange,
+        isDetecting = data.isDetectingKeycode,
+        onDetect = data.onDetectKeycode,
+        onCancelDetect = data.onCancelDetectKeycode,
     )
 }
 
@@ -114,15 +120,22 @@ fun ThemeDropdown(
 }
 
 @Suppress("FunctionName")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KeycodeDropdown(
     currentKeycode: Int,
     onKeycodeChange: (Int) -> Unit,
+    isDetecting: Boolean = false,
+    onDetect: () -> Unit = {},
+    onCancelDetect: () -> Unit = {},
 ) {
-    var expanded by remember { mutableStateOf(false) }
     val selectedOption = KEYCODE_OPTIONS.find { it.code == currentKeycode }
-    val displayText = selectedOption?.let { "${it.name} (${it.code})" } ?: "Unknown ($currentKeycode)"
+    val displayText =
+        if (isDetecting) {
+            "Press any button..."
+        } else {
+            selectedOption?.let { "${it.name} (${it.code})" }
+                ?: "${KeyEvent.keyCodeToString(currentKeycode)} ($currentKeycode)"
+        }
 
     Column {
         Text(
@@ -131,38 +144,89 @@ fun KeycodeDropdown(
             style = MaterialTheme.typography.titleMedium,
         )
         Spacer(modifier = Modifier.height(4.dp))
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded },
-        ) {
-            OutlinedTextField(
-                value = displayText,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors =
-                    OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                    ),
-                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
-            )
-            if (expanded) {
-                KeycodeMenu(
-                    currentKeycode = currentKeycode,
-                    onKeycodeChange = onKeycodeChange,
-                    onDismiss = { expanded = false },
-                )
-            }
-        }
+        KeycodeSelector(displayText, currentKeycode, isDetecting, onKeycodeChange)
+        Spacer(modifier = Modifier.height(4.dp))
+        KeycodeDetectButton(isDetecting, onDetect, onCancelDetect)
         Spacer(modifier = Modifier.height(2.dp))
         Text(
-            text = "Select the button your Bluetooth remote sends.",
+            text = "Select from the list, or tap Detect to auto-detect your remote's button.",
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             style = MaterialTheme.typography.bodySmall,
         )
+    }
+}
+
+@Suppress("FunctionName")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun KeycodeSelector(
+    displayText: String,
+    currentKeycode: Int,
+    isDetecting: Boolean,
+    onKeycodeChange: (Int) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val primary = MaterialTheme.colorScheme.primary
+    val onBg = MaterialTheme.colorScheme.onBackground
+    val textColor = if (isDetecting) primary else onBg
+    val borderColor = if (isDetecting) primary else onBg.copy(alpha = 0.5f)
+
+    ExposedDropdownMenuBox(
+        expanded = expanded && !isDetecting,
+        onExpandedChange = { if (!isDetecting) expanded = !expanded },
+    ) {
+        OutlinedTextField(
+            value = displayText,
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = {
+                if (!isDetecting) ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = textColor,
+                    unfocusedTextColor = textColor,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = borderColor,
+                ),
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+        )
+        if (expanded && !isDetecting) {
+            KeycodeMenu(
+                currentKeycode = currentKeycode,
+                onKeycodeChange = onKeycodeChange,
+                onDismiss = { expanded = false },
+            )
+        }
+    }
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun KeycodeDetectButton(
+    isDetecting: Boolean,
+    onDetect: () -> Unit,
+    onCancelDetect: () -> Unit,
+) {
+    if (isDetecting) {
+        OutlinedButton(
+            onClick = onCancelDetect,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Cancel")
+        }
+    } else {
+        Button(
+            onClick = onDetect,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                ),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Detect Button")
+        }
     }
 }
 
@@ -249,9 +313,12 @@ data class AppSettingsData(
     val currentTheme: AppTheme,
     val currentMatchFormat: MatchFormat,
     val isMatchFormatLocked: Boolean = false,
+    val isDetectingKeycode: Boolean = false,
     val onKeycodeChange: (Int) -> Unit,
     val onThemeChange: (AppTheme) -> Unit,
     val onMatchFormatChange: (MatchFormat) -> Unit,
+    val onDetectKeycode: () -> Unit = {},
+    val onCancelDetectKeycode: () -> Unit = {},
 )
 
 @Suppress("FunctionName")

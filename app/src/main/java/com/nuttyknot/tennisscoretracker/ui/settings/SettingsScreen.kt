@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,49 +33,20 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val matchState by scoreModel.matchState.collectAsState()
-    val isMatchInProgress = !matchState.isScoreZero
-    val currentKeycode by settingsManager.keycodeFlow.collectAsState(
-        initial = SettingsManager.DEFAULT_KEYCODE,
-    )
-    val currentDoubleClick by settingsManager.doubleClickLatencyFlow.collectAsState(
-        initial = SettingsManager.DEFAULT_DOUBLE_CLICK_LATENCY,
-    )
-    val currentLongPress by settingsManager.longPressLatencyFlow.collectAsState(
-        initial = SettingsManager.DEFAULT_LONG_PRESS_LATENCY,
-    )
-    val userName by settingsManager.userNameFlow.collectAsState(
-        initial = SettingsManager.DEFAULT_USER_NAME,
-    )
-    val opponentName by settingsManager.opponentNameFlow.collectAsState(
-        initial = SettingsManager.DEFAULT_OPPONENT_NAME,
-    )
-    val initialServerIsUser by settingsManager.initialServerIsUserFlow.collectAsState(
-        initial = SettingsManager.DEFAULT_INITIAL_SERVER_IS_USER,
-    )
-    val appTheme by settingsManager.appThemeFlow.collectAsState(
-        initial = SettingsManager.DEFAULT_APP_THEME,
-    )
-    val matchFormat by settingsManager.matchFormatFlow.collectAsState(
-        initial = SettingsManager.DEFAULT_MATCH_FORMAT,
-    )
+    val state = collectSettingsState(scoreModel, settingsManager)
+
+    LaunchedEffect(Unit) {
+        settingsManager.detectedKeycode.collect { keycode ->
+            settingsManager.updateKeycode(keycode)
+            settingsManager.stopKeycodeDetection()
+        }
+    }
 
     val (playerData, appData, latencyData) =
         buildSettingsData(
             settingsManager = settingsManager,
             coroutineScope = coroutineScope,
-            isMatchInProgress = isMatchInProgress,
-            state =
-                SettingsState(
-                    userName = userName,
-                    opponentName = opponentName,
-                    initialServerIsUser = initialServerIsUser,
-                    currentKeycode = currentKeycode,
-                    currentDoubleClick = currentDoubleClick,
-                    currentLongPress = currentLongPress,
-                    appTheme = appTheme,
-                    matchFormat = matchFormat,
-                ),
+            state = state,
         )
 
     Scaffold(
@@ -90,11 +62,50 @@ fun SettingsScreen(
     }
 }
 
+@Suppress("FunctionName")
+@Composable
+private fun collectSettingsState(
+    scoreModel: ScoreModel,
+    settingsManager: SettingsManager,
+): SettingsState {
+    val matchState by scoreModel.matchState.collectAsState()
+    val currentKeycode by settingsManager.keycodeFlow.collectAsState(initial = SettingsManager.DEFAULT_KEYCODE)
+    val currentDoubleClick by settingsManager.doubleClickLatencyFlow.collectAsState(
+        initial = SettingsManager.DEFAULT_DOUBLE_CLICK_LATENCY,
+    )
+    val currentLongPress by settingsManager.longPressLatencyFlow.collectAsState(
+        initial = SettingsManager.DEFAULT_LONG_PRESS_LATENCY,
+    )
+    val userName by settingsManager.userNameFlow.collectAsState(initial = SettingsManager.DEFAULT_USER_NAME)
+    val opponentName by settingsManager.opponentNameFlow.collectAsState(initial = SettingsManager.DEFAULT_OPPONENT_NAME)
+    val initialServerIsUser by settingsManager.initialServerIsUserFlow.collectAsState(
+        initial = SettingsManager.DEFAULT_INITIAL_SERVER_IS_USER,
+    )
+    val appTheme by settingsManager.appThemeFlow.collectAsState(initial = SettingsManager.DEFAULT_APP_THEME)
+    val matchFormat by settingsManager.matchFormatFlow.collectAsState(initial = SettingsManager.DEFAULT_MATCH_FORMAT)
+    val isDetectingKeycode by settingsManager.isDetectingKeycode.collectAsState()
+
+    return SettingsState(
+        isMatchInProgress = !matchState.isScoreZero,
+        userName = userName,
+        opponentName = opponentName,
+        initialServerIsUser = initialServerIsUser,
+        currentKeycode = currentKeycode,
+        isDetectingKeycode = isDetectingKeycode,
+        currentDoubleClick = currentDoubleClick,
+        currentLongPress = currentLongPress,
+        appTheme = appTheme,
+        matchFormat = matchFormat,
+    )
+}
+
 private data class SettingsState(
+    val isMatchInProgress: Boolean,
     val userName: String,
     val opponentName: String,
     val initialServerIsUser: Boolean,
     val currentKeycode: Int,
+    val isDetectingKeycode: Boolean,
     val currentDoubleClick: Long,
     val currentLongPress: Long,
     val appTheme: AppTheme,
@@ -104,7 +115,6 @@ private data class SettingsState(
 private fun buildSettingsData(
     settingsManager: SettingsManager,
     coroutineScope: kotlinx.coroutines.CoroutineScope,
-    isMatchInProgress: Boolean,
     state: SettingsState,
 ): Triple<PlayerSettingsData, AppSettingsData, LatencySettingsData> {
     val playerData =
@@ -127,7 +137,8 @@ private fun buildSettingsData(
             currentKeycode = state.currentKeycode,
             currentTheme = state.appTheme,
             currentMatchFormat = state.matchFormat,
-            isMatchFormatLocked = isMatchInProgress,
+            isMatchFormatLocked = state.isMatchInProgress,
+            isDetectingKeycode = state.isDetectingKeycode,
             onKeycodeChange = { code ->
                 coroutineScope.launch { settingsManager.updateKeycode(code) }
             },
@@ -137,6 +148,8 @@ private fun buildSettingsData(
             onMatchFormatChange = { format ->
                 coroutineScope.launch { settingsManager.updateMatchFormat(format) }
             },
+            onDetectKeycode = { settingsManager.startKeycodeDetection() },
+            onCancelDetectKeycode = { settingsManager.stopKeycodeDetection() },
         )
     val latencyData =
         LatencySettingsData(
