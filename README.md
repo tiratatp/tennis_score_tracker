@@ -13,6 +13,18 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
 - **Customizable** — Set player names, adjust button sensitivity, and choose from multiple color themes
 - **Tap input** — You can also tap the screen to score if you prefer
 
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/main.png" width="600" alt="Score screen (landscape)">
+</p>
+<p align="center">
+  <img src="screenshots/portrait.png" width="300" alt="Score screen (portrait)">
+</p>
+<p align="center">
+  <img src="screenshots/help.png" width="300" alt="Help screen">
+</p>
+
 ## How to Install
 
 **Requires Android 8.0 or newer.**
