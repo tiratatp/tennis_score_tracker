@@ -20,19 +20,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nuttyknot.tennisscoretracker.AppTheme
 import com.nuttyknot.tennisscoretracker.MatchFormat
-import com.nuttyknot.tennisscoretracker.ScoreManager
+import com.nuttyknot.tennisscoretracker.ScoreModel
 import com.nuttyknot.tennisscoretracker.SettingsManager
 import kotlinx.coroutines.launch
 
 @Suppress("FunctionName")
 @Composable
 fun SettingsScreen(
-    scoreManager: ScoreManager,
+    scoreModel: ScoreModel,
     settingsManager: SettingsManager,
     onNavigateBack: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val matchState by scoreManager.matchState.collectAsState()
+    val matchState by scoreModel.matchState.collectAsState()
     val isMatchInProgress = !matchState.isScoreZero
     val currentKeycode by settingsManager.keycodeFlow.collectAsState(
         initial = SettingsManager.DEFAULT_KEYCODE,

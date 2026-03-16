@@ -1,11 +1,12 @@
 package com.nuttyknot.tennisscoretracker
 
+import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class ScoreManager {
+class ScoreModel : ViewModel() {
     private val _matchState = MutableStateFlow(TennisMatchState())
     val matchState: StateFlow<TennisMatchState> = _matchState.asStateFlow()
 

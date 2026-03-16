@@ -9,6 +9,7 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,7 +30,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private lateinit var scoreManager: ScoreManager
+    private val scoreModel: ScoreModel by viewModels()
     private lateinit var settingsManager: SettingsManager
     private lateinit var ttsManager: TtsManager
     private lateinit var keyEventManager: KeyEventManager
@@ -50,7 +51,7 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                scoreManager.matchState.drop(1).collectLatest { state ->
+                scoreModel.matchState.drop(1).collectLatest { state ->
                     state.announcement?.let { ttsManager.announce(it) }
                 }
             }
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     TennisAppNavigation(
-                        scoreManager = scoreManager,
+                        scoreModel = scoreModel,
                         settingsManager = settingsManager,
                     )
                 }
@@ -75,16 +76,15 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun initializeManagers() {
-        scoreManager = ScoreManager()
         settingsManager = SettingsManager(this)
         ttsManager = TtsManager(this)
 
         keyEventManager =
             KeyEventManager(
                 scope = lifecycleScope,
-                onSingleClick = { scoreManager.incrementUserScore() },
-                onDoubleClick = { scoreManager.incrementOpponentScore() },
-                onLongPress = { scoreManager.undo() },
+                onSingleClick = { scoreModel.incrementUserScore() },
+                onDoubleClick = { scoreModel.incrementOpponentScore() },
+                onLongPress = { scoreModel.undo() },
             )
     }
 
@@ -116,21 +116,21 @@ class MainActivity : ComponentActivity() {
                     settingsManager.userNameFlow,
                     settingsManager.opponentNameFlow,
                 ) { user, opponent -> user to opponent }.collectLatest { (user, opponent) ->
-                    scoreManager.updateMatchParameters(userName = user, opponentName = opponent)
+                    scoreModel.updateMatchParameters(userName = user, opponentName = opponent)
                 }
             }
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsManager.initialServerIsUserFlow.collectLatest { isUser ->
-                    scoreManager.updateMatchParameters(initialServerIsUser = isUser)
+                    scoreModel.updateMatchParameters(initialServerIsUser = isUser)
                 }
             }
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsManager.matchFormatFlow.collectLatest { format ->
-                    scoreManager.updateMatchParameters(matchFormat = format)
+                    scoreModel.updateMatchParameters(matchFormat = format)
                 }
             }
         }

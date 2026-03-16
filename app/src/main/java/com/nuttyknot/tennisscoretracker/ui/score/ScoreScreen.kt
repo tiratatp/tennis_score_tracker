@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nuttyknot.tennisscoretracker.MatchFormat
-import com.nuttyknot.tennisscoretracker.ScoreManager
+import com.nuttyknot.tennisscoretracker.ScoreModel
 import com.nuttyknot.tennisscoretracker.SettingsManager
 import com.nuttyknot.tennisscoretracker.TennisMatchState
 
@@ -36,12 +36,12 @@ import com.nuttyknot.tennisscoretracker.TennisMatchState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScoreScreen(
-    scoreManager: ScoreManager,
+    scoreModel: ScoreModel,
     settingsManager: SettingsManager,
     onNavigateToSettings: () -> Unit,
     onNavigateToHelp: () -> Unit,
 ) {
-    val state by scoreManager.matchState.collectAsState()
+    val state by scoreModel.matchState.collectAsState()
 
     val doubleClickLatency by settingsManager.doubleClickLatencyFlow
         .collectAsState(initial = SettingsManager.DEFAULT_DOUBLE_CLICK_LATENCY)
@@ -53,7 +53,7 @@ fun ScoreScreen(
     ResetConfirmationDialog(
         showDialog = showResetDialog,
         onConfirm = {
-            scoreManager.reset()
+            scoreModel.reset()
             showResetDialog = false
         },
         onDismiss = { showResetDialog = false },
@@ -66,7 +66,7 @@ fun ScoreScreen(
                 onNavigateToSettings = onNavigateToSettings,
                 onResetClick = {
                     if (state.isScoreZero) {
-                        scoreManager.reset()
+                        scoreModel.reset()
                     } else {
                         showResetDialog = true
                     }
@@ -77,7 +77,7 @@ fun ScoreScreen(
     ) { paddingValues ->
         ScoreScreenContent(
             state = state,
-            scoreManager = scoreManager,
+            scoreModel = scoreModel,
             doubleClickLatency = doubleClickLatency,
             longPressLatency = longPressLatency,
             paddingValues = paddingValues,
@@ -89,7 +89,7 @@ fun ScoreScreen(
 @Composable
 private fun ScoreScreenContent(
     state: TennisMatchState,
-    scoreManager: ScoreManager,
+    scoreModel: ScoreModel,
     doubleClickLatency: Long,
     longPressLatency: Long,
     paddingValues: androidx.compose.foundation.layout.PaddingValues,
@@ -110,16 +110,16 @@ private fun ScoreScreenContent(
                     detectTapGestures(
                         onTap = {
                             if (state.matchWinner == null) {
-                                scoreManager.incrementUserScore()
+                                scoreModel.incrementUserScore()
                             }
                         },
                         onDoubleTap = {
                             if (state.matchWinner == null) {
-                                scoreManager.incrementOpponentScore()
+                                scoreModel.incrementOpponentScore()
                             }
                         },
                         onLongPress = {
-                            scoreManager.undo()
+                            scoreModel.undo()
                         },
                     )
                 },

@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.nuttyknot.tennisscoretracker.ScoreManager
+import com.nuttyknot.tennisscoretracker.ScoreModel
 import com.nuttyknot.tennisscoretracker.SettingsManager
 import com.nuttyknot.tennisscoretracker.ui.help.HelpScreen
 import com.nuttyknot.tennisscoretracker.ui.score.ScoreScreen
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TennisAppNavigation(
     navController: NavHostController = rememberNavController(),
-    scoreManager: ScoreManager,
+    scoreModel: ScoreModel,
     settingsManager: SettingsManager,
 ) {
     val hasSeenHelp by settingsManager.hasSeenHelpFlow.collectAsState(initial = true)
@@ -40,7 +40,7 @@ fun TennisAppNavigation(
     ) {
         composable(Routes.SCORE_SCREEN) {
             ScoreScreen(
-                scoreManager = scoreManager,
+                scoreModel = scoreModel,
                 settingsManager = settingsManager,
                 onNavigateToSettings = { navController.navigate(Routes.SETTINGS_SCREEN) },
                 onNavigateToHelp = { navController.navigate(Routes.HELP_SCREEN) },
@@ -48,7 +48,7 @@ fun TennisAppNavigation(
         }
         composable(Routes.SETTINGS_SCREEN) {
             SettingsScreen(
-                scoreManager = scoreManager,
+                scoreModel = scoreModel,
                 settingsManager = settingsManager,
                 onNavigateBack = { navController.popBackStack() },
             )
