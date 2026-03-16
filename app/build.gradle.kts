@@ -56,11 +56,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            signingConfig = try {
-                signingConfigs.getByName("release")
-            } catch (_: UnknownDomainObjectException) {
-                signingConfigs.getByName("debug")
-            }
+            signingConfig =
+                try {
+                    signingConfigs.getByName("release")
+                } catch (_: UnknownDomainObjectException) {
+                    signingConfigs.getByName("debug")
+                }
         }
     }
     compileOptions {
