@@ -63,9 +63,13 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                scoreModel.matchState.collectLatest { state ->
-                    wearSyncManager.pushState(state)
-                }
+                combine(
+                    scoreModel.matchState,
+                    settingsManager.appThemeFlow,
+                ) { state, theme -> state to theme }
+                    .collectLatest { (state, theme) ->
+                        wearSyncManager.pushState(state, theme)
+                    }
             }
         }
 

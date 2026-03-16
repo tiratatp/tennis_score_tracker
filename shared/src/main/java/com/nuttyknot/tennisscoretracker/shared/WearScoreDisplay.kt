@@ -16,6 +16,8 @@ data class WearScoreDisplay(
     val isUserServing: Boolean = true,
     val isMatchOver: Boolean = false,
     val matchWinner: String? = null,
+    val primaryColorArgb: Int? = null,
+    val secondaryColorArgb: Int? = null,
 ) {
     fun toJson(): String {
         val obj = JSONObject()
@@ -39,6 +41,12 @@ data class WearScoreDisplay(
         obj.put("isMatchOver", isMatchOver)
         if (matchWinner != null) {
             obj.put("matchWinner", matchWinner)
+        }
+        if (primaryColorArgb != null) {
+            obj.put("primaryColorArgb", primaryColorArgb)
+        }
+        if (secondaryColorArgb != null) {
+            obj.put("secondaryColorArgb", secondaryColorArgb)
         }
         return obj.toString()
     }
@@ -67,6 +75,8 @@ data class WearScoreDisplay(
                 isUserServing = obj.optBoolean("isUserServing", true),
                 isMatchOver = obj.optBoolean("isMatchOver", false),
                 matchWinner = obj.optString("matchWinner", "").ifEmpty { null },
+                primaryColorArgb = if (obj.has("primaryColorArgb")) obj.getInt("primaryColorArgb") else null,
+                secondaryColorArgb = if (obj.has("secondaryColorArgb")) obj.getInt("secondaryColorArgb") else null,
             )
         }
     }

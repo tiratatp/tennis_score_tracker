@@ -38,6 +38,7 @@ private val LABEL_FONT_SIZE = 11.sp
 private val SCREEN_PADDING = 8.dp
 private val INNER_PADDING = 4.dp
 private val SPACER_HEIGHT = 2.dp
+private val SCORE_GAP = 16.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Suppress("FunctionName", "LongParameterList")
@@ -120,6 +121,9 @@ private fun ScoreContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        val userColor = scoreDisplay.primaryColorArgb?.let { Color(it) } ?: Color.White
+        val opponentColor = scoreDisplay.secondaryColorArgb?.let { Color(it) } ?: Color.White
+
         if (scoreDisplay.isMatchOver && scoreDisplay.matchWinner != null) {
             Text(
                 text = "${scoreDisplay.matchWinner} wins!",
@@ -130,9 +134,9 @@ private fun ScoreContent(
             Spacer(modifier = Modifier.height(SPACER_HEIGHT))
         }
 
-        PlayerNames(scoreDisplay)
+        PlayerNames(scoreDisplay, userColor, opponentColor)
         Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-        PointScore(scoreDisplay)
+        PointScore(scoreDisplay, userColor, opponentColor)
         Spacer(modifier = Modifier.height(SPACER_HEIGHT))
         Row(
             horizontalArrangement = Arrangement.spacedBy(INNER_PADDING * 2),
@@ -141,13 +145,13 @@ private fun ScoreContent(
                 Text(
                     text = "$user-$opp",
                     fontSize = DETAIL_FONT_SIZE,
-                    color = Color.Gray,
+                    color = userColor.copy(alpha = 0.5f),
                 )
             }
             Text(
                 text = "${scoreDisplay.userGames}-${scoreDisplay.opponentGames}",
                 fontSize = DETAIL_FONT_SIZE,
-                color = Color.LightGray,
+                color = userColor,
             )
         }
 
@@ -165,7 +169,11 @@ private fun ScoreContent(
 
 @Suppress("FunctionName")
 @Composable
-private fun PlayerNames(scoreDisplay: WearScoreDisplay) {
+private fun PlayerNames(
+    scoreDisplay: WearScoreDisplay,
+    userColor: Color,
+    opponentColor: Color,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -173,17 +181,23 @@ private fun PlayerNames(scoreDisplay: WearScoreDisplay) {
         PlayerLabel(
             name = scoreDisplay.userName.ifEmpty { "You" },
             isServing = scoreDisplay.isUserServing,
+            color = userColor,
         )
         PlayerLabel(
             name = scoreDisplay.opponentName.ifEmpty { "Opp" },
             isServing = !scoreDisplay.isUserServing,
+            color = opponentColor,
         )
     }
 }
 
 @Suppress("FunctionName")
 @Composable
-private fun PointScore(scoreDisplay: WearScoreDisplay) {
+private fun PointScore(
+    scoreDisplay: WearScoreDisplay,
+    userColor: Color,
+    opponentColor: Color,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
@@ -193,18 +207,14 @@ private fun PointScore(scoreDisplay: WearScoreDisplay) {
             text = scoreDisplay.userScore,
             fontSize = SCORE_FONT_SIZE,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = userColor,
         )
-        Text(
-            text = " - ",
-            fontSize = SCORE_FONT_SIZE,
-            color = Color.Gray,
-        )
+        Spacer(modifier = Modifier.size(SCORE_GAP))
         Text(
             text = scoreDisplay.opponentScore,
             fontSize = SCORE_FONT_SIZE,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = opponentColor,
         )
     }
 }
@@ -263,6 +273,7 @@ private fun TapZones(
 private fun PlayerLabel(
     name: String,
     isServing: Boolean,
+    color: Color,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -274,13 +285,13 @@ private fun PlayerLabel(
                     Modifier
                         .size(SERVING_DOT_SIZE)
                         .clip(CircleShape)
-                        .background(Color(COLOR_TENNIS_GREEN)),
+                        .background(color),
             )
         }
         Text(
             text = name,
             fontSize = LABEL_FONT_SIZE,
-            color = Color.White,
+            color = color,
             maxLines = 1,
         )
     }
