@@ -4,4 +4,5 @@ object Routes {
     const val SCORE_SCREEN = "score"
     const val SETTINGS_SCREEN = "settings"
     const val HELP_SCREEN = "help"
+    const val MATCH_SUMMARY_SCREEN = "match_summary"
 }
