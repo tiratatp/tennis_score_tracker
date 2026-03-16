@@ -21,10 +21,12 @@ class WearMainActivity : ComponentActivity() {
         object : AmbientLifecycleObserver.AmbientLifecycleCallback {
             override fun onEnterAmbient(ambientDetails: AmbientLifecycleObserver.AmbientDetails) {
                 isAmbient = true
+                viewModel.onAmbientStateChanged(true)
             }
 
             override fun onExitAmbient() {
                 isAmbient = false
+                viewModel.onAmbientStateChanged(false)
             }
         }
 

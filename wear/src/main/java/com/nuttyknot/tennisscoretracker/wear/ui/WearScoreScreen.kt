@@ -1,5 +1,6 @@
 package com.nuttyknot.tennisscoretracker.wear.ui
 
+import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -222,6 +224,7 @@ private fun TapZones(
     onOpponentScored: () -> Unit,
     onUndo: () -> Unit,
 ) {
+    val view = LocalView.current
     Row(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier =
@@ -229,8 +232,14 @@ private fun TapZones(
                     .fillMaxHeight()
                     .weight(1f)
                     .combinedClickable(
-                        onClick = onUserScored,
-                        onLongClick = onUndo,
+                        onClick = {
+                            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                            onUserScored()
+                        },
+                        onLongClick = {
+                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                            onUndo()
+                        },
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() },
                     ),
@@ -241,8 +250,14 @@ private fun TapZones(
                     .fillMaxHeight()
                     .weight(1f)
                     .combinedClickable(
-                        onClick = onOpponentScored,
-                        onLongClick = onUndo,
+                        onClick = {
+                            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                            onOpponentScored()
+                        },
+                        onLongClick = {
+                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                            onUndo()
+                        },
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() },
                     ),
