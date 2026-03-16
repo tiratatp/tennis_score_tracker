@@ -8,23 +8,15 @@ plugins {
     id("app.cash.paparazzi") version "1.3.5" apply false
 }
 
-tasks.register<Copy>("installGitHook") {
-    from("scripts/pre-commit")
-    into(".git/hooks")
-    filePermissions {
-        user {
-            read = true
-            write = true
-            execute = true
-        }
-        group {
-            read = true
-            execute = true
-        }
-        other {
-            read = true
-            execute = true
-        }
+tasks.register("installGitHook") {
+    val hookFile = file(".git/hooks/pre-commit")
+    val scriptFile = file("scripts/pre-commit")
+    outputs.file(hookFile)
+    inputs.file(scriptFile)
+    doLast {
+        if (hookFile.exists()) hookFile.delete()
+        val relative = hookFile.parentFile.toPath().relativize(scriptFile.toPath())
+        Runtime.getRuntime().exec(arrayOf("ln", "-s", relative.toString(), hookFile.absolutePath)).waitFor()
     }
 }
 

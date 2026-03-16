@@ -5,14 +5,16 @@
 
 set -euo pipefail
 
+# Capture staged Kotlin files before formatting
+STAGED_KT=$(git diff --cached --name-only --diff-filter=ACM -- '*.kt' '*.kts')
+
 echo "==> Running ktlintFormat..."
 ./gradlew ktlintFormat --daemon -q
 
-# Re-stage any files that ktlintFormat may have modified
-CHANGED_FILES=$(git diff --name-only -- '*.kt' '*.kts' 2>/dev/null || true)
-if [ -n "$CHANGED_FILES" ]; then
+# Re-stage only files that were already staged
+if [ -n "$STAGED_KT" ]; then
     echo "==> Re-staging formatted files..."
-    echo "$CHANGED_FILES" | xargs git add
+    echo "$STAGED_KT" | xargs git add
 fi
 
 echo "==> Running detekt..."
