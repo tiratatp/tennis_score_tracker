@@ -87,14 +87,22 @@ private fun AmbientScoreContent(scoreDisplay: WearScoreDisplay) {
             textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-        Text(
-            text =
-                "G ${scoreDisplay.userGames}-${scoreDisplay.opponentGames}  " +
-                    "S ${scoreDisplay.userSets}-${scoreDisplay.opponentSets}",
-            fontSize = DETAIL_FONT_SIZE,
-            color = Color.Gray,
-            textAlign = TextAlign.Center,
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(INNER_PADDING * 2),
+        ) {
+            scoreDisplay.setHistory.forEach { (user, opp) ->
+                Text(
+                    text = "$user-$opp",
+                    fontSize = DETAIL_FONT_SIZE,
+                    color = Color.Gray,
+                )
+            }
+            Text(
+                text = "${scoreDisplay.userGames}-${scoreDisplay.opponentGames}",
+                fontSize = DETAIL_FONT_SIZE,
+                color = Color.Gray,
+            )
+        }
     }
 }
 
@@ -126,15 +134,20 @@ private fun ScoreContent(
         Spacer(modifier = Modifier.height(SPACER_HEIGHT))
         PointScore(scoreDisplay)
         Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-        GamesAndSets(scoreDisplay)
-
-        if (scoreDisplay.setHistory.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(INNER_PADDING * 2),
+        ) {
+            scoreDisplay.setHistory.forEach { (user, opp) ->
+                Text(
+                    text = "$user-$opp",
+                    fontSize = DETAIL_FONT_SIZE,
+                    color = Color.Gray,
+                )
+            }
             Text(
-                text = scoreDisplay.setHistory.joinToString("  ") { "${it.first}-${it.second}" },
-                fontSize = LABEL_FONT_SIZE,
-                color = Color.Gray,
-                textAlign = TextAlign.Center,
+                text = "${scoreDisplay.userGames}-${scoreDisplay.opponentGames}",
+                fontSize = DETAIL_FONT_SIZE,
+                color = Color.LightGray,
             )
         }
 
@@ -192,26 +205,6 @@ private fun PointScore(scoreDisplay: WearScoreDisplay) {
             fontSize = SCORE_FONT_SIZE,
             fontWeight = FontWeight.Bold,
             color = Color.White,
-        )
-    }
-}
-
-@Suppress("FunctionName")
-@Composable
-private fun GamesAndSets(scoreDisplay: WearScoreDisplay) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-    ) {
-        Text(
-            text = "G ${scoreDisplay.userGames}-${scoreDisplay.opponentGames}",
-            fontSize = DETAIL_FONT_SIZE,
-            color = Color.LightGray,
-        )
-        Text(
-            text = "S ${scoreDisplay.userSets}-${scoreDisplay.opponentSets}",
-            fontSize = DETAIL_FONT_SIZE,
-            color = Color.LightGray,
         )
     }
 }
