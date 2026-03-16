@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nuttyknot.tennisscoretracker.ui.AppFooter
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,14 +104,7 @@ private fun HelpScreenContent(
             Text("Got it", fontSize = 18.sp)
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = "made with ♥ by NuttyKnot",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
+        AppFooter()
     }
 }
 

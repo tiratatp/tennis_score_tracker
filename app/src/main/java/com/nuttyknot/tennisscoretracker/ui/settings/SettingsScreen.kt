@@ -2,27 +2,24 @@ package com.nuttyknot.tennisscoretracker.ui.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nuttyknot.tennisscoretracker.AppTheme
 import com.nuttyknot.tennisscoretracker.MatchFormat
 import com.nuttyknot.tennisscoretracker.ScoreModel
 import com.nuttyknot.tennisscoretracker.SettingsManager
+import com.nuttyknot.tennisscoretracker.ui.AppFooter
 import kotlinx.coroutines.launch
 
 @Suppress("FunctionName")
@@ -195,12 +192,6 @@ private fun SettingsLayout(
         CollapsibleSettingsSection(title = "Advanced") {
             LatencySettings(latencyData)
         }
-        Spacer(modifier = Modifier.height(32.dp))
-        Text(
-            text = "made with ♥ by NuttyKnot",
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        )
+        AppFooter()
     }
 }
