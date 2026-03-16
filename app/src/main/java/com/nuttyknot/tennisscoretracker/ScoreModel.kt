@@ -219,7 +219,7 @@ class ScoreModel : ViewModel() {
             return if (isTiebreakWon) {
                 val winnerName =
                     if (newUserPoints > newOppPoints) {
-                        state.userName.ifEmpty { "User" }
+                        state.userName.ifEmpty { "You" }
                     } else {
                         state.opponentName.ifEmpty { "Opponent" }
                     }
@@ -250,7 +250,7 @@ class ScoreModel : ViewModel() {
             val opponentGamesForCheck = if (userScored) currentState.opponentGames else currentState.opponentGames + 1
             val winnerName =
                 if (userScored) {
-                    currentState.userName.ifEmpty { "User" }
+                    currentState.userName.ifEmpty { "You" }
                 } else {
                     currentState.opponentName.ifEmpty { "Opponent" }
                 }

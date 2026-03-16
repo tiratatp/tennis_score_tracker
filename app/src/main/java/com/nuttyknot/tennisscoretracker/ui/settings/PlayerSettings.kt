@@ -7,7 +7,7 @@ import androidx.compose.ui.text.input.KeyboardType
 @Composable
 fun PlayerSettings(data: PlayerSettingsData) {
     SettingsItem(
-        label = "User Name",
+        label = "Your Name",
         value = data.userName,
         onValueChange = data.onUserNameChange,
         description = "Your name for announcements.",
@@ -41,7 +41,7 @@ fun PlayerSettings(data: PlayerSettingsData) {
     )
 
     SettingsToggle(
-        label = "User starts serving",
+        label = "You start serving",
         checked = data.initialServerIsUser,
         onCheckedChange = data.onInitialServerChange,
     )

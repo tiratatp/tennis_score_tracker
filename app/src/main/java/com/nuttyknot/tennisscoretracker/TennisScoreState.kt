@@ -85,7 +85,7 @@ private fun generateSetWinningAnnouncement(state: TennisMatchState): String {
 private fun generateNewSetAnnouncement(state: TennisMatchState): String {
     val serverName =
         if (state.isUserServing) {
-            state.userName.ifEmpty { "User" }
+            state.userName.ifEmpty { "You" }
         } else {
             state.opponentName.ifEmpty { "Opponent" }
         }
@@ -105,7 +105,7 @@ private fun generateGameWinningAnnouncement(state: TennisMatchState): String {
             val isUserLeading = state.userGames > state.opponentGames
             val leaderName =
                 if (isUserLeading) {
-                    state.userName.ifEmpty { "User" }
+                    state.userName.ifEmpty { "You" }
                 } else {
                     state.opponentName.ifEmpty { "Opponent" }
                 }
