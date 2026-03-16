@@ -2,6 +2,7 @@ package com.nuttyknot.tennisscoretracker
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -649,5 +650,16 @@ class ScoreModelTest {
         assertEquals("Player 1", state().setWinner)
         assertEquals(7, state().userGames)
         assertEquals(6, state().opponentGames)
+    }
+
+    @Test
+    fun `test updateMatchParameters clears announcement`() {
+        scoreModel.incrementUserScore()
+        assertNotNull(state().announcement)
+
+        scoreModel.updateMatchParameters(userName = "Alice")
+        assertNull(state().announcement)
+        assertEquals(PlayerScore.Fifteen, state().userScore)
+        assertEquals("Alice", state().userName)
     }
 }

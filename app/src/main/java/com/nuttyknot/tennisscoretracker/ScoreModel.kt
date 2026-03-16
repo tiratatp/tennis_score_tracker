@@ -89,6 +89,7 @@ class ScoreModel : ViewModel() {
                 opponentName = opponentName ?: currentState.opponentName,
                 isUserServing = if (canUpdateServer) initialServerIsUser!! else currentState.isUserServing,
                 matchFormat = if (canUpdateFormat) matchFormat!! else currentState.matchFormat,
+                announcement = null,
             )
         }
     }
