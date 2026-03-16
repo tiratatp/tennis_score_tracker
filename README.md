@@ -36,8 +36,10 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
 
 ### Option A: Download the APK (easiest)
 
-1. Go to the [Releases](https://github.com/tiratatp/tennis_score_tracker/releases) page on GitHub
-2. Download the latest `.apk` file to your Android device
+1. Go to the [Releases](https://github.com/tiratatp/tennis_score_tracker/releases/latest) page on GitHub
+2. Download the APK for your device:
+   - **`tennisdroid-<version>.apk`** — Phone app. Install on your Android phone or tablet.
+   - **`tennisdroid-wear-<version>.apk`** — Wear OS app. Install on your Android watch for live score display and tap-to-score. Requires the phone app to be installed and paired.
 3. Open the file on your device and follow the prompts to install
    - You may need to allow "Install from unknown sources" in your device settings
 

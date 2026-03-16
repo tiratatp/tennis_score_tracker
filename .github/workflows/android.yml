@@ -69,13 +69,13 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       run: |
         VERSION="${GITHUB_REF_NAME#v}"
-        cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/tennis-score-tracker-${VERSION}-debug.apk
-        cp wear/build/outputs/apk/debug/wear-debug.apk wear/build/outputs/apk/debug/tennis-score-tracker-wear-${VERSION}-debug.apk
+        cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/tennisdroid-${VERSION}-debug.apk
+        cp wear/build/outputs/apk/debug/wear-debug.apk wear/build/outputs/apk/debug/tennisdroid-wear-${VERSION}-debug.apk
         if [ -f app/build/outputs/apk/release/app-release.apk ]; then
-          cp app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/tennis-score-tracker-${VERSION}-release.apk
+          cp app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/tennisdroid-${VERSION}-release.apk
         fi
         if [ -f wear/build/outputs/apk/release/wear-release.apk ]; then
-          cp wear/build/outputs/apk/release/wear-release.apk wear/build/outputs/apk/release/tennis-score-tracker-wear-${VERSION}-release.apk
+          cp wear/build/outputs/apk/release/wear-release.apk wear/build/outputs/apk/release/tennisdroid-wear-${VERSION}-release.apk
         fi
 
     - name: Create GitHub Release and Upload APK
@@ -83,8 +83,8 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: |
-          app/build/outputs/apk/debug/tennis-score-tracker-*-debug.apk
-          app/build/outputs/apk/release/tennis-score-tracker-*-release.apk
-          wear/build/outputs/apk/debug/tennis-score-tracker-wear-*-debug.apk
-          wear/build/outputs/apk/release/tennis-score-tracker-wear-*-release.apk
+          app/build/outputs/apk/debug/tennisdroid-*-debug.apk
+          app/build/outputs/apk/release/tennisdroid-*-release.apk
+          wear/build/outputs/apk/debug/tennisdroid-wear-*-debug.apk
+          wear/build/outputs/apk/release/tennisdroid-wear-*-release.apk
         generate_release_notes: true
