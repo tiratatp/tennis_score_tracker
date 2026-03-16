@@ -1,0 +1,31 @@
+name: Cleanup Old Releases
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at midnight UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Delete old releases and tags
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        CUTOFF=$(date -d '90 days ago' -u +%Y-%m-%dT%H:%M:%SZ)
+        echo "Deleting releases older than $CUTOFF"
+
+        gh release list --limit 100 --json tagName,publishedAt \
+          --jq ".[] | select(.publishedAt < \"$CUTOFF\") | .tagName" | \
+        while read -r tag; do
+          echo "Deleting release and tag: $tag"
+          gh release delete "$tag" --yes --cleanup-tag
+        done
+

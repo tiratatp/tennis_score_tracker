@@ -81,8 +81,6 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       run: |
         VERSION="${GITHUB_REF_NAME#v}"
-        cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/tennisdroid-${VERSION}-debug.apk
-        cp wear/build/outputs/apk/debug/wear-debug.apk wear/build/outputs/apk/debug/tennisdroid-wear-${VERSION}-debug.apk
         if [ -f app/build/outputs/apk/release/app-release.apk ]; then
           cp app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/tennisdroid-${VERSION}-release.apk
         fi
@@ -101,9 +99,7 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: |
-          app/build/outputs/apk/debug/tennisdroid-*-debug.apk
           app/build/outputs/apk/release/tennisdroid-*-release.apk
-          wear/build/outputs/apk/debug/tennisdroid-wear-*-debug.apk
           wear/build/outputs/apk/release/tennisdroid-wear-*-release.apk
           app/build/outputs/bundle/release/tennisdroid-*-release.aab
           wear/build/outputs/bundle/release/tennisdroid-wear-*-release.aab
