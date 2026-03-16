@@ -23,6 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nuttyknot.tennisscoretracker.MatchFormat
@@ -137,16 +141,29 @@ private fun ScoreScreenContent(
     }
 }
 
-private fun formatGameStatus(state: TennisMatchState): String {
+@Composable
+private fun formatGameStatus(state: TennisMatchState): AnnotatedString {
+    val primaryColor = MaterialTheme.colorScheme.primary
     return when {
-        state.matchWinner != null -> "MATCH OVER"
-        state.setWinner != null -> "SET OVER"
-        state.isMatchTiebreak -> "MATCH TIEBREAK"
-        state.isDeuce -> "DEUCE"
+        state.matchWinner != null -> AnnotatedString("MATCH OVER")
+        state.setWinner != null -> AnnotatedString("SET OVER")
+        state.isMatchTiebreak -> AnnotatedString("MATCH TIEBREAK")
+        state.isDeuce -> AnnotatedString("DEUCE")
         state.matchFormat == MatchFormat.FAST ->
-            "G ${state.userGames}-${state.opponentGames}"
+            AnnotatedString("${state.userGames}-${state.opponentGames}")
         else ->
-            "S ${state.userSets}-${state.opponentSets}  G ${state.userGames}-${state.opponentGames}"
+            buildAnnotatedString {
+                val mutedColor = primaryColor.copy(alpha = 0.5f)
+                if (state.setHistory.isNotEmpty()) {
+                    withStyle(SpanStyle(color = mutedColor)) {
+                        append(state.setHistory.joinToString("  ") { "${it.first}-${it.second}" })
+                    }
+                    append("  ")
+                }
+                withStyle(SpanStyle(color = primaryColor)) {
+                    append("${state.userGames}-${state.opponentGames}")
+                }
+            }
     }
 }
 
@@ -154,7 +171,7 @@ private fun formatGameStatus(state: TennisMatchState): String {
 @Composable
 private fun LandscapeScoreContent(
     state: TennisMatchState,
-    gameStatus: String,
+    gameStatus: AnnotatedString,
     maxHeight: Float,
     maxWidth: Float,
     onNavigateToSummary: () -> Unit,
@@ -216,7 +233,7 @@ private fun LandscapeScoreContent(
 @Composable
 private fun PortraitScoreContent(
     state: TennisMatchState,
-    gameStatus: String,
+    gameStatus: AnnotatedString,
     maxHeight: Float,
     maxWidth: Float,
     onNavigateToSummary: () -> Unit,
