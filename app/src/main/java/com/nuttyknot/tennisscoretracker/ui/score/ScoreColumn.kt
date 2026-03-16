@@ -1,14 +1,19 @@
 package com.nuttyknot.tennisscoretracker.ui.score
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -16,11 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -101,13 +104,25 @@ private fun LandscapeScoreColumn(
     alignment: Alignment,
 ) {
     val finalAlignment = if (data.score == "0") Alignment.Center else alignment
-    val dotRadiusPx = with(LocalDensity.current) { ScoreScreenConstants.SERVING_DOT_RADIUS.toPx() }
-    val dotColor = color
 
-    Box(
+    Column(
         modifier = Modifier.fillMaxHeight().fillMaxWidth(),
-        contentAlignment = finalAlignment,
+        horizontalAlignment =
+            when (finalAlignment) {
+                Alignment.CenterStart -> Alignment.Start
+                Alignment.CenterEnd -> Alignment.End
+                else -> Alignment.CenterHorizontally
+            },
+        verticalArrangement = Arrangement.Center,
     ) {
+        if (data.name.isNotEmpty()) {
+            PlayerNameLabel(
+                name = data.name,
+                isServing = data.isServing,
+                color = color,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
+        }
         Text(
             text = data.score,
             color = color,
@@ -116,16 +131,7 @@ private fun LandscapeScoreColumn(
             fontWeight = FontWeight.ExtraBold,
             maxLines = 1,
             softWrap = false,
-            modifier =
-                Modifier.wrapContentWidth().drawBehind {
-                    if (data.isServing) {
-                        drawCircle(
-                            color = dotColor,
-                            radius = dotRadiusPx,
-                            center = Offset(size.width - dotRadiusPx, dotRadiusPx),
-                        )
-                    }
-                },
+            modifier = Modifier.wrapContentWidth(),
         )
     }
 }
@@ -137,10 +143,14 @@ private fun PortraitScoreColumn(
     mainTextSize: TextUnit,
     color: Color,
 ) {
-    val dotRadiusPx = with(LocalDensity.current) { ScoreScreenConstants.SERVING_DOT_RADIUS.toPx() }
-    val dotColor = color
-
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+        if (data.name.isNotEmpty()) {
+            PlayerNameLabel(
+                name = data.name,
+                isServing = data.isServing,
+                color = color,
+            )
+        }
         Text(
             text = data.score,
             color = color,
@@ -149,16 +159,37 @@ private fun PortraitScoreColumn(
             fontWeight = FontWeight.ExtraBold,
             maxLines = 1,
             softWrap = false,
-            modifier =
-                Modifier.drawBehind {
-                    if (data.isServing) {
-                        drawCircle(
-                            color = dotColor,
-                            radius = dotRadiusPx,
-                            center = Offset(size.width - dotRadiusPx, dotRadiusPx),
-                        )
-                    }
-                },
+        )
+    }
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun PlayerNameLabel(
+    name: String,
+    isServing: Boolean,
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(ScoreScreenConstants.SERVING_DOT_RADIUS),
+    ) {
+        if (isServing) {
+            Box(
+                modifier =
+                    Modifier
+                        .size(ScoreScreenConstants.SERVING_DOT_RADIUS * 2)
+                        .clip(CircleShape)
+                        .background(color),
+            )
+        }
+        Text(
+            text = name,
+            color = color.copy(alpha = ScoreScreenConstants.NAME_ALPHA),
+            fontSize = ScoreScreenConstants.NAME_TEXT_SIZE,
+            maxLines = 1,
         )
     }
 }
@@ -166,4 +197,5 @@ private fun PortraitScoreColumn(
 data class ScoreDisplayData(
     val score: String,
     val isServing: Boolean,
+    val name: String = "",
 )
