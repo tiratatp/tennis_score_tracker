@@ -73,3 +73,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
+
+// Ensure linters run before the wear app is installed for debugging
+tasks.whenTaskAdded {
+    if (name == "installDebug") {
+        dependsOn("ktlintCheck", "lintDebug", "detekt")
+    }
+}
