@@ -21,6 +21,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up JDK 21
       uses: actions/setup-java@v4
@@ -53,6 +55,16 @@ jobs:
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: ./gradlew assembleRelease
 
+    - name: Build Release AABs
+      if: startsWith(github.ref, 'refs/tags/') && env.KEYSTORE_BASE64 != ''
+      env:
+        KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        KEYSTORE_FILE: ${{ format('{0}/release.jks', github.workspace) }}
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      run: ./gradlew :app:bundleRelease :wear:bundleRelease
+
     - name: Upload Phone APK Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -77,6 +89,12 @@ jobs:
         if [ -f wear/build/outputs/apk/release/wear-release.apk ]; then
           cp wear/build/outputs/apk/release/wear-release.apk wear/build/outputs/apk/release/tennisdroid-wear-${VERSION}-release.apk
         fi
+        if [ -f app/build/outputs/bundle/release/app-release.aab ]; then
+          cp app/build/outputs/bundle/release/app-release.aab app/build/outputs/bundle/release/tennisdroid-${VERSION}-release.aab
+        fi
+        if [ -f wear/build/outputs/bundle/release/wear-release.aab ]; then
+          cp wear/build/outputs/bundle/release/wear-release.aab wear/build/outputs/bundle/release/tennisdroid-wear-${VERSION}-release.aab
+        fi
 
     - name: Create GitHub Release and Upload APK
       uses: softprops/action-gh-release@v2
@@ -87,4 +105,32 @@ jobs:
           app/build/outputs/apk/release/tennisdroid-*-release.apk
           wear/build/outputs/apk/debug/tennisdroid-wear-*-debug.apk
           wear/build/outputs/apk/release/tennisdroid-wear-*-release.apk
+          app/build/outputs/bundle/release/tennisdroid-*-release.aab
+          wear/build/outputs/bundle/release/tennisdroid-wear-*-release.aab
         generate_release_notes: true
+
+    - name: Publish Phone App to Play Store (Internal Track)
+      if: startsWith(github.ref, 'refs/tags/') && env.PLAY_STORE_SERVICE_ACCOUNT_JSON != ''
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+        packageName: com.nuttyknot.tennisscoretracker
+        releaseFiles: app/build/outputs/bundle/release/app-release.aab
+        track: internal
+        status: completed
+        mappingFile: app/build/outputs/mapping/release/mapping.txt
+      env:
+        PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+
+    - name: Publish Wear App to Play Store (Internal Track)
+      if: startsWith(github.ref, 'refs/tags/') && env.PLAY_STORE_SERVICE_ACCOUNT_JSON != ''
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+        packageName: com.nuttyknot.tennisscoretracker
+        releaseFiles: wear/build/outputs/bundle/release/wear-release.aab
+        track: wear:internal
+        status: completed
+        mappingFile: wear/build/outputs/mapping/release/mapping.txt
+      env:
+        PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}

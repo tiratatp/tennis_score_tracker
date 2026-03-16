@@ -72,7 +72,7 @@ Multi-module Android app (app + shared + wear) built with Kotlin and Jetpack Com
 - **Wear OS Sync**: `WearSyncManager` in the phone app pushes match state to the watch via Wearable Data Layer API; receives scoring commands back via `MessageClient`
 - **Shared Module**: `WearConstants` (data paths, command strings) and `WearScoreDisplay` (JSON-serializable score snapshot) shared between phone and watch
 - **Wear Module**: Standalone Wear OS app — `WearMainActivity` with ambient mode support, `WearRemoteViewModel` listens for score updates and sends commands, `WearScoreScreen` with tap zones (left=you, right=opponent, long-press=undo)
-- **CI/CD**: GitHub Actions runs detekt, ktlint, unit tests, and assembleDebug on push/PR. Tagged pushes (`v*`) create GitHub Releases with the APK
+- **CI/CD**: GitHub Actions runs detekt, ktlint, unit tests, and assembleDebug on push/PR. Tagged pushes (`v*`) create GitHub Releases with the APK and optionally publish to the Google Play Store
 
 ### Release Code Signing
 
@@ -98,6 +98,41 @@ By default, release builds are signed with the debug keystore (installable via s
    ```
 
 For local release builds, set the environment variables `KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` before running `./gradlew assembleRelease`.
+
+### Play Store Publishing
+
+The CI workflow can automatically publish to the Google Play Store when you push a version tag. Publishing is **optional** — if the secret below is not configured, the workflow skips publishing and behaves exactly as before.
+
+#### One-time setup
+
+1. **Google Play Developer Account** — Register at [Google Play Console](https://play.google.com/console) if you haven't already ($25 one-time fee).
+
+2. **Create app listing** — In Play Console, create the app and complete the store listing (screenshots, description, content rating, data safety form).
+
+3. **Upload the first AAB manually** — Google Play requires the initial upload through the Console:
+   ```bash
+   # Build locally (requires signing env vars — see "Release Code Signing" above)
+   ./gradlew :app:bundleRelease
+   ```
+   Upload `app/build/outputs/bundle/release/app-release.aab` to the **Internal testing** track in Play Console.
+
+4. **Create a Google Cloud service account** for API access:
+   - Play Console > Setup > API access > Link to Google Cloud project
+   - Create a service account (e.g. `github-play-publisher`) and download the JSON key
+   - Back in Play Console, grant the service account access to your app with "Release apps to testing tracks" permission
+
+5. **Add the GitHub secret**:
+   | Secret | Value |
+   |--------|-------|
+   | `PLAY_STORE_SERVICE_ACCOUNT_JSON` | Entire contents of the service account JSON key file |
+
+6. **Push a tag** — the workflow will build the AAB and publish to the internal track:
+   ```bash
+   git tag v1.1.0
+   git push origin v1.1.0
+   ```
+
+To publish to a different track (e.g. `production`), edit the `track` field in `.github/workflows/android.yml`.
 
 ### Build Commands
 
