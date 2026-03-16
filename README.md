@@ -10,6 +10,7 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
   - Long press: undo the last point
 - **3 match formats** — Standard (best-of-3 sets), League (3rd set is a 10-point tiebreak), and Fast (single 8-game pro set, no advantage scoring)
 - **Voice announcements** — The app calls out the score after each point, just like a real umpire
+- **Auto-detect your remote** — Tap "Detect Button" in settings, press any button on your remote, and the app automatically identifies and saves the key code
 - **Customizable** — Set player names, adjust button sensitivity, and choose from multiple color themes
 - **Tap input** — You can also tap the screen to score if you prefer
 
