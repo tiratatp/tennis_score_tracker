@@ -40,7 +40,9 @@ fun AppFooter(modifier: Modifier = Modifier) {
                     val intent =
                         Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse("https://github.com/tiratatp/tennis_score_tracker/issues/new"),
+                            Uri.parse(
+                                "https://github.com/tiratatp/tennis_score_tracker/issues/new?template=bug_report.md",
+                            ),
                         )
                     context.startActivity(intent)
                 },
