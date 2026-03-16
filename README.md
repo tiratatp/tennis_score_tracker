@@ -1,59 +1,66 @@
 # TennisDroid
 
-A Native Android application built with Kotlin and Jetpack Compose designed to track tennis match scores using a bluetooth remote. 
+A tennis score-tracking app for Android that lets you keep score hands-free using a Bluetooth remote button — perfect for when you're on the court and can't touch your phone.
 
-## Features
-- **Hardware Interception**: The app securely intercepts raw HID KeyEvent inputs in the foreground without requiring accessible services permissions.
-- **Temporal Debouncing**: Distinguishes between three events originating from a single hardware button using a precise temporal debouncing algorithm (Kotlin Coroutines)
-  - Single Click: Increment your score
-  - Double Click: Increment the opponent's score
-  - Long Press: Undo the last score recording
-- **True State Management**: Scoring logic operates as an independent finite state machine. Complex point reversals utilize an immutable Last-In-First-Out (LIFO) stack.
-- **Text-To-Speech (TTS)**: The application audibly announces standard tennis terminology sequentially upon state changes.
-- **Minimalist Jetpack Compose UI**: Provides high contrast visual indicators with 3 configurable themes: Grand Slam (yellow & white), Miami Night (cyan & magenta), and Colorblind Safe (orange & blue). Utilizes `BoxWithConstraints` to scale text and implements battery saving/KeepScreenOn logic.
-- **Tap Input**: Supports touch screen tap input in addition to hardware button control.
-- **Configurable Settings**: Player names, key bindings, and click latency thresholds are all adjustable via the settings screen.
-- **Match Format**: Best-of-3 sets with tiebreak at 6-6 and proper server rotation during tiebreaks.
-- **First-Run Help**: Onboarding overlay guides new users through the app on first launch.
+## What It Does
 
-## Project Structure
-- Architecture: `Finite State Machine` with Jetpack Compose
-- Hardware Debouncing: Managed by `KeyEventManager.kt` using Coroutines Delay mechanism
-- Storage: Jetpack `Preferences DataStore` for variable target KeyCodes and latency thresholds.
-- CI/CD: Automated Gradle building and testing using GitHub Actions (`.github/workflows/android.yml`)
-- Formatting/Linting: Integrated with `Ktlint` and `Detekt` for robust style and defect detection.
+- **Hands-free scoring** — Use any Bluetooth remote button to track points without touching your phone
+  - Single click: add a point for you
+  - Double click: add a point for your opponent
+  - Long press: undo the last point
+- **3 match formats** — Standard (best-of-3 sets), League (3rd set is a 10-point tiebreak), and Fast (single 8-game pro set, no advantage scoring)
+- **Voice announcements** — The app calls out the score after each point, just like a real umpire
+- **Customizable** — Set player names, adjust button sensitivity, and choose from multiple color themes
+- **Tap input** — You can also tap the screen to score if you prefer
 
-## Requirements
-- Android 8.0+ (API 26)
+## How to Install
 
-## Building and Verification
-1. Open the project in Android Studio (or run through Gradle)
-2. Assemble and build a debug APK:
-```bash
-./gradlew assembleDebug
-```
-3. Run Local Unit Tests:
-```bash
-./gradlew testDebugUnitTest
-```
-4. Run Linter validation:
-```bash
-./gradlew ktlintCheck detekt
-```
+**Requires Android 8.0 or newer.**
 
-## How to Install on Your Device
-To install the application on your physical Android device, follow these steps:
+### Option A: Download the APK (easiest)
 
-1. **Enable Developer Options**: On your Android device, go to `Settings > About phone` and tap `Build number` seven times.
-2. **Enable USB Debugging**: Go to `Settings > System > Developer options` and enable `USB debugging`.
-3. **Connect Device**: Connect your device to your computer via USB.
-4. **Install via Gradle**: Run the following command in your terminal:
+1. Go to the [Releases](https://github.com/tiratatp/tennis_score_tracker/releases) page on GitHub
+2. Download the latest `.apk` file to your Android device
+3. Open the file on your device and follow the prompts to install
+   - You may need to allow "Install from unknown sources" in your device settings
+
+### Option B: Build from source
+
+1. Clone this repository
+2. Connect your Android device via USB
+3. Enable Developer Options and USB Debugging on your device (Settings > About phone > tap "Build number" 7 times, then Settings > Developer options > USB debugging)
+4. Run:
 ```bash
 ./gradlew installDebug
 ```
-Note: `installDebug` also runs unit tests and linters (`ktlintCheck`, `detekt`, `lintDebug`) before installing.
 
-Alternatively, you can find the generated APK at `app/build/outputs/apk/debug/app-debug.apk` and transfer it manually to your device.
+## Technical Details
+
+<details>
+<summary>For developers — architecture, build commands, and project structure</summary>
+
+### Architecture
+
+Single-activity Android app built with Kotlin and Jetpack Compose. Scoring logic operates as a finite state machine with immutable state and a LIFO stack for undo.
+
+### Project Structure
+
+- **Hardware Input**: `KeyEventManager` intercepts raw HID KeyEvent inputs and uses a coroutine-based temporal debouncing algorithm to distinguish single click, double click, and long press from one button
+- **Scoring Engine**: `ScoreManager` exposes match state via `StateFlow` — pure state transformations with no side effects
+- **Storage**: Jetpack Preferences DataStore for settings (key codes, latency thresholds, player names, theme)
+- **TTS**: UK English locale with umpire-style speech rate and pitch
+- **CI/CD**: GitHub Actions runs detekt, ktlint, unit tests, and assembleDebug on push/PR. Tagged pushes (`v*`) create GitHub Releases with the APK
+
+### Build Commands
+
+```bash
+./gradlew assembleDebug          # Build debug APK
+./gradlew testDebugUnitTest      # Run unit tests
+./gradlew ktlintCheck detekt     # Run linters (ktlint + detekt)
+./gradlew installDebug           # Install on device (also runs tests + linters)
+```
+
+</details>
 
 ## License
 
