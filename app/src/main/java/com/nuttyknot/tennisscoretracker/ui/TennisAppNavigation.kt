@@ -42,7 +42,7 @@ fun TennisAppNavigation(
     LaunchedEffect(hasSeenHelp) {
         if (!hasSeenHelp) {
             navController.navigate(Routes.HELP_SCREEN) {
-                popUpTo(Routes.SCORE_SCREEN) { inclusive = false }
+                launchSingleTop = true
             }
         }
     }

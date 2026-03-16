@@ -16,14 +16,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.nuttyknot.tennisscoretracker.shared.WearConstants
 import com.nuttyknot.tennisscoretracker.ui.Routes
+import com.nuttyknot.tennisscoretracker.ui.SystemBarsEffect
 import com.nuttyknot.tennisscoretracker.ui.TennisAppNavigation
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -46,9 +44,7 @@ class MainActivity : ComponentActivity() {
         // Keep Screen On
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        // Enable Immersive Mode
         enableEdgeToEdge()
-        hideSystemBars()
 
         initializeManagers()
         observeSettings()
@@ -78,6 +74,7 @@ class MainActivity : ComponentActivity() {
                 initial = SettingsManager.DEFAULT_APP_THEME,
             )
             TennisScoreTrackerTheme(appTheme = appTheme) {
+                SystemBarsEffect()
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
@@ -211,12 +208,6 @@ class MainActivity : ComponentActivity() {
                 else -> false
             }
         return if (handled) true else super.dispatchKeyEvent(event)
-    }
-
-    private fun hideSystemBars() {
-        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
-        windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
     }
 
     override fun onStart() {
