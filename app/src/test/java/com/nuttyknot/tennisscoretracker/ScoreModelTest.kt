@@ -600,6 +600,90 @@ class ScoreModelTest {
     }
 
     @Test
+    fun `test scoring through set winner state auto-advances to next set`() {
+        // User wins first set 6-0
+        repeat(6) { repeat(4) { scoreModel.incrementUserScore() } }
+        assertEquals("Player 1", state().setWinner)
+
+        // Instead of calling startNextSet(), score another point to trigger auto-advance (line 141)
+        scoreModel.incrementUserScore()
+
+        assertTrue(state().isNewSet)
+        assertEquals(0, state().userGames)
+        assertEquals(0, state().opponentGames)
+        assertEquals(PlayerScore.Love, state().userScore)
+        assertEquals(PlayerScore.Love, state().opponentScore)
+        assertEquals(1, state().userSets)
+        assertNull(state().setWinner)
+    }
+
+    @Test
+    fun `test opponent wins match in standard format`() {
+        // Opponent wins first set 6-0
+        repeat(6) { repeat(4) { scoreModel.incrementOpponentScore() } }
+        assertEquals("Player 2", state().setWinner)
+
+        scoreModel.startNextSet()
+
+        // Opponent wins second set 6-0
+        repeat(6) { repeat(4) { scoreModel.incrementOpponentScore() } }
+
+        assertEquals("Player 2", state().matchWinner)
+        assertEquals(2, state().opponentSets)
+        assertEquals(0, state().userSets)
+        assertEquals(listOf(0 to 6, 0 to 6), state().setHistory)
+    }
+
+    @Test
+    fun `test league format opponent wins match tiebreak`() {
+        scoreModel.updateMatchParameters(matchFormat = MatchFormat.LEAGUE)
+        scoreModel.reset()
+
+        // Opponent wins first set 6-0
+        repeat(6) { repeat(4) { scoreModel.incrementOpponentScore() } }
+        scoreModel.startNextSet()
+
+        // User wins second set 6-0
+        repeat(6) { repeat(4) { scoreModel.incrementUserScore() } }
+        scoreModel.startNextSet()
+
+        // Should be match tiebreak
+        assertTrue(state().isMatchTiebreak)
+
+        // Opponent wins match tiebreak 10-0
+        repeat(10) { scoreModel.incrementOpponentScore() }
+
+        assertEquals("Player 2", state().matchWinner)
+        assertEquals(2, state().opponentSets)
+        assertEquals(1, state().userSets)
+    }
+
+    @Test
+    fun `test server correct after non-tiebreak set win`() {
+        // Play to 5-4 (alternating game wins)
+        repeat(4) {
+            repeat(4) { scoreModel.incrementUserScore() }
+            repeat(4) { scoreModel.incrementOpponentScore() }
+        }
+        // User wins game to make it 5-4
+        repeat(4) { scoreModel.incrementUserScore() }
+        assertEquals(5, state().userGames)
+        assertEquals(4, state().opponentGames)
+
+        // Record the server before the set-winning game
+        val serverBeforeLastGame = state().isUserServing
+
+        // User wins 6th game -> 6-4 set win
+        repeat(4) { scoreModel.incrementUserScore() }
+        assertEquals("Player 1", state().setWinner)
+
+        scoreModel.startNextSet()
+
+        // After set win, server should have alternated from the last game
+        assertEquals(!serverBeforeLastGame, state().isUserServing)
+    }
+
+    @Test
     fun `test format only changes when score is zero`() {
         // Start with standard format
         scoreModel.updateMatchParameters(matchFormat = MatchFormat.STANDARD)
