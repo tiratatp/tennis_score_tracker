@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "TennisDroid"
 include(":app")
+include(":shared")
+include(":wear")

@@ -65,19 +65,29 @@ jobs:
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: ./gradlew assembleRelease
 
-    - name: Upload APK Artifact
+    - name: Upload Phone APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: app-debug-apk
         path: app/build/outputs/apk/debug/*.apk
+
+    - name: Upload Wear APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: wear-debug-apk
+        path: wear/build/outputs/apk/debug/*.apk
 
     - name: Rename APKs for Release
       if: startsWith(github.ref, 'refs/tags/')
       run: |
         VERSION="${GITHUB_REF_NAME#v}"
         cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/tennis-score-tracker-${VERSION}-debug.apk
+        cp wear/build/outputs/apk/debug/wear-debug.apk wear/build/outputs/apk/debug/tennis-score-tracker-wear-${VERSION}-debug.apk
         if [ -f app/build/outputs/apk/release/app-release.apk ]; then
           cp app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/tennis-score-tracker-${VERSION}-release.apk
+        fi
+        if [ -f wear/build/outputs/apk/release/wear-release.apk ]; then
+          cp wear/build/outputs/apk/release/wear-release.apk wear/build/outputs/apk/release/tennis-score-tracker-wear-${VERSION}-release.apk
         fi
 
     - name: Create GitHub Release and Upload APK
@@ -87,4 +97,6 @@ jobs:
         files: |
           app/build/outputs/apk/debug/tennis-score-tracker-*-debug.apk
           app/build/outputs/apk/release/tennis-score-tracker-*-release.apk
+          wear/build/outputs/apk/debug/tennis-score-tracker-wear-*-debug.apk
+          wear/build/outputs/apk/release/tennis-score-tracker-wear-*-release.apk
         generate_release_notes: true

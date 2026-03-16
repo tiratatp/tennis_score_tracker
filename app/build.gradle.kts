@@ -99,6 +99,12 @@ dependencies {
     // DataStore Preferences
     implementation("androidx.datastore:datastore-preferences:1.1.4")
 
+    // Shared module
+    implementation(project(":shared"))
+
+    // Wear OS Data Layer
+    implementation("com.google.android.gms:play-services-wearable:19.0.0")
+
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

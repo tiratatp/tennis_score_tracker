@@ -7,6 +7,8 @@
 ./gradlew testDebugUnitTest      # Run unit tests
 ./gradlew ktlintCheck detekt     # Run linters (ktlint + detekt)
 ./gradlew installDebug           # Install on device (also runs tests + linters via task dependency)
+./gradlew :wear:assembleDebug    # Build wear APK
+./gradlew :wear:installDebug     # Install wear app on watch
 ```
 
 `installDebug` depends on `testDebugUnitTest`, `ktlintCheck`, `lintDebug`, and `detekt` — all checks run automatically before install.
@@ -17,7 +19,7 @@ Always run `./gradlew ktlintCheck detekt` after making changes. ktlint and detek
 
 ## Architecture
 
-Single-activity Android app (Kotlin, Jetpack Compose, min SDK 26). Package: `com.nuttyknot.tennisscoretracker`.
+Multi-module Android app (app + shared + wear) built with Kotlin and Jetpack Compose (min SDK 26, wear min SDK 30). Package: `com.nuttyknot.tennisscoretracker`.
 
 ### Scoring Engine
 
@@ -40,6 +42,12 @@ Single-activity Android app (Kotlin, Jetpack Compose, min SDK 26). Package: `com
 ### Testing
 
 Unit tests in `app/src/test/`: `ScoreModelTest.kt`, `TennisScoreStateTest.kt`, `KeyEventManagerTest.kt`. Uses JUnit 4 and `kotlinx-coroutines-test`.
+
+### Wear OS
+
+- **`shared/`** — Android library module with `WearConstants` (data paths/commands) and `WearScoreDisplay` (JSON-serializable score data class shared between phone and watch)
+- **`wear/`** — Standalone Wear OS app (min SDK 30, Compose Material3 for Wear). `WearMainActivity` with ambient mode, `WearRemoteViewModel` (DataClient listener + MessageClient sender), `WearScoreScreen` (tap left=user point, right=opponent, long-press=undo)
+- **`WearSyncManager.kt`** (in app module) — Pushes `TennisMatchState` to watch via Wearable Data Layer API, receives commands via `MessageClient`
 
 ## Rules
 

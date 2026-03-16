@@ -15,4 +15,5 @@ subprojects {
         buildUponDefaultConfig = true // preconfigure defaults
         allRules = false // activate all available (even unstable) rules.
     }
+
 }

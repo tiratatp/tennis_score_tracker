@@ -22,6 +22,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.nuttyknot.tennisscoretracker.shared.WearConstants
 import com.nuttyknot.tennisscoretracker.ui.Routes
 import com.nuttyknot.tennisscoretracker.ui.TennisAppNavigation
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var settingsManager: SettingsManager
     private lateinit var ttsManager: TtsManager
     private lateinit var keyEventManager: KeyEventManager
+    private lateinit var wearSyncManager: WearSyncManager
     private var pendingTheme: AppTheme? = null
     private var isOnScoreScreen: Boolean = true
 
@@ -55,6 +57,14 @@ class MainActivity : ComponentActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 scoreModel.matchState.drop(1).collectLatest { state ->
                     state.announcement?.let { ttsManager.announce(it) }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                scoreModel.matchState.collectLatest { state ->
+                    wearSyncManager.pushState(state)
                 }
             }
         }
@@ -91,6 +101,16 @@ class MainActivity : ComponentActivity() {
                 onDoubleClick = { scoreModel.incrementOpponentScore() },
                 onLongPress = { scoreModel.undo() },
             )
+
+        wearSyncManager =
+            WearSyncManager(this) { command ->
+                when (command) {
+                    WearConstants.CMD_USER_SCORED -> scoreModel.incrementUserScore()
+                    WearConstants.CMD_OPPONENT_SCORED -> scoreModel.incrementOpponentScore()
+                    WearConstants.CMD_UNDO -> scoreModel.undo()
+                    WearConstants.CMD_RESET -> scoreModel.reset()
+                }
+            }
     }
 
     private fun observeSettings() {
@@ -195,8 +215,14 @@ class MainActivity : ComponentActivity() {
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
     }
 
+    override fun onStart() {
+        super.onStart()
+        wearSyncManager.start()
+    }
+
     override fun onStop() {
         super.onStop()
+        wearSyncManager.stop()
         pendingTheme?.let { theme ->
             updateLauncherIcon(theme)
             pendingTheme = null

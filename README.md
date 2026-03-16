@@ -13,6 +13,7 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
 - **Auto-detect your remote** — Tap "Detect Button" in settings, press any button on your remote, and the app automatically identifies and saves the key code
 - **Customizable** — Set player names, adjust button sensitivity, and choose from multiple color themes
 - **Tap input** — You can also tap the screen to score if you prefer
+- **Wear OS companion** — See the live score on your watch and tap to score directly from your wrist
 
 ## Screenshots
 
@@ -28,7 +29,7 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
 
 ## How to Install
 
-**Requires Android 8.0 or newer.**
+**Requires Android 8.0 or newer.** Wear OS app requires Android 11+ (API 30) on the watch.
 
 ### Option A: Download the APK (easiest)
 
@@ -44,7 +45,8 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
 3. Enable Developer Options and USB Debugging on your device (Settings > About phone > tap "Build number" 7 times, then Settings > Developer options > USB debugging)
 4. Run:
 ```bash
-./gradlew installDebug
+./gradlew installDebug           # Install phone app
+./gradlew :wear:installDebug     # Install wear app on watch
 ```
 
 ## Technical Details
@@ -54,7 +56,7 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
 
 ### Architecture
 
-Single-activity Android app built with Kotlin and Jetpack Compose. Scoring logic operates as a finite state machine with immutable state and a LIFO stack for undo.
+Multi-module Android app (app + shared + wear) built with Kotlin and Jetpack Compose. Scoring logic operates as a finite state machine with immutable state and a LIFO stack for undo.
 
 ### Project Structure
 
@@ -62,6 +64,9 @@ Single-activity Android app built with Kotlin and Jetpack Compose. Scoring logic
 - **Scoring Engine**: `ScoreManager` exposes match state via `StateFlow` — pure state transformations with no side effects
 - **Storage**: Jetpack Preferences DataStore for settings (key codes, latency thresholds, player names, theme)
 - **TTS**: UK English locale with umpire-style speech rate and pitch
+- **Wear OS Sync**: `WearSyncManager` in the phone app pushes match state to the watch via Wearable Data Layer API; receives scoring commands back via `MessageClient`
+- **Shared Module**: `WearConstants` (data paths, command strings) and `WearScoreDisplay` (JSON-serializable score snapshot) shared between phone and watch
+- **Wear Module**: Standalone Wear OS app — `WearMainActivity` with ambient mode support, `WearRemoteViewModel` listens for score updates and sends commands, `WearScoreScreen` with tap zones (left=you, right=opponent, long-press=undo)
 - **CI/CD**: GitHub Actions runs detekt, ktlint, unit tests, and assembleDebug on push/PR. Tagged pushes (`v*`) create GitHub Releases with the APK
 
 ### Release Code Signing
@@ -96,6 +101,8 @@ For local release builds, set the environment variables `KEYSTORE_FILE`, `KEYSTO
 ./gradlew testDebugUnitTest      # Run unit tests
 ./gradlew ktlintCheck detekt     # Run linters (ktlint + detekt)
 ./gradlew installDebug           # Install on device (also runs tests + linters)
+./gradlew :wear:assembleDebug    # Build wear APK
+./gradlew :wear:installDebug     # Install wear app on watch
 ```
 
 </details>
