@@ -52,9 +52,15 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                scoreModel.matchState.drop(1).collectLatest { state ->
-                    state.announcement?.let { ttsManager.announce(it) }
-                }
+                combine(
+                    scoreModel.matchState.drop(1),
+                    settingsManager.ttsEnabledFlow,
+                ) { state, enabled -> state to enabled }
+                    .collectLatest { (state, enabled) ->
+                        if (enabled) {
+                            state.announcement?.let { ttsManager.announce(it) }
+                        }
+                    }
             }
         }
 

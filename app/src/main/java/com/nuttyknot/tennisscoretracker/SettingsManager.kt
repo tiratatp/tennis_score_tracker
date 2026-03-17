@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.KeyEvent
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -32,6 +33,7 @@ class SettingsManager(private val context: Context) {
         val HAS_SEEN_HELP = androidx.datastore.preferences.core.booleanPreferencesKey("has_seen_help")
         val APP_THEME = androidx.datastore.preferences.core.stringPreferencesKey("app_theme")
         val MATCH_FORMAT = stringPreferencesKey("match_format")
+        val TTS_ENABLED = booleanPreferencesKey("tts_enabled")
 
         const val DEFAULT_KEYCODE = KeyEvent.KEYCODE_VOLUME_UP
         const val DEFAULT_DOUBLE_CLICK_LATENCY = 300L
@@ -42,6 +44,7 @@ class SettingsManager(private val context: Context) {
         const val DEFAULT_HAS_SEEN_HELP = false
         val DEFAULT_APP_THEME = AppTheme.SKY_BLUE
         val DEFAULT_MATCH_FORMAT = MatchFormat.STANDARD
+        const val DEFAULT_TTS_ENABLED = true
     }
 
     private val _isDetectingKeycode = MutableStateFlow(false)
@@ -109,6 +112,11 @@ class SettingsManager(private val context: Context) {
             MatchFormat.entries.find { it.name == formatName } ?: DEFAULT_MATCH_FORMAT
         }
 
+    val ttsEnabledFlow: Flow<Boolean> =
+        context.dataStore.data.map { preferences ->
+            preferences[TTS_ENABLED] ?: DEFAULT_TTS_ENABLED
+        }
+
     suspend fun updateKeycode(keycode: Int) {
         context.dataStore.edit { preferences ->
             preferences[KEYCODE] = keycode
@@ -160,6 +168,12 @@ class SettingsManager(private val context: Context) {
     suspend fun updateMatchFormat(format: MatchFormat) {
         context.dataStore.edit { preferences ->
             preferences[MATCH_FORMAT] = format.name
+        }
+    }
+
+    suspend fun updateTtsEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[TTS_ENABLED] = enabled
         }
     }
 }

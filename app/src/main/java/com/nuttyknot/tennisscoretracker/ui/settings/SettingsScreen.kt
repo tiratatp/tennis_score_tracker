@@ -80,6 +80,7 @@ private fun collectSettingsState(
     )
     val appTheme by settingsManager.appThemeFlow.collectAsState(initial = SettingsManager.DEFAULT_APP_THEME)
     val matchFormat by settingsManager.matchFormatFlow.collectAsState(initial = SettingsManager.DEFAULT_MATCH_FORMAT)
+    val ttsEnabled by settingsManager.ttsEnabledFlow.collectAsState(initial = SettingsManager.DEFAULT_TTS_ENABLED)
     val isDetectingKeycode by settingsManager.isDetectingKeycode.collectAsState()
 
     return SettingsState(
@@ -93,6 +94,7 @@ private fun collectSettingsState(
         currentLongPress = currentLongPress,
         appTheme = appTheme,
         matchFormat = matchFormat,
+        ttsEnabled = ttsEnabled,
     )
 }
 
@@ -107,6 +109,7 @@ private data class SettingsState(
     val currentLongPress: Long,
     val appTheme: AppTheme,
     val matchFormat: MatchFormat,
+    val ttsEnabled: Boolean,
 )
 
 private fun buildSettingsData(
@@ -135,6 +138,7 @@ private fun buildSettingsData(
             currentTheme = state.appTheme,
             currentMatchFormat = state.matchFormat,
             isMatchFormatLocked = state.isMatchInProgress,
+            ttsEnabled = state.ttsEnabled,
             isDetectingKeycode = state.isDetectingKeycode,
             onKeycodeChange = { code ->
                 coroutineScope.launch { settingsManager.updateKeycode(code) }
@@ -144,6 +148,9 @@ private fun buildSettingsData(
             },
             onMatchFormatChange = { format ->
                 coroutineScope.launch { settingsManager.updateMatchFormat(format) }
+            },
+            onTtsEnabledChange = { enabled ->
+                coroutineScope.launch { settingsManager.updateTtsEnabled(enabled) }
             },
             onDetectKeycode = { settingsManager.startKeycodeDetection() },
             onCancelDetectKeycode = { settingsManager.stopKeycodeDetection() },

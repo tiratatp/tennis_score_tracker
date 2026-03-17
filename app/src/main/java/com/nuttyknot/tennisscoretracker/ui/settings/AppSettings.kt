@@ -50,6 +50,12 @@ fun AppSettings(data: AppSettingsData) {
         onDetect = data.onDetectKeycode,
         onCancelDetect = data.onCancelDetectKeycode,
     )
+
+    SettingsToggle(
+        label = "Score Announcements",
+        checked = data.ttsEnabled,
+        onCheckedChange = data.onTtsEnabledChange,
+    )
 }
 
 @Suppress("FunctionName")
@@ -313,10 +319,12 @@ data class AppSettingsData(
     val currentTheme: AppTheme,
     val currentMatchFormat: MatchFormat,
     val isMatchFormatLocked: Boolean = false,
+    val ttsEnabled: Boolean = true,
     val isDetectingKeycode: Boolean = false,
     val onKeycodeChange: (Int) -> Unit,
     val onThemeChange: (AppTheme) -> Unit,
     val onMatchFormatChange: (MatchFormat) -> Unit,
+    val onTtsEnabledChange: (Boolean) -> Unit = {},
     val onDetectKeycode: () -> Unit = {},
     val onCancelDetectKeycode: () -> Unit = {},
 )
