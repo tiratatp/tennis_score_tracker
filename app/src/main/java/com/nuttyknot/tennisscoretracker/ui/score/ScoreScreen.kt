@@ -107,13 +107,15 @@ private fun ScoreScreenContent(
             PortraitScoreContent(state, maxHeight.value, maxWidth.value, onNavigateToSummary)
         }
 
-        TapZones(
-            isLandscape = isLandscape,
-            matchWinner = state.matchWinner,
-            onUserScored = { scoreModel.incrementUserScore() },
-            onOpponentScored = { scoreModel.incrementOpponentScore() },
-            onUndo = { scoreModel.undo() },
-        )
+        if (state.matchWinner == null) {
+            TapZones(
+                isLandscape = isLandscape,
+                matchWinner = state.matchWinner,
+                onUserScored = { scoreModel.incrementUserScore() },
+                onOpponentScored = { scoreModel.incrementOpponentScore() },
+                onUndo = { scoreModel.undo() },
+            )
+        }
     }
 }
 
