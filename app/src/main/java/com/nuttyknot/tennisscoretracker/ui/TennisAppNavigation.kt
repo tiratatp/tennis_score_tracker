@@ -32,6 +32,7 @@ fun TennisAppNavigation(
     val matchState by scoreModel.matchState.collectAsState()
     val scope = rememberCoroutineScope()
     var hasNavigatedToSummary by rememberSaveable { mutableStateOf(false) }
+    var hasHandledHelpNavigation by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow.collect { entry ->
@@ -40,7 +41,8 @@ fun TennisAppNavigation(
     }
 
     LaunchedEffect(hasSeenHelp) {
-        if (!hasSeenHelp) {
+        if (!hasSeenHelp && !hasHandledHelpNavigation) {
+            hasHandledHelpNavigation = true
             navController.navigate(Routes.HELP_SCREEN) {
                 launchSingleTop = true
             }

@@ -1,5 +1,6 @@
 package com.nuttyknot.tennisscoretracker.ui.help
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,6 +39,7 @@ import com.nuttyknot.tennisscoretracker.ui.AppFooter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HelpScreen(onDismiss: () -> Unit) {
+    BackHandler { onDismiss() }
     Scaffold(
         topBar = {
             TopAppBar(
