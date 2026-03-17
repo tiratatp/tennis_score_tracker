@@ -31,7 +31,8 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
 ### Wear OS
 
 <p align="center">
-  <img src="screenshots/watch.png" width="300" alt="Wear OS watch app">
+  <img src="screenshots/watch.png" width="300" alt="Wear OS watch app">&nbsp;&nbsp;
+  <img src="screenshots/watch-help.png" width="300" alt="Wear OS help screen">
 </p>
 
 ## How to Install
