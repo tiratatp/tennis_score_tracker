@@ -20,10 +20,11 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
 ### Phone
 
 <p align="center">
-  <img src="screenshots/landscape.png" width="600" alt="Score screen (landscape)">
+  <img src="screenshots/score-landscape.png" width="600" alt="Score screen (landscape)">
 </p>
 <p align="center">
-  <img src="screenshots/portrait.png" width="300" alt="Score screen (portrait)">&nbsp;&nbsp;
+  <img src="screenshots/score-portrait.png" width="300" alt="Score screen (portrait)">&nbsp;&nbsp;
+  <img src="screenshots/match-summary.png" width="300" alt="Match summary screen">&nbsp;&nbsp;
   <img src="screenshots/help.png" width="300" alt="Help screen">
 </p>
 

@@ -70,7 +70,7 @@ fun MatchSummaryScreen(
 
 @Suppress("FunctionName")
 @Composable
-private fun MatchSummaryContent(
+internal fun MatchSummaryContent(
     state: TennisMatchState,
     onNewMatch: () -> Unit,
     paddingValues: PaddingValues,
