@@ -25,7 +25,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nuttyknot.tennisscoretracker.ScoreModel
@@ -109,13 +112,7 @@ internal fun MatchSummaryContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(
-            text = state.setHistory.joinToString("   ") { "${it.first}-${it.second}" },
-            fontFamily = ScoreScreenConstants.JetBrainsMonoFamily,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
+        SetHistoryText(state.setHistory)
 
         Spacer(modifier = Modifier.height(48.dp))
 
@@ -125,4 +122,27 @@ internal fun MatchSummaryContent(
             Text("New Match", fontSize = 18.sp)
         }
     }
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun SetHistoryText(setHistory: List<Pair<Int, Int>>) {
+    val separatorStyle = SpanStyle(color = MaterialTheme.colorScheme.onBackground)
+    val userStyle = SpanStyle(color = MaterialTheme.colorScheme.primary)
+    val opponentStyle = SpanStyle(color = MaterialTheme.colorScheme.secondary)
+    val text =
+        buildAnnotatedString {
+            setHistory.forEachIndexed { index, (userGames, opponentGames) ->
+                if (index > 0) withStyle(separatorStyle) { append("   ") }
+                withStyle(userStyle) { append("$userGames") }
+                withStyle(separatorStyle) { append("-") }
+                withStyle(opponentStyle) { append("$opponentGames") }
+            }
+        }
+    Text(
+        text = text,
+        fontFamily = ScoreScreenConstants.JetBrainsMonoFamily,
+        fontSize = 32.sp,
+        fontWeight = FontWeight.Bold,
+    )
 }
