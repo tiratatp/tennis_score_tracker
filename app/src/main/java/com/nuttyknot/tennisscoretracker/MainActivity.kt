@@ -47,10 +47,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         initializeManagers()
+        wearSyncManager.start()
         observeSettings()
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 scoreModel.matchState.drop(1).collectLatest { state ->
                     state.announcement?.let { ttsManager.announce(it) }
                 }
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 combine(
                     scoreModel.matchState,
                     settingsManager.appThemeFlow,
@@ -210,14 +211,8 @@ class MainActivity : ComponentActivity() {
         return if (handled) true else super.dispatchKeyEvent(event)
     }
 
-    override fun onStart() {
-        super.onStart()
-        wearSyncManager.start()
-    }
-
     override fun onStop() {
         super.onStop()
-        wearSyncManager.stop()
         pendingTheme?.let { theme ->
             updateLauncherIcon(theme)
             pendingTheme = null
@@ -225,6 +220,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        wearSyncManager.stop()
         ttsManager.shutdown()
         super.onDestroy()
     }
