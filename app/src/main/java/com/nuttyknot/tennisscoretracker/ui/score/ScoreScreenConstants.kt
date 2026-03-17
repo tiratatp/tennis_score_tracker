@@ -36,10 +36,9 @@ object ScoreScreenConstants {
     const val LANDSCAPE_MAX_SAFE_SIZE_FACTOR = 2.5f
 
     // Scoreboard table constants
-    val SCOREBOARD_FONT_SIZE_PORTRAIT = 20.sp
-    val SCOREBOARD_FONT_SIZE_LANDSCAPE = 16.sp
+    val SCOREBOARD_FONT_SIZE = 20.sp
     const val SCOREBOARD_MUTED_ALPHA = 0.5f
     val SCOREBOARD_COLUMN_GAP = 12.dp
     val SCOREBOARD_ROW_GAP = 2.dp
-    val SCOREBOARD_SERVING_DOT_SIZE = 8.dp
+    val SCOREBOARD_SERVING_DOT_SIZE = 16.dp
 }

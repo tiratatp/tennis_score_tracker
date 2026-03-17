@@ -48,12 +48,7 @@ fun ScoreboardTable(
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val fontSize =
-        if (isLandscape) {
-            ScoreScreenConstants.SCOREBOARD_FONT_SIZE_LANDSCAPE
-        } else {
-            ScoreScreenConstants.SCOREBOARD_FONT_SIZE_PORTRAIT
-        }
+    val fontSize = ScoreScreenConstants.SCOREBOARD_FONT_SIZE
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
