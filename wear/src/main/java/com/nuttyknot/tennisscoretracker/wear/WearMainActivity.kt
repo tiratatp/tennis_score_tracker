@@ -55,6 +55,7 @@ class WearMainActivity : ComponentActivity() {
                         showHelp = false
                         prefs.edit().putBoolean(KEY_HAS_SEEN_HELP, true).apply()
                     },
+                    onShowHelp = { showHelp = true },
                     onUserScored = { viewModel.sendCommand(WearConstants.CMD_USER_SCORED) },
                     onOpponentScored = { viewModel.sendCommand(WearConstants.CMD_OPPONENT_SCORED) },
                     onUndo = { viewModel.sendCommand(WearConstants.CMD_UNDO) },

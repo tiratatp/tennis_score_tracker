@@ -59,6 +59,7 @@ fun WearScoreScreen(
     isAmbient: Boolean = false,
     showHelp: Boolean = false,
     onDismissHelp: () -> Unit = {},
+    onShowHelp: () -> Unit = {},
     onUserScored: () -> Unit,
     onOpponentScored: () -> Unit,
     onUndo: () -> Unit,
@@ -76,6 +77,27 @@ fun WearScoreScreen(
 
             if (isConnected && !scoreDisplay.isMatchOver) {
                 TapZones(onUserScored, onOpponentScored, onUndo)
+            }
+
+            if (!showHelp) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.BottomCenter,
+                ) {
+                    Text(
+                        text = "?",
+                        fontSize = DETAIL_FONT_SIZE,
+                        color = Color.White.copy(alpha = 0.35f),
+                        modifier =
+                            Modifier
+                                .padding(bottom = SCREEN_PADDING)
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    onClick = onShowHelp,
+                                ),
+                    )
+                }
             }
 
             if (showHelp) {
