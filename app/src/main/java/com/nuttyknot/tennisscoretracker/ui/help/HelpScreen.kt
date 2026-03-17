@@ -121,16 +121,16 @@ private fun ScoringGestures() {
 
     GestureItem(
         icon = Icons.Default.KeyboardArrowUp,
-        label = "Tap Your Score",
-        action = "Increase Your Score",
-        description = "Tap on your score to give yourself a point.",
+        label = "Tap Your Side",
+        action = "Award Your Point",
+        description = "Tap on your side to award yourself a point.",
     )
 
     GestureItem(
         icon = Icons.Default.KeyboardArrowUp,
-        label = "Tap Opponent Score",
-        action = "Increase Opponent's Score",
-        description = "Tap on the opponent's score to give them a point.",
+        label = "Tap Opponent Side",
+        action = "Award Opponent's Point",
+        description = "Tap on the opponent's side to award them a point.",
     )
 
     GestureItem(
