@@ -25,6 +25,10 @@ tasks.matching { it.name == "prepareKotlinBuildScriptModel" }.configureEach {
     dependsOn("installGitHook")
 }
 
+tasks.register("updateReadmeScreenshots") {
+    dependsOn(":app:updateReadmeScreenshots", ":wear:updateReadmeScreenshots")
+}
+
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")

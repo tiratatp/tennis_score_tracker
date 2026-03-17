@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("app.cash.paparazzi")
 }
 
 fun gitVersionCode(): Int {
@@ -106,4 +107,13 @@ tasks.whenTaskAdded {
     if (name == "installDebug") {
         dependsOn("ktlintCheck", "lintDebug", "detekt")
     }
+}
+
+tasks.register<Copy>("updateReadmeScreenshots") {
+    dependsOn("recordPaparazziDebug")
+    from("src/test/snapshots/images") {
+        include("*_watch.png")
+        rename(".*_watch\\.png", "watch.png")
+    }
+    into("${rootProject.projectDir}/screenshots")
 }

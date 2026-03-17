@@ -17,17 +17,20 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
 
 ## Screenshots
 
+### Phone
+
 <p align="center">
   <img src="screenshots/main.png" width="600" alt="Score screen (landscape)">
 </p>
 <p align="center">
-  <img src="screenshots/portrait.png" width="300" alt="Score screen (portrait)">
-</p>
-<p align="center">
+  <img src="screenshots/portrait.png" width="300" alt="Score screen (portrait)">&nbsp;&nbsp;
   <img src="screenshots/help.png" width="300" alt="Help screen">
 </p>
+
+### Wear OS
+
 <p align="center">
-  <img src="screenshots/watch.jpeg" width="200" alt="Wear OS watch app">
+  <img src="screenshots/watch.png" width="300" alt="Wear OS watch app">
 </p>
 
 ## How to Install
@@ -143,9 +146,14 @@ To publish to a different track (e.g. `production`), edit the `track` field in `
 ./gradlew installDebug               # Install on device (also runs tests + linters)
 ./gradlew :wear:assembleDebug        # Build wear APK
 ./gradlew :wear:installDebug         # Install wear app on watch
-./gradlew :app:recordPaparazziDebug  # Update screenshot snapshots after UI changes
-./gradlew :app:verifyPaparazziDebug  # Verify snapshots match (used in CI)
-./gradlew :app:updateReadmeScreenshots  # Copy snapshots to screenshots/ for README
+```
+
+### Screenshots
+
+README screenshots are auto-generated using [Paparazzi](https://github.com/cashapp/paparazzi) (no device needed). After UI changes, run:
+
+```bash
+./gradlew updateReadmeScreenshots    # Re-generate all screenshots (phone + watch)
 ```
 
 </details>
