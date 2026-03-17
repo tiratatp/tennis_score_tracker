@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
@@ -25,15 +27,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nuttyknot.tennisscoretracker.ScoreModel
 import com.nuttyknot.tennisscoretracker.TennisMatchState
-import com.nuttyknot.tennisscoretracker.ui.score.ScoreScreenConstants
+import com.nuttyknot.tennisscoretracker.ui.score.Scoreboard
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,12 +76,15 @@ internal fun MatchSummaryContent(
     onNewMatch: () -> Unit,
     paddingValues: PaddingValues,
 ) {
+    val isUserWinner = state.matchWinner == state.userName.ifEmpty { "You" }
+
     Column(
         modifier =
             Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(24.dp),
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -96,23 +98,35 @@ internal fun MatchSummaryContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = state.matchWinner ?: "",
+            text = "${state.matchWinner ?: ""} wins!",
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "${state.userSets} - ${state.opponentSets}",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
         Spacer(modifier = Modifier.height(24.dp))
 
-        SetHistoryText(state.setHistory)
+        Scoreboard(
+            userGames = 0,
+            opponentGames = 0,
+            setHistory = state.setHistory,
+            userColor =
+                if (isUserWinner) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+            opponentColor =
+                if (isUserWinner) {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.primary
+                },
+            isMatchOver = true,
+            userName = state.userName.ifEmpty { "You" },
+            opponentName = state.opponentName.ifEmpty { "Opponent" },
+            matchFormat = state.matchFormat,
+        )
 
         Spacer(modifier = Modifier.height(48.dp))
 
@@ -122,27 +136,4 @@ internal fun MatchSummaryContent(
             Text("New Match", fontSize = 18.sp)
         }
     }
-}
-
-@Suppress("FunctionName")
-@Composable
-private fun SetHistoryText(setHistory: List<Pair<Int, Int>>) {
-    val separatorStyle = SpanStyle(color = MaterialTheme.colorScheme.onBackground)
-    val userStyle = SpanStyle(color = MaterialTheme.colorScheme.primary)
-    val opponentStyle = SpanStyle(color = MaterialTheme.colorScheme.secondary)
-    val text =
-        buildAnnotatedString {
-            setHistory.forEachIndexed { index, (userGames, opponentGames) ->
-                if (index > 0) withStyle(separatorStyle) { append("   ") }
-                withStyle(userStyle) { append("$userGames") }
-                withStyle(separatorStyle) { append("-") }
-                withStyle(opponentStyle) { append("$opponentGames") }
-            }
-        }
-    Text(
-        text = text,
-        fontFamily = ScoreScreenConstants.JetBrainsMonoFamily,
-        fontSize = 32.sp,
-        fontWeight = FontWeight.Bold,
-    )
 }

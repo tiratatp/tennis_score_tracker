@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import com.nuttyknot.tennisscoretracker.MatchFormat
 
-@Suppress("FunctionName", "LongParameterList", "LongMethod")
+@Suppress("FunctionName", "LongParameterList")
 @Composable
 fun ScoreboardTable(
     userGames: Int,
@@ -48,7 +48,6 @@ fun ScoreboardTable(
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val fontSize = ScoreScreenConstants.SCOREBOARD_FONT_SIZE
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,58 +61,24 @@ fun ScoreboardTable(
         Text(
             text = statusText ?: " ",
             color = if (statusText != null) MaterialTheme.colorScheme.primary else Color.Transparent,
-            fontSize = fontSize,
+            fontSize = ScoreScreenConstants.SCOREBOARD_FONT_SIZE,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(ScoreScreenConstants.SCOREBOARD_ROW_GAP))
 
-        val maxSetColumns =
-            when (matchFormat) {
-                MatchFormat.FAST -> 0
-                else -> 2
-            }
-
-        val hasNames = userName.isNotEmpty() || opponentName.isNotEmpty()
-        val rowModifier = if (hasNames) Modifier.fillMaxWidth() else Modifier
-
-        val rows = @Composable {
-            // User row
-            ScoreboardRow(
-                name = userName,
-                isServing = userName.isNotEmpty() && isUserServing,
-                games = setHistory.map { it.first },
-                currentGames = userGames,
-                color = userColor,
-                fontSize = fontSize,
-                modifier = rowModifier,
-                maxSetColumns = maxSetColumns,
-                isMatchOver = isMatchOver,
-            )
-
-            Spacer(modifier = Modifier.height(ScoreScreenConstants.SCOREBOARD_ROW_GAP))
-
-            // Opponent row
-            ScoreboardRow(
-                name = opponentName,
-                isServing = opponentName.isNotEmpty() && !isUserServing,
-                games = setHistory.map { it.second },
-                currentGames = opponentGames,
-                color = opponentColor,
-                fontSize = fontSize,
-                modifier = rowModifier,
-                maxSetColumns = maxSetColumns,
-                isMatchOver = isMatchOver,
-            )
-        }
-
-        if (hasNames) {
-            Column(modifier = Modifier.width(IntrinsicSize.Max)) {
-                rows()
-            }
-        } else {
-            rows()
-        }
+        Scoreboard(
+            userGames = userGames,
+            opponentGames = opponentGames,
+            setHistory = setHistory,
+            userColor = userColor,
+            opponentColor = opponentColor,
+            isMatchOver = isMatchOver,
+            userName = userName,
+            opponentName = opponentName,
+            isUserServing = isUserServing,
+            matchFormat = matchFormat,
+        )
 
         Spacer(modifier = Modifier.height(ScoreScreenConstants.VERTICAL_SPACING_MEDIUM))
         Button(
@@ -129,6 +94,70 @@ fun ScoreboardTable(
         ) {
             Text("Match Summary")
         }
+    }
+}
+
+@Suppress("FunctionName", "LongParameterList")
+@Composable
+fun Scoreboard(
+    userGames: Int,
+    opponentGames: Int,
+    setHistory: List<Pair<Int, Int>>,
+    userColor: Color,
+    opponentColor: Color,
+    isMatchOver: Boolean = false,
+    userName: String = "",
+    opponentName: String = "",
+    isUserServing: Boolean = false,
+    matchFormat: MatchFormat = MatchFormat.STANDARD,
+) {
+    val fontSize = ScoreScreenConstants.SCOREBOARD_FONT_SIZE
+
+    val maxSetColumns =
+        when (matchFormat) {
+            MatchFormat.FAST -> 0
+            else -> 2
+        }
+
+    val hasNames = userName.isNotEmpty() || opponentName.isNotEmpty()
+    val rowModifier = if (hasNames) Modifier.fillMaxWidth() else Modifier
+
+    val rows = @Composable {
+        // User row
+        ScoreboardRow(
+            name = userName,
+            isServing = userName.isNotEmpty() && isUserServing,
+            games = setHistory.map { it.first },
+            currentGames = userGames,
+            color = userColor,
+            fontSize = fontSize,
+            modifier = rowModifier,
+            maxSetColumns = maxSetColumns,
+            isMatchOver = isMatchOver,
+        )
+
+        Spacer(modifier = Modifier.height(ScoreScreenConstants.SCOREBOARD_ROW_GAP))
+
+        // Opponent row
+        ScoreboardRow(
+            name = opponentName,
+            isServing = opponentName.isNotEmpty() && !isUserServing,
+            games = setHistory.map { it.second },
+            currentGames = opponentGames,
+            color = opponentColor,
+            fontSize = fontSize,
+            modifier = rowModifier,
+            maxSetColumns = maxSetColumns,
+            isMatchOver = isMatchOver,
+        )
+    }
+
+    if (hasNames) {
+        Column(modifier = Modifier.width(IntrinsicSize.Max)) {
+            rows()
+        }
+    } else {
+        rows()
     }
 }
 
@@ -150,21 +179,23 @@ private fun ScoreboardRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (name.isNotEmpty()) {
-            Box(
-                modifier = Modifier.size(ScoreScreenConstants.SCOREBOARD_SERVING_DOT_SIZE),
-                contentAlignment = Alignment.Center,
-            ) {
-                if (isServing) {
-                    Box(
-                        modifier =
-                            Modifier
-                                .size(ScoreScreenConstants.SCOREBOARD_SERVING_DOT_SIZE)
-                                .clip(CircleShape)
-                                .background(color),
-                    )
+            if (!isMatchOver) {
+                Box(
+                    modifier = Modifier.size(ScoreScreenConstants.SCOREBOARD_SERVING_DOT_SIZE),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (isServing) {
+                        Box(
+                            modifier =
+                                Modifier
+                                    .size(ScoreScreenConstants.SCOREBOARD_SERVING_DOT_SIZE)
+                                    .clip(CircleShape)
+                                    .background(color),
+                        )
+                    }
                 }
+                Spacer(modifier = Modifier.width(ScoreScreenConstants.SCOREBOARD_COLUMN_GAP))
             }
-            Spacer(modifier = Modifier.width(ScoreScreenConstants.SCOREBOARD_COLUMN_GAP))
             Text(
                 text = name,
                 color = color.copy(alpha = ScoreScreenConstants.NAME_ALPHA),
