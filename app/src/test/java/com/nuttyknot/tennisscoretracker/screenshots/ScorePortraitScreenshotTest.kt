@@ -22,6 +22,30 @@ class ScorePortraitScreenshotTest {
         )
 
     @Test
+    fun matchOver() {
+        // 2004 Wimbledon Women's Final result: Sharapova d. S. Williams 6-1, 6-4
+        val state =
+            TennisMatchState(
+                userScore = PlayerScore.Love,
+                opponentScore = PlayerScore.Love,
+                userGames = 6,
+                opponentGames = 4,
+                userSets = 2,
+                opponentSets = 0,
+                setHistory = listOf(6 to 1, 6 to 4),
+                isUserServing = true,
+                userName = "Sharapova",
+                opponentName = "Williams",
+                matchWinner = "Sharapova",
+            )
+        paparazzi.snapshot("matchOver") {
+            TennisScoreTrackerTheme(appTheme = AppTheme.SKY_BLUE) {
+                ScoreScreenPreview(state)
+            }
+        }
+    }
+
+    @Test
     fun portrait() {
         val state =
             TennisMatchState(

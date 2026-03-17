@@ -37,6 +37,37 @@ class WearScoreScreenshotTest {
         )
 
     @Test
+    fun matchOver() {
+        // 2004 Wimbledon Women's Final result: Sharapova d. S. Williams 6-1, 6-4
+        val score =
+            WearScoreDisplay(
+                userName = "Sharapova",
+                opponentName = "Williams",
+                userScore = "0",
+                opponentScore = "0",
+                userGames = 6,
+                opponentGames = 4,
+                userSets = 2,
+                opponentSets = 0,
+                setHistory = listOf(6 to 1, 6 to 4),
+                isUserServing = true,
+                isMatchOver = true,
+                matchWinner = "Sharapova",
+            )
+        paparazzi.snapshot("matchOver") {
+            WearTheme {
+                WearScoreScreen(
+                    scoreDisplay = score,
+                    isConnected = true,
+                    onUserScored = {},
+                    onOpponentScored = {},
+                    onUndo = {},
+                )
+            }
+        }
+    }
+
+    @Test
     fun watch() {
         // Match point: Sharapova serving 40-30, 5-4 in 2nd set, won 1st 6-1
         val score =

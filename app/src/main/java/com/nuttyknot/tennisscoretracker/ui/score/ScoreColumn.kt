@@ -93,6 +93,7 @@ fun ScoreboardTable(
                 fontSize = fontSize,
                 modifier = rowModifier,
                 maxSetColumns = maxSetColumns,
+                isMatchOver = isMatchOver,
             )
 
             Spacer(modifier = Modifier.height(ScoreScreenConstants.SCOREBOARD_ROW_GAP))
@@ -107,6 +108,7 @@ fun ScoreboardTable(
                 fontSize = fontSize,
                 modifier = rowModifier,
                 maxSetColumns = maxSetColumns,
+                isMatchOver = isMatchOver,
             )
         }
 
@@ -145,6 +147,7 @@ private fun ScoreboardRow(
     fontSize: TextUnit,
     modifier: Modifier = Modifier,
     maxSetColumns: Int = 0,
+    isMatchOver: Boolean = false,
 ) {
     Row(
         modifier = modifier,
@@ -195,14 +198,16 @@ private fun ScoreboardRow(
                 fontFamily = ScoreScreenConstants.JetBrainsMonoFamily,
             )
         }
-        Spacer(modifier = Modifier.width(ScoreScreenConstants.SCOREBOARD_COLUMN_GAP))
-        Text(
-            text = "$currentGames",
-            color = color,
-            fontSize = fontSize,
-            fontWeight = FontWeight.Bold,
-            fontFamily = ScoreScreenConstants.JetBrainsMonoFamily,
-        )
+        if (!isMatchOver) {
+            Spacer(modifier = Modifier.width(ScoreScreenConstants.SCOREBOARD_COLUMN_GAP))
+            Text(
+                text = "$currentGames",
+                color = color,
+                fontSize = fontSize,
+                fontWeight = FontWeight.Bold,
+                fontFamily = ScoreScreenConstants.JetBrainsMonoFamily,
+            )
+        }
     }
 }
 

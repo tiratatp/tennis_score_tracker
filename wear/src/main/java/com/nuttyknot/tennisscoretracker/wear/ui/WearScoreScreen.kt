@@ -114,12 +114,14 @@ private fun AmbientScoreContent(scoreDisplay: WearScoreDisplay) {
                     color = Color.Gray,
                 )
             }
-            Text(
-                text = "${scoreDisplay.userGames}-${scoreDisplay.opponentGames}",
-                fontSize = DETAIL_FONT_SIZE,
-                fontFamily = FontFamily.Monospace,
-                color = Color.Gray,
-            )
+            if (!scoreDisplay.isMatchOver) {
+                Text(
+                    text = "${scoreDisplay.userGames}-${scoreDisplay.opponentGames}",
+                    fontSize = DETAIL_FONT_SIZE,
+                    fontFamily = FontFamily.Monospace,
+                    color = Color.Gray,
+                )
+            }
         }
     }
 }
@@ -141,15 +143,19 @@ private fun ScoreContent(
         val userColor = scoreDisplay.primaryColorArgb?.let { Color(it) } ?: DEFAULT_PRIMARY_COLOR
         val opponentColor = scoreDisplay.secondaryColorArgb?.let { Color(it) } ?: DEFAULT_SECONDARY_COLOR
 
-        if (scoreDisplay.isMatchOver && scoreDisplay.matchWinner != null) {
-            Text(
-                text = "${scoreDisplay.matchWinner} wins!",
-                fontSize = LABEL_FONT_SIZE,
-                color = Color(COLOR_TENNIS_GREEN),
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-        }
+        val statusText =
+            if (scoreDisplay.isMatchOver && scoreDisplay.matchWinner != null) {
+                "${scoreDisplay.matchWinner} wins!"
+            } else {
+                " "
+            }
+        Text(
+            text = statusText,
+            fontSize = LABEL_FONT_SIZE,
+            color = if (statusText != " ") Color(COLOR_TENNIS_GREEN) else Color.Transparent,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(SPACER_HEIGHT))
 
         PlayerNames(scoreDisplay, userColor, opponentColor)
         Spacer(modifier = Modifier.height(SPACER_HEIGHT))
@@ -193,13 +199,15 @@ private fun WearScoreboardTable(
                     fontFamily = FontFamily.Monospace,
                 )
             }
-            Text(
-                text = "${scoreDisplay.userGames}",
-                color = userColor,
-                fontSize = DETAIL_FONT_SIZE,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace,
-            )
+            if (!scoreDisplay.isMatchOver) {
+                Text(
+                    text = "${scoreDisplay.userGames}",
+                    color = userColor,
+                    fontSize = DETAIL_FONT_SIZE,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(SCOREBOARD_ROW_GAP))
@@ -218,13 +226,15 @@ private fun WearScoreboardTable(
                     fontFamily = FontFamily.Monospace,
                 )
             }
-            Text(
-                text = "${scoreDisplay.opponentGames}",
-                color = opponentColor,
-                fontSize = DETAIL_FONT_SIZE,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace,
-            )
+            if (!scoreDisplay.isMatchOver) {
+                Text(
+                    text = "${scoreDisplay.opponentGames}",
+                    color = opponentColor,
+                    fontSize = DETAIL_FONT_SIZE,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
+                )
+            }
         }
     }
 }
