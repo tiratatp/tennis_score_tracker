@@ -20,7 +20,7 @@ A tennis score-tracking app for Android that lets you keep score hands-free usin
 ### Phone
 
 <p align="center">
-  <img src="screenshots/main.png" width="600" alt="Score screen (landscape)">
+  <img src="screenshots/landscape.png" width="600" alt="Score screen (landscape)">
 </p>
 <p align="center">
   <img src="screenshots/portrait.png" width="300" alt="Score screen (portrait)">&nbsp;&nbsp;

@@ -132,11 +132,11 @@ tasks.whenTaskAdded {
 tasks.register<Copy>("updateReadmeScreenshots") {
     dependsOn("recordPaparazziDebug")
     from("src/test/snapshots/images") {
-        include("*_main.png")
-        include("*_portrait.png")
+        include("*Landscape*_matchover.png")
+        include("*Portrait*_inmatch.png")
         include("*_help.png")
-        rename(".*_main\\.png", "main.png")
-        rename(".*_portrait\\.png", "portrait.png")
+        rename(".*Landscape.*_matchover\\.png", "landscape.png")
+        rename(".*Portrait.*_inmatch\\.png", "portrait.png")
         rename(".*_help\\.png", "help.png")
     }
     into("${rootProject.projectDir}/screenshots")

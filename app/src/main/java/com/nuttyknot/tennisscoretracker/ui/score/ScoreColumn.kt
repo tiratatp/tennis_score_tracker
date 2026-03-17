@@ -120,18 +120,19 @@ fun ScoreboardTable(
             rows()
         }
 
-        if (isMatchOver) {
-            Spacer(modifier = Modifier.height(ScoreScreenConstants.VERTICAL_SPACING_MEDIUM))
-            Button(
-                onClick = onViewSummary,
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),
-            ) {
-                Text("Match Summary")
-            }
+        Spacer(modifier = Modifier.height(ScoreScreenConstants.VERTICAL_SPACING_MEDIUM))
+        Button(
+            onClick = onViewSummary,
+            enabled = isMatchOver,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = if (isMatchOver) MaterialTheme.colorScheme.primary else Color.Transparent,
+                    contentColor = if (isMatchOver) MaterialTheme.colorScheme.onPrimary else Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    disabledContentColor = Color.Transparent,
+                ),
+        ) {
+            Text("Match Summary")
         }
     }
 }

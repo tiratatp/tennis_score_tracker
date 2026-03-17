@@ -23,7 +23,31 @@ class ScoreLandscapeScreenshotTest {
         )
 
     @Test
-    fun main() {
+    fun matchOver() {
+        // 2003 Wimbledon Final result: Serena d. Venus 4-6, 6-4, 6-2
+        val state =
+            TennisMatchState(
+                userScore = PlayerScore.Love,
+                opponentScore = PlayerScore.Love,
+                userGames = 6,
+                opponentGames = 2,
+                userSets = 2,
+                opponentSets = 1,
+                setHistory = listOf(4 to 6, 6 to 4, 6 to 2),
+                isUserServing = true,
+                userName = "Serena",
+                opponentName = "Venus",
+                matchWinner = "Serena",
+            )
+        paparazzi.snapshot("matchOver") {
+            TennisScoreTrackerTheme(appTheme = AppTheme.SKY_BLUE) {
+                ScoreScreenPreview(state)
+            }
+        }
+    }
+
+    @Test
+    fun inMatch() {
         val state =
             TennisMatchState(
                 userScore = PlayerScore.Forty,
@@ -37,7 +61,7 @@ class ScoreLandscapeScreenshotTest {
                 userName = "Serena",
                 opponentName = "Venus",
             )
-        paparazzi.snapshot("main") {
+        paparazzi.snapshot("inMatch") {
             TennisScoreTrackerTheme(appTheme = AppTheme.SKY_BLUE) {
                 ScoreScreenPreview(state)
             }

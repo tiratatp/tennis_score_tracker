@@ -23,20 +23,20 @@ class ScorePortraitScreenshotTest {
 
     @Test
     fun matchOver() {
-        // 2004 Wimbledon Women's Final result: Sharapova d. S. Williams 6-1, 6-4
+        // 2008 Wimbledon Men's Final result: Nadal d. Federer 6-4, 6-4, 6-7, 6-7, 9-7
         val state =
             TennisMatchState(
                 userScore = PlayerScore.Love,
                 opponentScore = PlayerScore.Love,
-                userGames = 6,
-                opponentGames = 4,
-                userSets = 2,
-                opponentSets = 0,
-                setHistory = listOf(6 to 1, 6 to 4),
+                userGames = 9,
+                opponentGames = 7,
+                userSets = 3,
+                opponentSets = 2,
+                setHistory = listOf(6 to 4, 6 to 4, 6 to 7, 6 to 7, 9 to 7),
                 isUserServing = true,
-                userName = "Sharapova",
-                opponentName = "Williams",
-                matchWinner = "Sharapova",
+                userName = "Nadal",
+                opponentName = "Federer",
+                matchWinner = "Nadal",
             )
         paparazzi.snapshot("matchOver") {
             TennisScoreTrackerTheme(appTheme = AppTheme.SKY_BLUE) {
@@ -46,7 +46,7 @@ class ScorePortraitScreenshotTest {
     }
 
     @Test
-    fun portrait() {
+    fun inMatch() {
         val state =
             TennisMatchState(
                 userScore = PlayerScore.Forty,
@@ -60,7 +60,7 @@ class ScorePortraitScreenshotTest {
                 userName = "Nadal",
                 opponentName = "Federer",
             )
-        paparazzi.snapshot("portrait") {
+        paparazzi.snapshot("inMatch") {
             TennisScoreTrackerTheme(appTheme = AppTheme.SKY_BLUE) {
                 ScoreScreenPreview(state)
             }
