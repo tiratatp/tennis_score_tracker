@@ -175,7 +175,7 @@ private fun buildSettingsData(
 
 @Suppress("FunctionName")
 @Composable
-private fun SettingsLayout(
+internal fun SettingsLayout(
     paddingValues: androidx.compose.foundation.layout.PaddingValues,
     playerData: PlayerSettingsData,
     appData: AppSettingsData,
