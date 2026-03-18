@@ -1,6 +1,6 @@
 # TennisDroid
 
-Hands-free tennis scoring with Bluetooth remote, voice calls, and Wear OS sync.
+Smart tennis scoreboard: Bluetooth remote, voice announcements & watch sync.
 
 TennisDroid turns your phone into a smart tennis scoreboard. Use any Bluetooth remote button to track points hands-free while you play — no need to stop and tap your phone between points.
 
