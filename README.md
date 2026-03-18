@@ -160,6 +160,10 @@ README screenshots are auto-generated using [Paparazzi](https://github.com/casha
 
 </details>
 
+## Privacy Policy
+
+See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) for details. The app collects no personal data and requires no internet access.
+
 ## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
