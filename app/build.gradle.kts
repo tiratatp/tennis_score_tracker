@@ -137,10 +137,14 @@ tasks.register<Copy>("updateReadmeScreenshots") {
         include("*Portrait*_inmatch.png")
         include("*_help.png")
         include("*MatchSummaryPortrait*_matchover.png")
+        include("*Tablet7*_inmatch.png")
+        include("*Tablet10*_inmatch.png")
         rename(".*ScoreLandscape.*_matchover\\.png", "score-landscape.png")
         rename(".*Portrait.*_inmatch\\.png", "score-portrait.png")
         rename(".*_help\\.png", "help.png")
         rename(".*MatchSummaryPortrait.*_matchover\\.png", "match-summary.png")
+        rename(".*Tablet7.*_inmatch\\.png", "score-tablet-7.png")
+        rename(".*Tablet10.*_inmatch\\.png", "score-tablet-10.png")
     }
     into("${rootProject.projectDir}/screenshots")
 }

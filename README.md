@@ -54,6 +54,15 @@ No account required. No internet needed. No ads. No tracking. All data stays on 
   <img src="screenshots/help.png" width="300" alt="Help screen">
 </p>
 
+### Tablet
+
+<p align="center">
+  <img src="screenshots/score-tablet-10.png" width="600" alt="Score screen (10-inch tablet)">
+</p>
+<p align="center">
+  <img src="screenshots/score-tablet-7.png" width="500" alt="Score screen (7-inch tablet)">
+</p>
+
 ### Wear OS
 
 <p align="center">

@@ -26,6 +26,7 @@ object ScoreScreenConstants {
 
     const val LANDSCAPE_TEXT_SIZE_RATIO = 1.3
     const val PORTRAIT_TEXT_SIZE_RATIO = 1.1
+    const val LANDSCAPE_REFERENCE_WIDTH = 882f
     val MIDDLE_COLUMN_WIDTH = 180.dp
     val NAME_TEXT_SIZE = 24.sp
     const val NAME_ALPHA = 0.85f

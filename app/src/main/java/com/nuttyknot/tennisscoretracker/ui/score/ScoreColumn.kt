@@ -45,6 +45,7 @@ fun ScoreboardTable(
     opponentName: String = "",
     isUserServing: Boolean = false,
     matchFormat: MatchFormat = MatchFormat.STANDARD,
+    scaleFactor: Float = 1f,
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -53,7 +54,7 @@ fun ScoreboardTable(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
             if (isLandscape) {
-                Modifier.width(ScoreScreenConstants.MIDDLE_COLUMN_WIDTH)
+                Modifier.width(ScoreScreenConstants.MIDDLE_COLUMN_WIDTH * scaleFactor)
             } else {
                 Modifier
             },
@@ -61,11 +62,11 @@ fun ScoreboardTable(
         Text(
             text = statusText ?: " ",
             color = if (statusText != null) MaterialTheme.colorScheme.primary else Color.Transparent,
-            fontSize = ScoreScreenConstants.SCOREBOARD_FONT_SIZE,
+            fontSize = ScoreScreenConstants.SCOREBOARD_FONT_SIZE * scaleFactor,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
-        Spacer(modifier = Modifier.height(ScoreScreenConstants.SCOREBOARD_ROW_GAP))
+        Spacer(modifier = Modifier.height(ScoreScreenConstants.SCOREBOARD_ROW_GAP * scaleFactor))
 
         Scoreboard(
             userGames = userGames,
@@ -78,9 +79,10 @@ fun ScoreboardTable(
             opponentName = opponentName,
             isUserServing = isUserServing,
             matchFormat = matchFormat,
+            scaleFactor = scaleFactor,
         )
 
-        Spacer(modifier = Modifier.height(ScoreScreenConstants.VERTICAL_SPACING_MEDIUM))
+        Spacer(modifier = Modifier.height(ScoreScreenConstants.VERTICAL_SPACING_MEDIUM * scaleFactor))
         Button(
             onClick = onViewSummary,
             enabled = isMatchOver,
@@ -110,8 +112,9 @@ fun Scoreboard(
     opponentName: String = "",
     isUserServing: Boolean = false,
     matchFormat: MatchFormat = MatchFormat.STANDARD,
+    scaleFactor: Float = 1f,
 ) {
-    val fontSize = ScoreScreenConstants.SCOREBOARD_FONT_SIZE
+    val fontSize = ScoreScreenConstants.SCOREBOARD_FONT_SIZE * scaleFactor
 
     val maxSetColumns =
         when (matchFormat) {
@@ -134,9 +137,10 @@ fun Scoreboard(
             modifier = rowModifier,
             maxSetColumns = maxSetColumns,
             isMatchOver = isMatchOver,
+            scaleFactor = scaleFactor,
         )
 
-        Spacer(modifier = Modifier.height(ScoreScreenConstants.SCOREBOARD_ROW_GAP))
+        Spacer(modifier = Modifier.height(ScoreScreenConstants.SCOREBOARD_ROW_GAP * scaleFactor))
 
         // Opponent row
         ScoreboardRow(
@@ -149,6 +153,7 @@ fun Scoreboard(
             modifier = rowModifier,
             maxSetColumns = maxSetColumns,
             isMatchOver = isMatchOver,
+            scaleFactor = scaleFactor,
         )
     }
 
@@ -173,7 +178,11 @@ private fun ScoreboardRow(
     modifier: Modifier = Modifier,
     maxSetColumns: Int = 0,
     isMatchOver: Boolean = false,
+    scaleFactor: Float = 1f,
 ) {
+    val columnGap = ScoreScreenConstants.SCOREBOARD_COLUMN_GAP * scaleFactor
+    val dotSize = ScoreScreenConstants.SCOREBOARD_SERVING_DOT_SIZE * scaleFactor
+
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -181,20 +190,20 @@ private fun ScoreboardRow(
         if (name.isNotEmpty()) {
             if (!isMatchOver) {
                 Box(
-                    modifier = Modifier.size(ScoreScreenConstants.SCOREBOARD_SERVING_DOT_SIZE),
+                    modifier = Modifier.size(dotSize),
                     contentAlignment = Alignment.Center,
                 ) {
                     if (isServing) {
                         Box(
                             modifier =
                                 Modifier
-                                    .size(ScoreScreenConstants.SCOREBOARD_SERVING_DOT_SIZE)
+                                    .size(dotSize)
                                     .clip(CircleShape)
                                     .background(color),
                         )
                     }
                 }
-                Spacer(modifier = Modifier.width(ScoreScreenConstants.SCOREBOARD_COLUMN_GAP))
+                Spacer(modifier = Modifier.width(columnGap))
             }
             Text(
                 text = name,
@@ -206,7 +215,7 @@ private fun ScoreboardRow(
             )
         }
         repeat(maxSetColumns - games.size) {
-            Spacer(modifier = Modifier.width(ScoreScreenConstants.SCOREBOARD_COLUMN_GAP))
+            Spacer(modifier = Modifier.width(columnGap))
             Text(
                 text = " ",
                 color = Color.Transparent,
@@ -216,7 +225,7 @@ private fun ScoreboardRow(
             )
         }
         games.forEach { setGames ->
-            Spacer(modifier = Modifier.width(ScoreScreenConstants.SCOREBOARD_COLUMN_GAP))
+            Spacer(modifier = Modifier.width(columnGap))
             Text(
                 text = "$setGames",
                 color = color.copy(alpha = ScoreScreenConstants.SCOREBOARD_MUTED_ALPHA),
@@ -226,7 +235,7 @@ private fun ScoreboardRow(
             )
         }
         if (!isMatchOver) {
-            Spacer(modifier = Modifier.width(ScoreScreenConstants.SCOREBOARD_COLUMN_GAP))
+            Spacer(modifier = Modifier.width(columnGap))
             Text(
                 text = "$currentGames",
                 color = color,

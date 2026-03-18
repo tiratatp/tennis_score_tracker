@@ -137,9 +137,11 @@ internal fun LandscapeScoreContent(
     maxWidth: Float,
     onNavigateToSummary: () -> Unit,
 ) {
+    val scaleFactor = (maxWidth / ScoreScreenConstants.LANDSCAPE_REFERENCE_WIDTH).coerceAtLeast(1f)
+    val middleColumnWidth = ScoreScreenConstants.MIDDLE_COLUMN_WIDTH * scaleFactor
     val rawSize = maxHeight / ScoreScreenConstants.LANDSCAPE_TEXT_SIZE_RATIO.toFloat()
     val maxSafeSize =
-        (maxWidth - ScoreScreenConstants.MIDDLE_COLUMN_WIDTH.value) /
+        (maxWidth - middleColumnWidth.value) /
             ScoreScreenConstants.LANDSCAPE_MAX_SAFE_SIZE_FACTOR
     val mainTextSize = minOf(rawSize, maxSafeSize).sp
     Row(
@@ -176,6 +178,7 @@ internal fun LandscapeScoreContent(
             statusText = getStatusText(state),
             onViewSummary = onNavigateToSummary,
             matchFormat = state.matchFormat,
+            scaleFactor = scaleFactor,
         )
 
         // Opponent Score (Right)
