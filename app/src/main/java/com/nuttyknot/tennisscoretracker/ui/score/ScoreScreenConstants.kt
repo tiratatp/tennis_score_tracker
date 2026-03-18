@@ -33,7 +33,7 @@ object ScoreScreenConstants {
     val SERVING_DOT_RADIUS = 10.dp
     val VERTICAL_SPACING_LARGE = 32.dp
     val VERTICAL_SPACING_MEDIUM = 16.dp
-    const val PORTRAIT_MAX_SAFE_SIZE_FACTOR = 1.5f
+    const val PORTRAIT_MAX_SAFE_SIZE_FACTOR = 2.0f
     const val LANDSCAPE_MAX_SAFE_SIZE_FACTOR = 2.5f
 
     // Scoreboard table constants

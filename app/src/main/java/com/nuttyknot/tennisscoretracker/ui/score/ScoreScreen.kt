@@ -221,7 +221,7 @@ internal fun PortraitScoreContent(
         // User Score (Top) — only show during active match
         if (state.matchWinner == null) {
             Box(
-                modifier = Modifier.weight(1f).padding(bottom = 12.dp).clipToBounds(),
+                modifier = Modifier.weight(1f).clipToBounds(),
                 contentAlignment = Alignment.Center,
             ) {
                 ScoreColumn(
@@ -255,7 +255,7 @@ internal fun PortraitScoreContent(
         // Opponent Score (Bottom) — only show during active match
         if (state.matchWinner == null) {
             Box(
-                modifier = Modifier.weight(1f).padding(top = 12.dp).clipToBounds(),
+                modifier = Modifier.weight(1f).clipToBounds(),
                 contentAlignment = Alignment.Center,
             ) {
                 ScoreColumn(
