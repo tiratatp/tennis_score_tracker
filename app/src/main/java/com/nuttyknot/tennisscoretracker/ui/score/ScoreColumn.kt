@@ -254,12 +254,13 @@ fun ScoreColumn(
     mainTextSize: TextUnit,
     color: Color,
     alignment: Alignment = Alignment.Center,
+    scaleFactor: Float = 1f,
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     if (isLandscape) {
-        LandscapeScoreColumn(data, mainTextSize, color, alignment)
+        LandscapeScoreColumn(data, mainTextSize, color, alignment, scaleFactor)
     } else {
         PortraitScoreColumn(data, mainTextSize, color)
     }
@@ -272,6 +273,7 @@ private fun LandscapeScoreColumn(
     mainTextSize: TextUnit,
     color: Color,
     alignment: Alignment,
+    scaleFactor: Float = 1f,
 ) {
     val finalAlignment = if (data.score == "0") Alignment.Center else alignment
 
@@ -291,6 +293,7 @@ private fun LandscapeScoreColumn(
                 isServing = data.isServing,
                 color = color,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
+                scaleFactor = scaleFactor,
             )
         }
         Text(
@@ -340,17 +343,19 @@ private fun PlayerNameLabel(
     isServing: Boolean,
     color: Color,
     modifier: Modifier = Modifier,
+    scaleFactor: Float = 1f,
 ) {
+    val dotRadius = ScoreScreenConstants.SERVING_DOT_RADIUS * scaleFactor
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(ScoreScreenConstants.SERVING_DOT_RADIUS),
+        horizontalArrangement = Arrangement.spacedBy(dotRadius),
     ) {
         if (isServing) {
             Box(
                 modifier =
                     Modifier
-                        .size(ScoreScreenConstants.SERVING_DOT_RADIUS * 2)
+                        .size(dotRadius * 2)
                         .clip(CircleShape)
                         .background(color),
             )
@@ -358,7 +363,7 @@ private fun PlayerNameLabel(
         Text(
             text = name,
             color = color.copy(alpha = ScoreScreenConstants.NAME_ALPHA),
-            fontSize = ScoreScreenConstants.NAME_TEXT_SIZE,
+            fontSize = ScoreScreenConstants.NAME_TEXT_SIZE * scaleFactor,
             maxLines = 1,
         )
     }

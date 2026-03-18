@@ -140,9 +140,7 @@ internal fun LandscapeScoreContent(
     val scaleFactor = (maxWidth / ScoreScreenConstants.LANDSCAPE_REFERENCE_WIDTH).coerceAtLeast(1f)
     val middleColumnWidth = ScoreScreenConstants.MIDDLE_COLUMN_WIDTH * scaleFactor
     val rawSize = maxHeight / ScoreScreenConstants.LANDSCAPE_TEXT_SIZE_RATIO.toFloat()
-    val maxSafeSize =
-        (maxWidth - middleColumnWidth.value) /
-            ScoreScreenConstants.LANDSCAPE_MAX_SAFE_SIZE_FACTOR
+    val maxSafeSize = (maxWidth - middleColumnWidth.value) / ScoreScreenConstants.LANDSCAPE_MAX_SAFE_SIZE_FACTOR
     val mainTextSize = minOf(rawSize, maxSafeSize).sp
     Row(
         modifier = Modifier.fillMaxSize(),
@@ -164,6 +162,7 @@ internal fun LandscapeScoreContent(
                 mainTextSize = mainTextSize,
                 color = MaterialTheme.colorScheme.primary,
                 alignment = Alignment.CenterStart,
+                scaleFactor = scaleFactor,
             )
         }
 
@@ -196,6 +195,7 @@ internal fun LandscapeScoreContent(
                 mainTextSize = mainTextSize,
                 color = MaterialTheme.colorScheme.secondary,
                 alignment = Alignment.CenterEnd,
+                scaleFactor = scaleFactor,
             )
         }
     }
