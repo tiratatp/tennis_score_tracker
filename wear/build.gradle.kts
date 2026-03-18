@@ -10,7 +10,8 @@ fun gitVersionCode(): Int {
         providers.exec {
             commandLine("git", "tag", "--list", "v*")
         }.standardOutput.asText.get().trim()
-    return if (result.isEmpty()) 1 else result.lines().size
+    val base = if (result.isEmpty()) 1 else result.lines().size
+    return base * 10 + 2 // wear suffix
 }
 
 fun gitVersionName(): String {
