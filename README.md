@@ -1,19 +1,45 @@
 # TennisDroid
 
-A tennis score-tracking app for Android that lets you keep score hands-free using a Bluetooth remote button — perfect for when you're on the court and can't touch your phone.
+Hands-free tennis scoring with Bluetooth remote, voice calls, and Wear OS sync.
 
-## What It Does
+TennisDroid turns your phone into a smart tennis scoreboard. Use any Bluetooth remote button to track points hands-free while you play — no need to stop and tap your phone between points.
 
-- **Hands-free scoring** — Use any Bluetooth remote button to track points without touching your phone
-  - Single click: add a point for you
-  - Double click: add a point for your opponent
-  - Long press: undo the last point
-- **3 match formats** — Standard (best-of-3 sets), League (3rd set is a 10-point tiebreak), and Fast (single 8-game pro set, no advantage scoring)
-- **Voice announcements** — The app calls out the score after each point, just like a real umpire
-- **Auto-detect your remote** — Tap "Detect Button" in settings, press any button on your remote, and the app automatically identifies and saves the key code
-- **Customizable** — Set player names, adjust button sensitivity, and choose from multiple color themes
-- **Tap input** — You can also tap the screen to score if you prefer
-- **Wear OS companion** — See the live score on your watch and tap to score directly from your wrist
+## How It Works
+
+Clip your phone courtside and pair any Bluetooth remote button (camera shutter, presentation clicker, or any HID device):
+
+- **Single click** — point for you
+- **Double click** — point for your opponent
+- **Long press** — undo the last point
+
+The app auto-detects your remote — tap "Detect Button" in settings, press any button, and you're set. You can also tap the on-screen buttons if you prefer.
+
+## Voice Announcements
+
+After every point, the app calls out the score like a real chair umpire — "Fifteen Love," "Deuce," "Advantage In," "Game and Second Set, Sarah, 6-4." Hear exactly what the score is without looking at the screen.
+
+## Match Formats
+
+- **Standard** — Best-of-3 sets with advantage scoring (traditional tennis rules)
+- **League** — Best-of-3 sets; 3rd set is a 10-point match tiebreak (common in recreational leagues)
+- **Fast** — Single 8-game pro set with no-ad scoring (perfect for quick matches)
+
+All formats include proper tiebreak rules, deuce/advantage handling, set tracking, and full match history.
+
+## Wear OS Companion
+
+See the live score on your watch and score directly from your wrist. Tap the left side for your point, right side for opponent, long press to undo. The watch syncs in real time with your phone and automatically matches your chosen color theme.
+
+## Customization
+
+- Set player names (displayed on screen and in voice announcements)
+- Choose from 4 color themes including a colorblind-safe option
+- Adjust button sensitivity (double-click and long-press timing)
+- Toggle voice announcements on or off
+
+When a match ends, see a complete summary with set-by-set scores and game breakdowns.
+
+No account required. No internet needed. No ads. No tracking. All data stays on your device.
 
 ## Screenshots
 
