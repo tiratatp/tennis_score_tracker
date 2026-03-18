@@ -41,7 +41,7 @@ android {
     defaultConfig {
         applicationId = "com.nuttyknot.tennisscoretracker"
         minSdk = 30
-        targetSdk = 33
+        targetSdk = 35
         versionCode = gitVersionCode()
         versionName = gitVersionName()
     }
