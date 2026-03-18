@@ -26,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
@@ -217,20 +218,22 @@ internal fun PortraitScoreContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        // User Score (Top)
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            ScoreColumn(
-                data =
-                    ScoreDisplayData(
-                        score = state.userScore.display,
-                        isServing = state.isUserServing,
-                    ),
-                mainTextSize = mainTextSize,
-                color = MaterialTheme.colorScheme.primary,
-            )
+        // User Score (Top) — only show during active match
+        if (state.matchWinner == null) {
+            Box(
+                modifier = Modifier.weight(1f).padding(bottom = 12.dp).clipToBounds(),
+                contentAlignment = Alignment.Center,
+            ) {
+                ScoreColumn(
+                    data =
+                        ScoreDisplayData(
+                            score = state.userScore.display,
+                            isServing = state.isUserServing,
+                        ),
+                    mainTextSize = mainTextSize,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
 
         // Scoreboard Table
@@ -249,20 +252,22 @@ internal fun PortraitScoreContent(
             matchFormat = state.matchFormat,
         )
 
-        // Opponent Score (Bottom)
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            ScoreColumn(
-                data =
-                    ScoreDisplayData(
-                        score = state.opponentScore.display,
-                        isServing = !state.isUserServing,
-                    ),
-                mainTextSize = mainTextSize,
-                color = MaterialTheme.colorScheme.secondary,
-            )
+        // Opponent Score (Bottom) — only show during active match
+        if (state.matchWinner == null) {
+            Box(
+                modifier = Modifier.weight(1f).padding(top = 12.dp).clipToBounds(),
+                contentAlignment = Alignment.Center,
+            ) {
+                ScoreColumn(
+                    data =
+                        ScoreDisplayData(
+                            score = state.opponentScore.display,
+                            isServing = !state.isUserServing,
+                        ),
+                    mainTextSize = mainTextSize,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+            }
         }
     }
 }

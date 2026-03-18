@@ -50,6 +50,9 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -134,17 +137,21 @@ tasks.register<Copy>("updateReadmeScreenshots") {
     dependsOn("recordPaparazziDebug")
     from("src/test/snapshots/images") {
         include("*ScoreLandscape*_matchover.png")
-        include("*Portrait*_inmatch.png")
-        include("*_help.png")
+        include("*ScorePortrait*_inmatch.png")
+        include("*HelpScreenshotTest*_help.png")
         include("*MatchSummaryPortrait*_matchover.png")
         include("*Tablet7*_inmatch.png")
         include("*Tablet10*_inmatch.png")
+        include("*SettingsTablet10*_defaultsettings.png")
+        include("*HelpTablet10*_help.png")
         rename(".*ScoreLandscape.*_matchover\\.png", "score-landscape.png")
-        rename(".*Portrait.*_inmatch\\.png", "score-portrait.png")
-        rename(".*_help\\.png", "help.png")
+        rename(".*ScorePortrait.*_inmatch\\.png", "score-portrait.png")
+        rename(".*HelpScreenshotTest.*_help\\.png", "help.png")
         rename(".*MatchSummaryPortrait.*_matchover\\.png", "match-summary.png")
         rename(".*Tablet7.*_inmatch\\.png", "score-tablet-7.png")
         rename(".*Tablet10.*_inmatch\\.png", "score-tablet-10.png")
+        rename(".*SettingsTablet10.*_defaultsettings\\.png", "settings-tablet-10.png")
+        rename(".*HelpTablet10.*_help\\.png", "help-tablet-10.png")
     }
     into("${rootProject.projectDir}/screenshots")
 }

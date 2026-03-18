@@ -17,9 +17,10 @@ class MatchSummaryLandscapeScreenshotTest {
     @get:Rule
     val paparazzi =
         Paparazzi(
-            deviceConfig = DeviceConfig.PIXEL_6.copy(orientation = ScreenOrientation.LANDSCAPE),
+            deviceConfig = DeviceConfig.NEXUS_5.copy(orientation = ScreenOrientation.LANDSCAPE),
             theme = "android:Theme.Material.NoActionBar.Fullscreen",
             renderingMode = SessionParams.RenderingMode.NORMAL,
+            useDeviceResolution = true,
         )
 
     @Test

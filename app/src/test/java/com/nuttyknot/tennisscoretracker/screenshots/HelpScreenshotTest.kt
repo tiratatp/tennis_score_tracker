@@ -13,9 +13,10 @@ class HelpScreenshotTest {
     @get:Rule
     val paparazzi =
         Paparazzi(
-            deviceConfig = DeviceConfig.PIXEL_6,
+            deviceConfig = DeviceConfig.NEXUS_5,
             theme = "android:Theme.Material.NoActionBar.Fullscreen",
             renderingMode = SessionParams.RenderingMode.NORMAL,
+            useDeviceResolution = true,
         )
 
     @Test
