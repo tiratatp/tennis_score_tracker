@@ -216,6 +216,83 @@ class TennisScoreStateTest {
     }
 
     @Test
+    fun testBundleRoundTripDefaultState() {
+        val original = TennisMatchState()
+        val restored = tennisMatchStateFromBundle(original.toBundle())
+        assertEquals(original.userScore, restored.userScore)
+        assertEquals(original.opponentScore, restored.opponentScore)
+        assertEquals(original.userGames, restored.userGames)
+        assertEquals(original.opponentGames, restored.opponentGames)
+        assertEquals(original.userSets, restored.userSets)
+        assertEquals(original.opponentSets, restored.opponentSets)
+        assertEquals(original.isUserServing, restored.isUserServing)
+        assertEquals(original.matchFormat, restored.matchFormat)
+        assertEquals(original.isMatchTiebreak, restored.isMatchTiebreak)
+        assertEquals(original.setHistory, restored.setHistory)
+    }
+
+    @Test
+    fun testBundleRoundTripMidMatch() {
+        val original =
+            TennisMatchState(
+                userScore = PlayerScore.Thirty,
+                opponentScore = PlayerScore.Fifteen,
+                userGames = 3,
+                opponentGames = 2,
+                userSets = 1,
+                opponentSets = 0,
+                isUserServing = false,
+                userName = "Alice",
+                opponentName = "Bob",
+                matchFormat = MatchFormat.LEAGUE,
+                isMatchTiebreak = false,
+                setHistory = listOf(6 to 4),
+            )
+        val restored = tennisMatchStateFromBundle(original.toBundle())
+        assertEquals(original.userScore, restored.userScore)
+        assertEquals(original.opponentScore, restored.opponentScore)
+        assertEquals(original.userGames, restored.userGames)
+        assertEquals(original.opponentGames, restored.opponentGames)
+        assertEquals(original.userSets, restored.userSets)
+        assertEquals(original.opponentSets, restored.opponentSets)
+        assertEquals(original.isUserServing, restored.isUserServing)
+        assertEquals(original.userName, restored.userName)
+        assertEquals(original.opponentName, restored.opponentName)
+        assertEquals(original.matchFormat, restored.matchFormat)
+        assertEquals(original.isMatchTiebreak, restored.isMatchTiebreak)
+        assertEquals(original.setHistory, restored.setHistory)
+    }
+
+    @Test
+    fun testBundleRoundTripTiebreakScore() {
+        val original =
+            TennisMatchState(
+                userScore = PlayerScore.TiebreakScore(5),
+                opponentScore = PlayerScore.TiebreakScore(3),
+                userGames = 6,
+                opponentGames = 6,
+                isMatchTiebreak = false,
+            )
+        val restored = tennisMatchStateFromBundle(original.toBundle())
+        assertTrue(restored.userScore is PlayerScore.TiebreakScore)
+        assertEquals(5, (restored.userScore as PlayerScore.TiebreakScore).points)
+        assertTrue(restored.opponentScore is PlayerScore.TiebreakScore)
+        assertEquals(3, (restored.opponentScore as PlayerScore.TiebreakScore).points)
+    }
+
+    @Test
+    fun testBundleRoundTripAdvantage() {
+        val original =
+            TennisMatchState(
+                userScore = PlayerScore.Advantage,
+                opponentScore = PlayerScore.Forty,
+            )
+        val restored = tennisMatchStateFromBundle(original.toBundle())
+        assertEquals(PlayerScore.Advantage, restored.userScore)
+        assertEquals(PlayerScore.Forty, restored.opponentScore)
+    }
+
+    @Test
     fun testServerFirstRule() {
         // Opponent serving, Receiver (User) wins first point
         var state =

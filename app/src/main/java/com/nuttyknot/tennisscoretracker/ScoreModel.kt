@@ -1,13 +1,20 @@
 package com.nuttyknot.tennisscoretracker
 
+import android.os.Bundle
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class ScoreModel : ViewModel() {
-    private val _matchState = MutableStateFlow(TennisMatchState())
+class ScoreModel(private val savedStateHandle: SavedStateHandle = SavedStateHandle()) : ViewModel() {
+    private val _matchState =
+        MutableStateFlow(
+            savedStateHandle.get<Bundle>(SAVED_STATE_KEY)?.let {
+                tennisMatchStateFromBundle(it)
+            } ?: TennisMatchState(),
+        )
     val matchState: StateFlow<TennisMatchState> = _matchState.asStateFlow()
 
     private val historyStack = ArrayDeque<TennisMatchState>()
@@ -31,6 +38,23 @@ class ScoreModel : ViewModel() {
     )
 
     private var config = MatchConfig()
+
+    init {
+        _matchState.value.let { restored ->
+            if (!restored.isScoreZero) {
+                config =
+                    MatchConfig(
+                        userName = restored.userName,
+                        opponentName = restored.opponentName,
+                        matchFormat = restored.matchFormat,
+                    )
+            }
+        }
+    }
+
+    private fun saveState() {
+        savedStateHandle[SAVED_STATE_KEY] = _matchState.value.toBundle()
+    }
 
     private val formatConfig: FormatConfig
         get() =
@@ -102,12 +126,14 @@ class ScoreModel : ViewModel() {
         if (_matchState.value.matchWinner != null) return
         historyStack.addLast(_matchState.value)
         _matchState.update { processor.calculateNextState(it, userScored) }
+        saveState()
     }
 
     fun undo() {
         if (historyStack.isNotEmpty()) {
             val previousState = historyStack.removeLast()
             _matchState.value = previousState.copy(announcement = null)
+            saveState()
         }
     }
 
@@ -121,6 +147,7 @@ class ScoreModel : ViewModel() {
                 matchFormat = config.matchFormat,
                 announcement = null,
             )
+        saveState()
     }
 
     fun startNextSet() {
@@ -131,6 +158,7 @@ class ScoreModel : ViewModel() {
                 currentState
             }
         }
+        saveState()
     }
 
     private inner class Processor {
@@ -436,6 +464,7 @@ class ScoreModel : ViewModel() {
     }
 
     companion object {
+        private const val SAVED_STATE_KEY = "tennis_match_state"
         private const val GAMES_TO_WIN_SET_STANDARD = 6
         private const val GAMES_TO_WIN_SET_FAST = 8
         private const val GAME_DIFFERENCE_FOR_SET = 2

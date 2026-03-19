@@ -1,5 +1,7 @@
 package com.nuttyknot.tennisscoretracker
 
+import android.os.Bundle
+
 sealed class PlayerScore(val display: String, val tts: String = display) {
     object Love : PlayerScore("0", "Love")
 
@@ -135,6 +137,75 @@ private fun generatePointScoreAnnouncement(state: TennisMatchState): String {
         serverScore == receiverScore -> "${serverScore.tts} All"
         else -> "${serverScore.tts} ${receiverScore.tts}"
     }
+}
+
+private object ScoreSerialization {
+    fun serialize(score: PlayerScore): String =
+        when (score) {
+            PlayerScore.Love -> "LOVE"
+            PlayerScore.Fifteen -> "FIFTEEN"
+            PlayerScore.Thirty -> "THIRTY"
+            PlayerScore.Forty -> "FORTY"
+            PlayerScore.Advantage -> "ADVANTAGE"
+            is PlayerScore.TiebreakScore -> "TIEBREAK:${score.points}"
+        }
+
+    fun deserialize(value: String): PlayerScore =
+        when {
+            value == "LOVE" -> PlayerScore.Love
+            value == "FIFTEEN" -> PlayerScore.Fifteen
+            value == "THIRTY" -> PlayerScore.Thirty
+            value == "FORTY" -> PlayerScore.Forty
+            value == "ADVANTAGE" -> PlayerScore.Advantage
+            value.startsWith("TIEBREAK:") -> {
+                val points = value.removePrefix("TIEBREAK:").toIntOrNull() ?: 0
+                PlayerScore.TiebreakScore(points)
+            }
+            else -> PlayerScore.Love
+        }
+}
+
+fun TennisMatchState.toBundle(): Bundle =
+    Bundle().apply {
+        putString("userScore", ScoreSerialization.serialize(userScore))
+        putString("opponentScore", ScoreSerialization.serialize(opponentScore))
+        putInt("userGames", userGames)
+        putInt("opponentGames", opponentGames)
+        putInt("userSets", userSets)
+        putInt("opponentSets", opponentSets)
+        putBoolean("isUserServing", isUserServing)
+        putString("userName", userName)
+        putString("opponentName", opponentName)
+        putString("matchFormat", matchFormat.name)
+        putBoolean("isMatchTiebreak", isMatchTiebreak)
+        putIntArray("setHistoryUser", setHistory.map { it.first }.toIntArray())
+        putIntArray("setHistoryOpp", setHistory.map { it.second }.toIntArray())
+    }
+
+fun tennisMatchStateFromBundle(bundle: Bundle): TennisMatchState {
+    val userScores = bundle.getIntArray("setHistoryUser") ?: intArrayOf()
+    val oppScores = bundle.getIntArray("setHistoryOpp") ?: intArrayOf()
+    val setHistory = userScores.zip(oppScores).map { it.first to it.second }
+
+    return TennisMatchState(
+        userScore = ScoreSerialization.deserialize(bundle.getString("userScore", "LOVE")),
+        opponentScore = ScoreSerialization.deserialize(bundle.getString("opponentScore", "LOVE")),
+        userGames = bundle.getInt("userGames"),
+        opponentGames = bundle.getInt("opponentGames"),
+        userSets = bundle.getInt("userSets"),
+        opponentSets = bundle.getInt("opponentSets"),
+        isUserServing = bundle.getBoolean("isUserServing", true),
+        userName = bundle.getString("userName", ""),
+        opponentName = bundle.getString("opponentName", ""),
+        matchFormat =
+            try {
+                MatchFormat.valueOf(bundle.getString("matchFormat", "STANDARD"))
+            } catch (_: IllegalArgumentException) {
+                MatchFormat.STANDARD
+            },
+        isMatchTiebreak = bundle.getBoolean("isMatchTiebreak", false),
+        setHistory = setHistory,
+    )
 }
 
 private object OrdinalConstants {

@@ -29,6 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nuttyknot.tennisscoretracker.ScoreModel
@@ -100,7 +104,8 @@ private fun ScoreScreenContent(
                 .padding(
                     horizontal = 16.dp,
                     vertical = if (isLandscape) 0.dp else 16.dp,
-                ),
+                )
+                .semantics { liveRegion = LiveRegionMode.Polite },
     ) {
         if (isLandscape) {
             LandscapeScoreContent(state, maxHeight.value, maxWidth.value, onNavigateToSummary)
@@ -112,6 +117,8 @@ private fun ScoreScreenContent(
             TapZones(
                 isLandscape = isLandscape,
                 matchWinner = state.matchWinner,
+                userName = state.userName.ifEmpty { "You" },
+                opponentName = state.opponentName.ifEmpty { "Opponent" },
                 onUserScored = { scoreModel.incrementUserScore() },
                 onOpponentScored = { scoreModel.incrementOpponentScore() },
                 onUndo = { scoreModel.undo() },
@@ -278,6 +285,8 @@ internal fun PortraitScoreContent(
 private fun TapZones(
     isLandscape: Boolean,
     matchWinner: String?,
+    userName: String,
+    opponentName: String,
     onUserScored: () -> Unit,
     onOpponentScored: () -> Unit,
     onUndo: () -> Unit,
@@ -287,11 +296,16 @@ private fun TapZones(
     @Composable
     fun TapZone(
         onClick: () -> Unit,
+        playerName: String,
         modifier: Modifier,
     ) {
+        val description = "Score point for $playerName. Long press to undo."
         Box(
             modifier =
                 modifier
+                    .semantics {
+                        contentDescription = description
+                    }
                     .combinedClickable(
                         onClick = {
                             view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
@@ -311,10 +325,12 @@ private fun TapZones(
         Row(modifier = Modifier.fillMaxSize()) {
             TapZone(
                 onClick = { if (matchWinner == null) onUserScored() },
+                playerName = userName,
                 modifier = Modifier.fillMaxHeight().weight(1f),
             )
             TapZone(
                 onClick = { if (matchWinner == null) onOpponentScored() },
+                playerName = opponentName,
                 modifier = Modifier.fillMaxHeight().weight(1f),
             )
         }
@@ -322,10 +338,12 @@ private fun TapZones(
         Column(modifier = Modifier.fillMaxSize()) {
             TapZone(
                 onClick = { if (matchWinner == null) onUserScored() },
+                playerName = userName,
                 modifier = Modifier.fillMaxWidth().weight(1f),
             )
             TapZone(
                 onClick = { if (matchWinner == null) onOpponentScored() },
+                playerName = opponentName,
                 modifier = Modifier.fillMaxWidth().weight(1f),
             )
         }
