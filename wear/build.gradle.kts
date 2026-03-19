@@ -43,7 +43,7 @@ android {
         minSdk = 30
         // targetSdk 35 breaks Paparazzi 1.3.5 screenshot tests
         // (NoSuchMethodError: StaticLayout$Builder.setUseBoundsForWidth)
-        targetSdk = 35
+        targetSdk = 34
         versionCode = gitVersionCode()
         versionName = gitVersionName()
     }
