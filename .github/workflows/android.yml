@@ -112,7 +112,7 @@ jobs:
         serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
         packageName: com.nuttyknot.tennisscoretracker
         releaseFiles: app/build/outputs/bundle/release/app-release.aab
-        track: qa
+        track: internal
         status: completed
         mappingFile: app/build/outputs/mapping/release/mapping.txt
       env:
@@ -125,7 +125,7 @@ jobs:
         serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
         packageName: com.nuttyknot.tennisscoretracker
         releaseFiles: wear/build/outputs/bundle/release/wear-release.aab
-        track: wear:qa
+        track: wear:internal
         status: completed
         mappingFile: wear/build/outputs/mapping/release/mapping.txt
       env:
