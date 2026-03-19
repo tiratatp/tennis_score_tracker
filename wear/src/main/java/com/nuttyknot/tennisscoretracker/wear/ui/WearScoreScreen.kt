@@ -38,7 +38,7 @@ import com.nuttyknot.tennisscoretracker.shared.WearScoreDisplay
 private val SERVING_DOT_SIZE = 10.dp
 private val SCORE_FONT_SIZE = 40.sp
 private val DETAIL_FONT_SIZE = 14.sp
-private val LABEL_FONT_SIZE = 11.sp
+private val LABEL_FONT_SIZE = 12.sp
 private val SCREEN_PADDING = 8.dp
 private val INNER_PADDING = 4.dp
 private val SPACER_HEIGHT = 2.dp

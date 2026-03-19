@@ -98,6 +98,7 @@ android {
 
 dependencies {
     implementation(project(":shared"))
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.wear.compose:compose-material3:1.0.0-alpha32")
     implementation("androidx.wear.compose:compose-foundation:1.4.1")
     implementation("androidx.compose.ui:ui")

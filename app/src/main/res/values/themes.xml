@@ -1,5 +1,9 @@
 <resources>
-    <style name="Theme.TennisScoreTracker" parent="android:Theme.Material.NoActionBar">
-        <!-- Optional: Customize your theme here -->
+    <style name="Theme.TennisScoreTracker" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@android:color/black</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground_sky_blue</item>
+        <item name="postSplashScreenTheme">@style/Theme.TennisScoreTracker.Main</item>
     </style>
+
+    <style name="Theme.TennisScoreTracker.Main" parent="android:Theme.Material.NoActionBar" />
 </resources>
