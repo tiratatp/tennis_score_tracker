@@ -24,7 +24,7 @@ class WearScoreScreenshotTest {
                 density = Density.XHIGH,
                 ratio = ScreenRatio.NOTLONG,
                 size = ScreenSize.SMALL,
-                screenRound = ScreenRound.ROUND,
+                screenRound = ScreenRound.NOTROUND,
             )
     }
 
