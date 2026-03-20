@@ -13,25 +13,25 @@ import com.nuttyknot.tennisscoretracker.wear.ui.WearTheme
 import org.junit.Rule
 import org.junit.Test
 
-// 2004 Wimbledon Women's Final: Sharapova d. S. Williams 6-1, 6-4
-class WearScoreScreenshotTest {
+// Circular variants for UX/internal testing on round watch displays
+class WearScoreScreenCircularScreenshotTest {
     companion object {
         // Galaxy Watch 7 (44mm): 480x480 px, ~327 PPI, round
-        private val GALAXY_WATCH_7 =
+        private val GALAXY_WATCH_7_ROUND =
             DeviceConfig(
                 screenWidth = 480,
                 screenHeight = 480,
                 density = Density.XHIGH,
                 ratio = ScreenRatio.NOTLONG,
                 size = ScreenSize.SMALL,
-                screenRound = ScreenRound.NOTROUND,
+                screenRound = ScreenRound.ROUND,
             )
     }
 
     @get:Rule
     val paparazzi =
         Paparazzi(
-            deviceConfig = GALAXY_WATCH_7,
+            deviceConfig = GALAXY_WATCH_7_ROUND,
             theme = "android:Theme.DeviceDefault",
             renderingMode = SessionParams.RenderingMode.NORMAL,
         )
@@ -54,7 +54,7 @@ class WearScoreScreenshotTest {
                 isMatchOver = true,
                 matchWinner = "Sharapova",
             )
-        paparazzi.snapshot("matchOver") {
+        paparazzi.snapshot("matchOverCircular") {
             WearTheme {
                 WearScoreScreen(
                     scoreDisplay = score,
@@ -85,7 +85,7 @@ class WearScoreScreenshotTest {
                 setHistory = listOf(6 to 1),
                 isUserServing = true,
             )
-        paparazzi.snapshot("watch") {
+        paparazzi.snapshot("watchCircular") {
             WearTheme {
                 WearScoreScreen(
                     scoreDisplay = score,
@@ -116,7 +116,7 @@ class WearScoreScreenshotTest {
                 setHistory = listOf(6 to 1),
                 isUserServing = false,
             )
-        paparazzi.snapshot("watchOpponentServing") {
+        paparazzi.snapshot("watchOpponentServingCircular") {
             WearTheme {
                 WearScoreScreen(
                     scoreDisplay = score,
@@ -147,7 +147,7 @@ class WearScoreScreenshotTest {
                 setHistory = listOf(6 to 1),
                 isUserServing = true,
             )
-        paparazzi.snapshot("watchLongNames") {
+        paparazzi.snapshot("watchLongNamesCircular") {
             WearTheme {
                 WearScoreScreen(
                     scoreDisplay = score,
@@ -178,7 +178,7 @@ class WearScoreScreenshotTest {
                 setHistory = listOf(6 to 1),
                 isUserServing = false,
             )
-        paparazzi.snapshot("watchLongNamesOpponentServing") {
+        paparazzi.snapshot("watchLongNamesOpponentServingCircular") {
             WearTheme {
                 WearScoreScreen(
                     scoreDisplay = score,

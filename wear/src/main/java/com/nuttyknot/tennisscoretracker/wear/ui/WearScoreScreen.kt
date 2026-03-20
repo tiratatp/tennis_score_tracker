@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.Text
 import com.nuttyknot.tennisscoretracker.shared.WearScoreDisplay
@@ -476,6 +477,8 @@ private fun RowScope.PlayerLabel(
             fontSize = LABEL_FONT_SIZE,
             color = color,
             maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false),
         )
         if (dotOnRight) dot()
     }
