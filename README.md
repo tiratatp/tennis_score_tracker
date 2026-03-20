@@ -35,7 +35,7 @@ See the live score on your watch and score directly from your wrist. Tap the lef
 - Set player names (displayed on screen and in voice announcements)
 - Choose from 4 color themes including a colorblind-safe option
 - Adjust button sensitivity (double-click and long-press timing)
-- Toggle voice announcements on or off
+- Toggle voice announcements on or off, with male or female announcer voice
 
 When a match ends, see a complete summary with set-by-set scores and game breakdowns.
 
@@ -114,7 +114,7 @@ Multi-module Android app (app + shared + wear) built with Kotlin and Jetpack Com
 - **Hardware Input**: `KeyEventManager` intercepts raw HID KeyEvent inputs and uses a coroutine-based temporal debouncing algorithm to distinguish single click, double click, and long press from one button
 - **Scoring Engine**: `ScoreModel` exposes match state via `StateFlow` — pure state transformations with no side effects
 - **Storage**: Jetpack Preferences DataStore for settings (key codes, latency thresholds, player names, theme)
-- **TTS**: UK English locale with umpire-style speech rate and pitch
+- **TTS**: UK English locale with umpire-style speech rate, media audio stream (plays in vibrate/silent mode), and configurable voice pitch (male/female)
 - **Wear OS Sync**: `WearSyncManager` in the phone app pushes match state to the watch via Wearable Data Layer API; receives scoring commands back via `MessageClient`
 - **Shared Module**: `WearConstants` (data paths, command strings) and `WearScoreDisplay` (JSON-serializable score snapshot) shared between phone and watch
 - **Wear Module**: Standalone Wear OS app — `WearMainActivity` with ambient mode support, `WearRemoteViewModel` listens for score updates and sends commands, `WearScoreScreen` with tap zones (left=you, right=opponent, long-press=undo)

@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.nuttyknot.tennisscoretracker.AnnouncerVoice
 import com.nuttyknot.tennisscoretracker.AppTheme
 import com.nuttyknot.tennisscoretracker.MatchFormat
 
@@ -56,6 +57,13 @@ fun AppSettings(data: AppSettingsData) {
         checked = data.ttsEnabled,
         onCheckedChange = data.onTtsEnabledChange,
     )
+
+    if (data.ttsEnabled) {
+        AnnouncerVoiceDropdown(
+            currentVoice = data.announcerVoice,
+            onVoiceChange = data.onAnnouncerVoiceChange,
+        )
+    }
 }
 
 @Suppress("FunctionName")
@@ -320,11 +328,13 @@ data class AppSettingsData(
     val currentMatchFormat: MatchFormat,
     val isMatchFormatLocked: Boolean = false,
     val ttsEnabled: Boolean = true,
+    val announcerVoice: AnnouncerVoice = AnnouncerVoice.FEMALE,
     val isDetectingKeycode: Boolean = false,
     val onKeycodeChange: (Int) -> Unit,
     val onThemeChange: (AppTheme) -> Unit,
     val onMatchFormatChange: (MatchFormat) -> Unit,
     val onTtsEnabledChange: (Boolean) -> Unit = {},
+    val onAnnouncerVoiceChange: (AnnouncerVoice) -> Unit = {},
     val onDetectKeycode: () -> Unit = {},
     val onCancelDetectKeycode: () -> Unit = {},
 )
@@ -414,6 +424,67 @@ private fun MatchFormatMenuBox(
                                 },
                         ),
                 )
+            }
+        }
+    }
+}
+
+@Suppress("FunctionName")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AnnouncerVoiceDropdown(
+    currentVoice: AnnouncerVoice,
+    onVoiceChange: (AnnouncerVoice) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column {
+        Text(
+            text = "Announcer Voice",
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+        ) {
+            OutlinedTextField(
+                value = currentVoice.displayName,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    ),
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                AnnouncerVoice.entries.forEach { voice ->
+                    DropdownMenuItem(
+                        text = { Text(voice.displayName) },
+                        onClick = {
+                            onVoiceChange(voice)
+                            expanded = false
+                        },
+                        colors =
+                            MenuDefaults.itemColors(
+                                textColor =
+                                    if (voice == currentVoice) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
+                                    },
+                            ),
+                    )
+                }
             }
         }
     }

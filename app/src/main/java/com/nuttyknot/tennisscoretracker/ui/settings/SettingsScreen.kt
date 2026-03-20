@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.nuttyknot.tennisscoretracker.AnnouncerVoice
 import com.nuttyknot.tennisscoretracker.AppTheme
 import com.nuttyknot.tennisscoretracker.MatchFormat
 import com.nuttyknot.tennisscoretracker.ScoreModel
@@ -81,6 +82,9 @@ private fun collectSettingsState(
     val appTheme by settingsManager.appThemeFlow.collectAsState(initial = SettingsManager.DEFAULT_APP_THEME)
     val matchFormat by settingsManager.matchFormatFlow.collectAsState(initial = SettingsManager.DEFAULT_MATCH_FORMAT)
     val ttsEnabled by settingsManager.ttsEnabledFlow.collectAsState(initial = SettingsManager.DEFAULT_TTS_ENABLED)
+    val announcerVoice by settingsManager.announcerVoiceFlow.collectAsState(
+        initial = SettingsManager.DEFAULT_ANNOUNCER_VOICE,
+    )
     val isDetectingKeycode by settingsManager.isDetectingKeycode.collectAsState()
 
     return SettingsState(
@@ -95,6 +99,7 @@ private fun collectSettingsState(
         appTheme = appTheme,
         matchFormat = matchFormat,
         ttsEnabled = ttsEnabled,
+        announcerVoice = announcerVoice,
     )
 }
 
@@ -110,8 +115,10 @@ private data class SettingsState(
     val appTheme: AppTheme,
     val matchFormat: MatchFormat,
     val ttsEnabled: Boolean,
+    val announcerVoice: AnnouncerVoice,
 )
 
+@Suppress("LongMethod")
 private fun buildSettingsData(
     settingsManager: SettingsManager,
     coroutineScope: kotlinx.coroutines.CoroutineScope,
@@ -139,6 +146,7 @@ private fun buildSettingsData(
             currentMatchFormat = state.matchFormat,
             isMatchFormatLocked = state.isMatchInProgress,
             ttsEnabled = state.ttsEnabled,
+            announcerVoice = state.announcerVoice,
             isDetectingKeycode = state.isDetectingKeycode,
             onKeycodeChange = { code ->
                 coroutineScope.launch { settingsManager.updateKeycode(code) }
@@ -151,6 +159,9 @@ private fun buildSettingsData(
             },
             onTtsEnabledChange = { enabled ->
                 coroutineScope.launch { settingsManager.updateTtsEnabled(enabled) }
+            },
+            onAnnouncerVoiceChange = { voice ->
+                coroutineScope.launch { settingsManager.updateAnnouncerVoice(voice) }
             },
             onDetectKeycode = { settingsManager.startKeycodeDetection() },
             onCancelDetectKeycode = { settingsManager.stopKeycodeDetection() },

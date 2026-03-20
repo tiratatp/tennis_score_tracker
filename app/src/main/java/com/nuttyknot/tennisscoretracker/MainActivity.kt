@@ -123,6 +123,7 @@ class MainActivity : ComponentActivity() {
             }
     }
 
+    @Suppress("LongMethod")
     private fun observeSettings() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -173,6 +174,13 @@ class MainActivity : ComponentActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsManager.appThemeFlow.collectLatest { theme ->
                     pendingTheme = theme
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsManager.announcerVoiceFlow.collectLatest { voice ->
+                    ttsManager.updateVoiceGender(voice)
                 }
             }
         }

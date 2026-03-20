@@ -40,7 +40,7 @@ class TtsManager(context: Context) {
 
                         audioAttributes =
                             AudioAttributes.Builder()
-                                .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                                .setUsage(AudioAttributes.USAGE_MEDIA)
                                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                                 .build()
                         tts?.setAudioAttributes(audioAttributes)
@@ -81,6 +81,11 @@ class TtsManager(context: Context) {
 
     private fun abandonFocus() {
         focusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
+    }
+
+    fun updateVoiceGender(gender: AnnouncerVoice) {
+        if (!isInitialized) return
+        tts?.setPitch(gender.pitch)
     }
 
     fun shutdown() {

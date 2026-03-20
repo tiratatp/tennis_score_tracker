@@ -34,6 +34,7 @@ class SettingsManager(private val context: Context) {
         val APP_THEME = androidx.datastore.preferences.core.stringPreferencesKey("app_theme")
         val MATCH_FORMAT = stringPreferencesKey("match_format")
         val TTS_ENABLED = booleanPreferencesKey("tts_enabled")
+        val ANNOUNCER_VOICE = stringPreferencesKey("announcer_voice")
 
         const val DEFAULT_KEYCODE = KeyEvent.KEYCODE_VOLUME_UP
         const val DEFAULT_DOUBLE_CLICK_LATENCY = 300L
@@ -45,6 +46,7 @@ class SettingsManager(private val context: Context) {
         val DEFAULT_APP_THEME = AppTheme.SKY_BLUE
         val DEFAULT_MATCH_FORMAT = MatchFormat.STANDARD
         const val DEFAULT_TTS_ENABLED = true
+        val DEFAULT_ANNOUNCER_VOICE = AnnouncerVoice.FEMALE
     }
 
     private val _isDetectingKeycode = MutableStateFlow(false)
@@ -117,6 +119,12 @@ class SettingsManager(private val context: Context) {
             preferences[TTS_ENABLED] ?: DEFAULT_TTS_ENABLED
         }
 
+    val announcerVoiceFlow: Flow<AnnouncerVoice> =
+        context.dataStore.data.map { preferences ->
+            val voiceName = preferences[ANNOUNCER_VOICE] ?: DEFAULT_ANNOUNCER_VOICE.name
+            AnnouncerVoice.entries.find { it.name == voiceName } ?: DEFAULT_ANNOUNCER_VOICE
+        }
+
     suspend fun updateKeycode(keycode: Int) {
         context.dataStore.edit { preferences ->
             preferences[KEYCODE] = keycode
@@ -176,12 +184,24 @@ class SettingsManager(private val context: Context) {
             preferences[TTS_ENABLED] = enabled
         }
     }
+
+    suspend fun updateAnnouncerVoice(voice: AnnouncerVoice) {
+        context.dataStore.edit { preferences ->
+            preferences[ANNOUNCER_VOICE] = voice.name
+        }
+    }
 }
 
 enum class MatchFormat(val displayName: String) {
     STANDARD("Standard Match (Best of 3 Sets)"),
     LEAGUE("League Match (3rd Set Tiebreak)"),
     FAST("Fast Match (8-Game Pro Set, No-Ad)"),
+}
+
+@Suppress("MagicNumber")
+enum class AnnouncerVoice(val displayName: String, val pitch: Float) {
+    FEMALE("Female", 0.95f),
+    MALE("Male", 0.75f),
 }
 
 enum class AppTheme(val displayName: String, val aliasName: String) {
