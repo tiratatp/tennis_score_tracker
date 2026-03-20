@@ -56,6 +56,8 @@ class WearHelpScreenshotTest {
                     scoreDisplay = score,
                     isConnected = true,
                     showHelp = true,
+                    currentTime = "2:30 PM",
+                    onNewMatch = {},
                     onUserScored = {},
                     onOpponentScored = {},
                     onUndo = {},

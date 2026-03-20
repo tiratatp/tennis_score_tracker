@@ -9,7 +9,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,24 +30,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
 import com.nuttyknot.tennisscoretracker.shared.WearScoreDisplay
 
 private val SERVING_DOT_SIZE = 10.dp
-private val SCORE_FONT_SIZE = 40.sp
-private val DETAIL_FONT_SIZE = 14.sp
-private val LABEL_FONT_SIZE = 12.sp
-private val SCREEN_PADDING = 8.dp
-private val INNER_PADDING = 4.dp
-private val SPACER_HEIGHT = 2.dp
 private val SCORE_GAP = 16.dp
 private val SCOREBOARD_COLUMN_GAP = 8.dp
 private val SCOREBOARD_ROW_GAP = 1.dp
-private const val SCOREBOARD_MUTED_ALPHA = 0.5f
-private const val COLOR_SKY_BLUE = 0xFF38BDF8
-private val DEFAULT_PRIMARY_COLOR = Color(COLOR_SKY_BLUE)
-private val DEFAULT_SECONDARY_COLOR = Color.White
+private const val PILL_CORNER_PERCENT = 50
+private val BUTTON_HORIZONTAL_PADDING = 12.dp
+private val BUTTON_VERTICAL_PADDING = 4.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Suppress("FunctionName", "LongParameterList")
@@ -58,8 +49,10 @@ fun WearScoreScreen(
     isConnected: Boolean,
     isAmbient: Boolean = false,
     showHelp: Boolean = false,
+    currentTime: String = "",
     onDismissHelp: () -> Unit = {},
     onShowHelp: () -> Unit = {},
+    onNewMatch: () -> Unit = {},
     onUserScored: () -> Unit,
     onOpponentScored: () -> Unit,
     onUndo: () -> Unit,
@@ -71,9 +64,9 @@ fun WearScoreScreen(
                 .background(Color.Black),
     ) {
         if (isAmbient) {
-            AmbientScoreContent(scoreDisplay)
+            AmbientScoreContent(scoreDisplay, currentTime)
         } else {
-            ScoreContent(scoreDisplay, isConnected)
+            ScoreContent(scoreDisplay, isConnected, currentTime, onNewMatch)
 
             if (isConnected && !scoreDisplay.isMatchOver) {
                 TapZones(onUserScored, onOpponentScored, onUndo)
@@ -115,7 +108,10 @@ fun WearScoreScreen(
 
 @Suppress("FunctionName")
 @Composable
-private fun AmbientScoreContent(scoreDisplay: WearScoreDisplay) {
+private fun AmbientScoreContent(
+    scoreDisplay: WearScoreDisplay,
+    currentTime: String,
+) {
     Column(
         modifier =
             Modifier
@@ -124,6 +120,16 @@ private fun AmbientScoreContent(scoreDisplay: WearScoreDisplay) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        if (currentTime.isNotEmpty()) {
+            Text(
+                text = currentTime,
+                fontSize = LABEL_FONT_SIZE,
+                fontFamily = FontFamily.Monospace,
+                color = Color.Gray,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+        }
         Text(
             text = "${scoreDisplay.userScore} - ${scoreDisplay.opponentScore}",
             fontSize = SCORE_FONT_SIZE,
@@ -161,6 +167,8 @@ private fun AmbientScoreContent(scoreDisplay: WearScoreDisplay) {
 private fun ScoreContent(
     scoreDisplay: WearScoreDisplay,
     isConnected: Boolean,
+    currentTime: String,
+    onNewMatch: () -> Unit,
 ) {
     Column(
         modifier =
@@ -172,6 +180,16 @@ private fun ScoreContent(
     ) {
         val userColor = scoreDisplay.primaryColorArgb?.let { Color(it) } ?: DEFAULT_PRIMARY_COLOR
         val opponentColor = scoreDisplay.secondaryColorArgb?.let { Color(it) } ?: DEFAULT_SECONDARY_COLOR
+
+        if (currentTime.isNotEmpty()) {
+            Text(
+                text = currentTime,
+                fontSize = LABEL_FONT_SIZE,
+                color = Color.White.copy(alpha = SCOREBOARD_MUTED_ALPHA),
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+        }
 
         val statusText =
             if (scoreDisplay.isMatchOver && scoreDisplay.matchWinner != null) {
@@ -187,21 +205,55 @@ private fun ScoreContent(
         )
         Spacer(modifier = Modifier.height(SPACER_HEIGHT))
 
-        PlayerNames(scoreDisplay, userColor, opponentColor)
-        Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-        PointScore(scoreDisplay, userColor, opponentColor)
-        Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+        PlayerNames(scoreDisplay, userColor, opponentColor, showServing = !scoreDisplay.isMatchOver)
+        if (!scoreDisplay.isMatchOver) {
+            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+            PointScore(scoreDisplay, userColor, opponentColor)
+            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+        } else {
+            Spacer(modifier = Modifier.height(INNER_PADDING))
+        }
         WearScoreboardTable(scoreDisplay, userColor, opponentColor)
 
-        if (!isConnected) {
-            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-            Text(
-                text = "Not connected",
-                fontSize = LABEL_FONT_SIZE,
-                color = Color(COLOR_DISCONNECTED_RED),
-                textAlign = TextAlign.Center,
-            )
-        }
+        ScoreFooter(scoreDisplay, isConnected, onNewMatch)
+    }
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun ScoreFooter(
+    scoreDisplay: WearScoreDisplay,
+    isConnected: Boolean,
+    onNewMatch: () -> Unit,
+) {
+    if (scoreDisplay.isMatchOver && isConnected) {
+        val view = LocalView.current
+        Spacer(modifier = Modifier.height(INNER_PADDING))
+        Text(
+            text = "New Match",
+            fontSize = LABEL_FONT_SIZE,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            modifier =
+                Modifier
+                    .background(
+                        color = Color(COLOR_TENNIS_GREEN),
+                        shape = RoundedCornerShape(PILL_CORNER_PERCENT),
+                    )
+                    .clickable {
+                        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                        onNewMatch()
+                    }
+                    .padding(horizontal = BUTTON_HORIZONTAL_PADDING, vertical = BUTTON_VERTICAL_PADDING),
+        )
+    } else if (!isConnected) {
+        Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+        Text(
+            text = "Not connected",
+            fontSize = LABEL_FONT_SIZE,
+            color = Color(COLOR_DISCONNECTED_RED),
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -275,6 +327,7 @@ private fun PlayerNames(
     scoreDisplay: WearScoreDisplay,
     userColor: Color,
     opponentColor: Color,
+    showServing: Boolean = true,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -282,12 +335,12 @@ private fun PlayerNames(
     ) {
         PlayerLabel(
             name = scoreDisplay.userName.ifEmpty { "You" },
-            isServing = scoreDisplay.isUserServing,
+            isServing = showServing && scoreDisplay.isUserServing,
             color = userColor,
         )
         PlayerLabel(
             name = scoreDisplay.opponentName.ifEmpty { "Opp" },
-            isServing = !scoreDisplay.isUserServing,
+            isServing = showServing && !scoreDisplay.isUserServing,
             color = opponentColor,
         )
     }
@@ -401,124 +454,4 @@ private fun PlayerLabel(
     }
 }
 
-@Suppress("FunctionName")
-@Composable
-private fun WearHelpOverlay(
-    userColor: Color,
-    opponentColor: Color,
-    onDismiss: () -> Unit,
-) {
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.93f))
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = onDismiss,
-                ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(SCREEN_PADDING * 2),
-        ) {
-            Text(
-                text = "How to Play",
-                fontSize = DETAIL_FONT_SIZE,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            HelpTapZones(userColor, opponentColor)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Long press = undo",
-                fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.7f),
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Tap to dismiss",
-                fontSize = LABEL_FONT_SIZE,
-                color = Color.White.copy(alpha = 0.4f),
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
-}
-
-@Suppress("FunctionName", "LongMethod")
-@Composable
-private fun HelpTapZones(
-    userColor: Color,
-    opponentColor: Color,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .background(
-                        color = userColor.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(8.dp),
-                    )
-                    .padding(vertical = 6.dp, horizontal = 4.dp),
-        ) {
-            Text(
-                text = "← Tap",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = userColor,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Text(
-                text = "Your point",
-                fontSize = 12.sp,
-                color = userColor,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .background(
-                        color = opponentColor.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(8.dp),
-                    )
-                    .padding(vertical = 6.dp, horizontal = 4.dp),
-        ) {
-            Text(
-                text = "Tap →",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = opponentColor,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Text(
-                text = "Opponent's point",
-                fontSize = 12.sp,
-                color = opponentColor,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-    }
-}
-
-private const val COLOR_TENNIS_GREEN = 0xFF4CAF50
 private const val COLOR_DISCONNECTED_RED = 0xFFFF5252

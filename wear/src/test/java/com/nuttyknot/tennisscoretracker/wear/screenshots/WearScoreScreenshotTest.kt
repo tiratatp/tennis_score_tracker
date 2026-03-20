@@ -59,6 +59,8 @@ class WearScoreScreenshotTest {
                 WearScoreScreen(
                     scoreDisplay = score,
                     isConnected = true,
+                    currentTime = "2:30 PM",
+                    onNewMatch = {},
                     onUserScored = {},
                     onOpponentScored = {},
                     onUndo = {},
@@ -88,6 +90,8 @@ class WearScoreScreenshotTest {
                 WearScoreScreen(
                     scoreDisplay = score,
                     isConnected = true,
+                    currentTime = "2:30 PM",
+                    onNewMatch = {},
                     onUserScored = {},
                     onOpponentScored = {},
                     onUndo = {},
