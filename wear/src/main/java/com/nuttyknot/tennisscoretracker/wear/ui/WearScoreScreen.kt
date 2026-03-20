@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -170,52 +171,67 @@ private fun ScoreContent(
     currentTime: String,
     onNewMatch: () -> Unit,
 ) {
+    val userColor = scoreDisplay.primaryColorArgb?.let { Color(it) } ?: DEFAULT_PRIMARY_COLOR
+    val opponentColor = scoreDisplay.secondaryColorArgb?.let { Color(it) } ?: DEFAULT_SECONDARY_COLOR
+
     Column(
         modifier =
             Modifier
                 .fillMaxSize()
                 .padding(SCREEN_PADDING),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
     ) {
-        val userColor = scoreDisplay.primaryColorArgb?.let { Color(it) } ?: DEFAULT_PRIMARY_COLOR
-        val opponentColor = scoreDisplay.secondaryColorArgb?.let { Color(it) } ?: DEFAULT_SECONDARY_COLOR
+        // Top section: time + status — pushed to bottom of its space
+        Column(
+            modifier = Modifier.weight(TOP_SECTION_WEIGHT),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom,
+        ) {
+            if (currentTime.isNotEmpty()) {
+                Text(
+                    text = currentTime,
+                    fontSize = LABEL_FONT_SIZE,
+                    color = Color.White.copy(alpha = SCOREBOARD_MUTED_ALPHA),
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+            }
 
-        if (currentTime.isNotEmpty()) {
+            val statusText =
+                if (scoreDisplay.isMatchOver && scoreDisplay.matchWinner != null) {
+                    "${scoreDisplay.matchWinner} wins!"
+                } else {
+                    " "
+                }
             Text(
-                text = currentTime,
+                text = statusText,
                 fontSize = LABEL_FONT_SIZE,
-                color = Color.White.copy(alpha = SCOREBOARD_MUTED_ALPHA),
+                color = if (statusText != " ") Color(COLOR_TENNIS_GREEN) else Color.Transparent,
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(SPACER_HEIGHT))
         }
 
-        val statusText =
-            if (scoreDisplay.isMatchOver && scoreDisplay.matchWinner != null) {
-                "${scoreDisplay.matchWinner} wins!"
-            } else {
-                " "
-            }
-        Text(
-            text = statusText,
-            fontSize = LABEL_FONT_SIZE,
-            color = if (statusText != " ") Color(COLOR_TENNIS_GREEN) else Color.Transparent,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-
+        // Player names — PINNED at the boundary between weights
         PlayerNames(scoreDisplay, userColor, opponentColor, showServing = !scoreDisplay.isMatchOver)
-        if (!scoreDisplay.isMatchOver) {
-            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-            PointScore(scoreDisplay, userColor, opponentColor)
-            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-        } else {
-            Spacer(modifier = Modifier.height(INNER_PADDING))
-        }
-        WearScoreboardTable(scoreDisplay, userColor, opponentColor)
 
-        ScoreFooter(scoreDisplay, isConnected, onNewMatch)
+        // Bottom section: point score + scoreboard + footer — pushed to top of its space
+        Column(
+            modifier = Modifier.weight(BOTTOM_SECTION_WEIGHT),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+        ) {
+            if (!scoreDisplay.isMatchOver) {
+                Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+                PointScore(scoreDisplay, userColor, opponentColor)
+                Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+            } else {
+                Spacer(modifier = Modifier.height(INNER_PADDING))
+            }
+            WearScoreboardTable(scoreDisplay, userColor, opponentColor)
+
+            ScoreFooter(scoreDisplay, isConnected, onNewMatch)
+        }
     }
 }
 
@@ -331,7 +347,7 @@ private fun PlayerNames(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
+        horizontalArrangement = Arrangement.spacedBy(SCORE_GAP),
     ) {
         PlayerLabel(
             name = scoreDisplay.userName.ifEmpty { "You" },
@@ -342,6 +358,7 @@ private fun PlayerNames(
             name = scoreDisplay.opponentName.ifEmpty { "Opp" },
             isServing = showServing && !scoreDisplay.isUserServing,
             color = opponentColor,
+            dotOnRight = true,
         )
     }
 }
@@ -427,30 +444,40 @@ private fun TapZones(
 
 @Suppress("FunctionName")
 @Composable
-private fun PlayerLabel(
+private fun RowScope.PlayerLabel(
     name: String,
     isServing: Boolean,
     color: Color,
+    dotOnRight: Boolean = false,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(INNER_PADDING),
-    ) {
-        if (isServing) {
+    val dotColor = if (isServing) color else Color.Transparent
+    val dot =
+        @Composable {
             Box(
                 modifier =
                     Modifier
                         .size(SERVING_DOT_SIZE)
                         .clip(CircleShape)
-                        .background(color),
+                        .background(dotColor),
             )
         }
+    Row(
+        modifier = Modifier.weight(1f),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement =
+            Arrangement.spacedBy(
+                INNER_PADDING,
+                if (dotOnRight) Alignment.Start else Alignment.End,
+            ),
+    ) {
+        if (!dotOnRight) dot()
         Text(
             text = name,
             fontSize = LABEL_FONT_SIZE,
             color = color,
             maxLines = 1,
         )
+        if (dotOnRight) dot()
     }
 }
 

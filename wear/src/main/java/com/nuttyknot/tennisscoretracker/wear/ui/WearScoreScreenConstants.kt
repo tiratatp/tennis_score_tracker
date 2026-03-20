@@ -15,3 +15,6 @@ internal const val COLOR_SKY_BLUE = 0xFF38BDF8
 internal const val COLOR_TENNIS_GREEN = 0xFF4CAF50
 internal val DEFAULT_PRIMARY_COLOR = Color(COLOR_SKY_BLUE)
 internal val DEFAULT_SECONDARY_COLOR = Color.White
+internal const val TOP_SECTION_WEIGHT = 1f
+internal const val BOTTOM_SECTION_WEIGHT = 1.5f
+internal val HELP_TAP_ZONE_MAX_HEIGHT = 72.dp

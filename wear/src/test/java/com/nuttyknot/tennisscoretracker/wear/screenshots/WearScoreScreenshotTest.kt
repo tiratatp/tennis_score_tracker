@@ -99,4 +99,35 @@ class WearScoreScreenshotTest {
             }
         }
     }
+
+    @Test
+    fun watchOpponentServing() {
+        // Same scenario but Williams serving (40-30, 5-4 in 2nd set)
+        val score =
+            WearScoreDisplay(
+                userName = "Sharapova",
+                opponentName = "Williams",
+                userScore = "40",
+                opponentScore = "30",
+                userGames = 5,
+                opponentGames = 4,
+                userSets = 1,
+                opponentSets = 0,
+                setHistory = listOf(6 to 1),
+                isUserServing = false,
+            )
+        paparazzi.snapshot("watchOpponentServing") {
+            WearTheme {
+                WearScoreScreen(
+                    scoreDisplay = score,
+                    isConnected = true,
+                    currentTime = "2:30 PM",
+                    onNewMatch = {},
+                    onUserScored = {},
+                    onOpponentScored = {},
+                    onUndo = {},
+                )
+            }
+        }
+    }
 }

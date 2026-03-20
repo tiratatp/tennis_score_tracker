@@ -49,8 +49,10 @@ internal fun WearHelpOverlay(
                 Modifier
                     .fillMaxSize()
                     .padding(
-                        horizontal = SCREEN_PADDING,
-                        vertical = SCREEN_PADDING * 4,
+                        start = SCREEN_PADDING,
+                        end = SCREEN_PADDING,
+                        top = SCREEN_PADDING * 6,
+                        bottom = SCREEN_PADDING * 4,
                     ),
         ) {
             Text(
@@ -60,9 +62,9 @@ internal fun WearHelpOverlay(
                 color = Color.White,
                 textAlign = TextAlign.Center,
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            HelpTapZones(userColor, opponentColor, modifier = Modifier.weight(1f))
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.weight(1f))
+            HelpTapZones(userColor, opponentColor, modifier = Modifier.height(HELP_TAP_ZONE_MAX_HEIGHT))
+            Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = "Long press = undo",
                 fontSize = 12.sp,
