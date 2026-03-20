@@ -6,7 +6,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -43,11 +42,16 @@ internal fun WearHelpOverlay(
                     interactionSource = remember { MutableInteractionSource() },
                     onClick = onDismiss,
                 ),
-        contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(SCREEN_PADDING * 2),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(
+                        horizontal = SCREEN_PADDING,
+                        vertical = SCREEN_PADDING * 4,
+                    ),
         ) {
             Text(
                 text = "How to Play",
@@ -57,7 +61,7 @@ internal fun WearHelpOverlay(
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            HelpTapZones(userColor, opponentColor)
+            HelpTapZones(userColor, opponentColor, modifier = Modifier.weight(1f))
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "Long press = undo",
@@ -81,13 +85,15 @@ internal fun WearHelpOverlay(
 private fun HelpTapZones(
     userColor: Color,
     opponentColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
             modifier =
                 Modifier
                     .weight(1f)
@@ -96,7 +102,7 @@ private fun HelpTapZones(
                         color = userColor.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(8.dp),
                     )
-                    .padding(vertical = 6.dp, horizontal = 4.dp),
+                    .padding(horizontal = 4.dp),
         ) {
             Text(
                 text = "← Tap",
@@ -116,6 +122,7 @@ private fun HelpTapZones(
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
             modifier =
                 Modifier
                     .weight(1f)
@@ -124,7 +131,7 @@ private fun HelpTapZones(
                         color = opponentColor.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(8.dp),
                     )
-                    .padding(vertical = 6.dp, horizontal = 4.dp),
+                    .padding(horizontal = 4.dp),
         ) {
             Text(
                 text = "Tap →",
