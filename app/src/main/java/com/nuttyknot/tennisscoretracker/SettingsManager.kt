@@ -46,7 +46,7 @@ class SettingsManager(private val context: Context) {
         val DEFAULT_APP_THEME = AppTheme.SKY_BLUE
         val DEFAULT_MATCH_FORMAT = MatchFormat.STANDARD
         const val DEFAULT_TTS_ENABLED = true
-        val DEFAULT_ANNOUNCER_VOICE = AnnouncerVoice.FEMALE
+        const val DEFAULT_ANNOUNCER_VOICE = ""
     }
 
     private val _isDetectingKeycode = MutableStateFlow(false)
@@ -119,10 +119,9 @@ class SettingsManager(private val context: Context) {
             preferences[TTS_ENABLED] ?: DEFAULT_TTS_ENABLED
         }
 
-    val announcerVoiceFlow: Flow<AnnouncerVoice> =
+    val announcerVoiceFlow: Flow<String> =
         context.dataStore.data.map { preferences ->
-            val voiceName = preferences[ANNOUNCER_VOICE] ?: DEFAULT_ANNOUNCER_VOICE.name
-            AnnouncerVoice.entries.find { it.name == voiceName } ?: DEFAULT_ANNOUNCER_VOICE
+            preferences[ANNOUNCER_VOICE] ?: DEFAULT_ANNOUNCER_VOICE
         }
 
     suspend fun updateKeycode(keycode: Int) {
@@ -185,9 +184,9 @@ class SettingsManager(private val context: Context) {
         }
     }
 
-    suspend fun updateAnnouncerVoice(voice: AnnouncerVoice) {
+    suspend fun updateAnnouncerVoice(voice: String) {
         context.dataStore.edit { preferences ->
-            preferences[ANNOUNCER_VOICE] = voice.name
+            preferences[ANNOUNCER_VOICE] = voice
         }
     }
 }
@@ -196,12 +195,6 @@ enum class MatchFormat(val displayName: String) {
     STANDARD("Standard Match (Best of 3 Sets)"),
     LEAGUE("League Match (3rd Set Tiebreak)"),
     FAST("Fast Match (8-Game Pro Set, No-Ad)"),
-}
-
-@Suppress("MagicNumber")
-enum class AnnouncerVoice(val displayName: String, val pitch: Float) {
-    FEMALE("Female", 0.95f),
-    MALE("Male", 0.75f),
 }
 
 enum class AppTheme(val displayName: String, val aliasName: String) {

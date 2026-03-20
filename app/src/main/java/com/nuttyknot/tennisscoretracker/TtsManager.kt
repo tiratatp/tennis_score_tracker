@@ -6,6 +6,9 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.util.Locale
 
 class TtsManager(context: Context) {
@@ -16,6 +19,10 @@ class TtsManager(context: Context) {
 
     @Volatile
     private var isInitialized = false
+    private var defaultVoice: android.speech.tts.Voice? = null
+
+    private val _availableVoices = MutableStateFlow<List<String>>(emptyList())
+    val availableVoices: StateFlow<List<String>> = _availableVoices.asStateFlow()
 
     private val focusListener =
         AudioManager.OnAudioFocusChangeListener { focusChange ->
@@ -58,9 +65,39 @@ class TtsManager(context: Context) {
                                 }
                             },
                         )
+
+                        defaultVoice = tts?.voice
+                        populateAvailableVoices()
                     }
                 }
             }
+    }
+
+    private fun populateAvailableVoices() {
+        val allVoices = tts?.voices ?: return
+        val ukLocales = setOf(Locale.UK, Locale("en", "GB"))
+        val enLocales = ukLocales + setOf(Locale.US, Locale.ENGLISH, Locale("en", "AU"))
+        val speakerVoices = allVoices.filter { !it.name.endsWith("-language") }
+
+        val localUk = speakerVoices.filter { !it.isNetworkConnectionRequired && it.locale in ukLocales }
+        val localEn = speakerVoices.filter { !it.isNetworkConnectionRequired && it.locale in enLocales }
+        val networkUk = speakerVoices.filter { it.isNetworkConnectionRequired && it.locale in ukLocales }
+        val networkEn = speakerVoices.filter { it.isNetworkConnectionRequired && it.locale in enLocales }
+
+        val chosen = localUk.ifEmpty { localEn }.ifEmpty { networkUk }.ifEmpty { networkEn }
+        _availableVoices.value = chosen.map { it.name }.sorted()
+    }
+
+    fun setVoice(voiceName: String) {
+        if (!isInitialized) return
+        if (voiceName.isEmpty()) {
+            tts?.voice = defaultVoice
+            return
+        }
+        val match = tts?.voices?.find { it.name == voiceName }
+        if (match != null) {
+            tts?.voice = match
+        }
     }
 
     fun announce(text: String) {
@@ -81,11 +118,6 @@ class TtsManager(context: Context) {
 
     private fun abandonFocus() {
         focusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
-    }
-
-    fun updateVoiceGender(gender: AnnouncerVoice) {
-        if (!isInitialized) return
-        tts?.setPitch(gender.pitch)
     }
 
     fun shutdown() {

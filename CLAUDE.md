@@ -3,15 +3,15 @@
 ## Build Commands
 
 ```bash
-./gradlew assembleDebug          # Build debug APK
+./gradlew :app:assembleDebug     # Build phone debug APK
 ./gradlew testDebugUnitTest      # Run unit tests
 ./gradlew ktlintCheck detekt     # Run linters (ktlint + detekt)
-./gradlew installDebug           # Install on device (also runs tests + linters via task dependency)
+./gradlew :app:installDebug      # Install phone app (also runs tests + linters via task dependency)
 ./gradlew :wear:assembleDebug    # Build wear APK
 ./gradlew :wear:installDebug     # Install wear app on watch
 ```
 
-`installDebug` depends on `testDebugUnitTest`, `ktlintCheck`, `lintDebug`, and `detekt` — all checks run automatically before install.
+`:app:installDebug` depends on `testDebugUnitTest`, `ktlintCheck`, `lintDebug`, and `detekt` — all checks run automatically before install.
 
 ## Linting
 

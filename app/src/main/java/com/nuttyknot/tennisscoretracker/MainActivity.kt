@@ -27,6 +27,7 @@ import com.nuttyknot.tennisscoretracker.ui.TennisAppNavigation
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
@@ -56,7 +57,7 @@ class MainActivity : ComponentActivity() {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 combine(
                     scoreModel.matchState.drop(1),
-                    settingsManager.ttsEnabledFlow,
+                    settingsManager.ttsEnabledFlow.distinctUntilChanged(),
                 ) { state, enabled -> state to enabled }
                     .collectLatest { (state, enabled) ->
                         if (enabled) {
@@ -91,6 +92,7 @@ class MainActivity : ComponentActivity() {
                     TennisAppNavigation(
                         scoreModel = scoreModel,
                         settingsManager = settingsManager,
+                        availableVoices = ttsManager.availableVoices,
                         onRouteChange = { route ->
                             isOnScoreScreen = route == Routes.SCORE_SCREEN
                         },
@@ -178,9 +180,15 @@ class MainActivity : ComponentActivity() {
             }
         }
         lifecycleScope.launch {
+            var isFirst = true
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsManager.announcerVoiceFlow.collectLatest { voice ->
-                    ttsManager.updateVoiceGender(voice)
+                settingsManager.announcerVoiceFlow.collectLatest { voiceName ->
+                    ttsManager.setVoice(voiceName)
+                    if (!isFirst) {
+                        val preview = scoreModel.matchState.value.announcement ?: VOICE_PREVIEW
+                        ttsManager.announce(preview)
+                    }
+                    isFirst = false
                 }
             }
         }
@@ -239,5 +247,9 @@ class MainActivity : ComponentActivity() {
         wearSyncManager.stop()
         ttsManager.shutdown()
         super.onDestroy()
+    }
+
+    private companion object {
+        const val VOICE_PREVIEW = "15 Love"
     }
 }

@@ -15,12 +15,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.nuttyknot.tennisscoretracker.AnnouncerVoice
 import com.nuttyknot.tennisscoretracker.AppTheme
 import com.nuttyknot.tennisscoretracker.MatchFormat
 import com.nuttyknot.tennisscoretracker.ScoreModel
 import com.nuttyknot.tennisscoretracker.SettingsManager
 import com.nuttyknot.tennisscoretracker.ui.AppFooter
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @Suppress("FunctionName")
@@ -28,10 +28,11 @@ import kotlinx.coroutines.launch
 fun SettingsScreen(
     scoreModel: ScoreModel,
     settingsManager: SettingsManager,
+    availableVoices: StateFlow<List<String>>,
     onNavigateBack: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val state = collectSettingsState(scoreModel, settingsManager)
+    val state = collectSettingsState(scoreModel, settingsManager, availableVoices)
 
     LaunchedEffect(Unit) {
         settingsManager.detectedKeycode.collect { keycode ->
@@ -65,6 +66,7 @@ fun SettingsScreen(
 private fun collectSettingsState(
     scoreModel: ScoreModel,
     settingsManager: SettingsManager,
+    availableVoices: StateFlow<List<String>>,
 ): SettingsState {
     val matchState by scoreModel.matchState.collectAsState()
     val currentKeycode by settingsManager.keycodeFlow.collectAsState(initial = SettingsManager.DEFAULT_KEYCODE)
@@ -85,6 +87,7 @@ private fun collectSettingsState(
     val announcerVoice by settingsManager.announcerVoiceFlow.collectAsState(
         initial = SettingsManager.DEFAULT_ANNOUNCER_VOICE,
     )
+    val voices by availableVoices.collectAsState()
     val isDetectingKeycode by settingsManager.isDetectingKeycode.collectAsState()
 
     return SettingsState(
@@ -100,6 +103,7 @@ private fun collectSettingsState(
         matchFormat = matchFormat,
         ttsEnabled = ttsEnabled,
         announcerVoice = announcerVoice,
+        availableVoices = voices,
     )
 }
 
@@ -115,7 +119,8 @@ private data class SettingsState(
     val appTheme: AppTheme,
     val matchFormat: MatchFormat,
     val ttsEnabled: Boolean,
-    val announcerVoice: AnnouncerVoice,
+    val announcerVoice: String,
+    val availableVoices: List<String> = emptyList(),
 )
 
 @Suppress("LongMethod")
@@ -147,6 +152,7 @@ private fun buildSettingsData(
             isMatchFormatLocked = state.isMatchInProgress,
             ttsEnabled = state.ttsEnabled,
             announcerVoice = state.announcerVoice,
+            availableVoices = state.availableVoices,
             isDetectingKeycode = state.isDetectingKeycode,
             onKeycodeChange = { code ->
                 coroutineScope.launch { settingsManager.updateKeycode(code) }

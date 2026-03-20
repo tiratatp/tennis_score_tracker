@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.nuttyknot.tennisscoretracker.AnnouncerVoice
 import com.nuttyknot.tennisscoretracker.AppTheme
 import com.nuttyknot.tennisscoretracker.MatchFormat
 
@@ -58,9 +57,10 @@ fun AppSettings(data: AppSettingsData) {
         onCheckedChange = data.onTtsEnabledChange,
     )
 
-    if (data.ttsEnabled) {
+    if (data.ttsEnabled && data.availableVoices.isNotEmpty()) {
         AnnouncerVoiceDropdown(
             currentVoice = data.announcerVoice,
+            availableVoices = data.availableVoices,
             onVoiceChange = data.onAnnouncerVoiceChange,
         )
     }
@@ -328,13 +328,14 @@ data class AppSettingsData(
     val currentMatchFormat: MatchFormat,
     val isMatchFormatLocked: Boolean = false,
     val ttsEnabled: Boolean = true,
-    val announcerVoice: AnnouncerVoice = AnnouncerVoice.FEMALE,
+    val announcerVoice: String = "",
+    val availableVoices: List<String> = emptyList(),
     val isDetectingKeycode: Boolean = false,
     val onKeycodeChange: (Int) -> Unit,
     val onThemeChange: (AppTheme) -> Unit,
     val onMatchFormatChange: (MatchFormat) -> Unit,
     val onTtsEnabledChange: (Boolean) -> Unit = {},
-    val onAnnouncerVoiceChange: (AnnouncerVoice) -> Unit = {},
+    val onAnnouncerVoiceChange: (String) -> Unit = {},
     val onDetectKeycode: () -> Unit = {},
     val onCancelDetectKeycode: () -> Unit = {},
 )
@@ -433,10 +434,12 @@ private fun MatchFormatMenuBox(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnnouncerVoiceDropdown(
-    currentVoice: AnnouncerVoice,
-    onVoiceChange: (AnnouncerVoice) -> Unit,
+    currentVoice: String,
+    availableVoices: List<String>,
+    onVoiceChange: (String) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val displayValue = if (currentVoice.isEmpty()) "Default" else currentVoice
 
     Column {
         Text(
@@ -450,7 +453,7 @@ fun AnnouncerVoiceDropdown(
             onExpandedChange = { expanded = !expanded },
         ) {
             OutlinedTextField(
-                value = currentVoice.displayName,
+                value = displayValue,
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -463,29 +466,43 @@ fun AnnouncerVoiceDropdown(
                     ),
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
             )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-            ) {
-                AnnouncerVoice.entries.forEach { voice ->
-                    DropdownMenuItem(
-                        text = { Text(voice.displayName) },
-                        onClick = {
-                            onVoiceChange(voice)
-                            expanded = false
-                        },
-                        colors =
-                            MenuDefaults.itemColors(
-                                textColor =
-                                    if (voice == currentVoice) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurface
-                                    },
-                            ),
-                    )
-                }
-            }
+            VoiceMenuItems(expanded, currentVoice, availableVoices, onVoiceChange) { expanded = false }
+        }
+    }
+}
+
+@Suppress("FunctionName")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExposedDropdownMenuBoxScope.VoiceMenuItems(
+    expanded: Boolean,
+    currentVoice: String,
+    availableVoices: List<String>,
+    onVoiceChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val options = listOf("" to "Default") + availableVoices.map { it to it }
+    ExposedDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss,
+    ) {
+        options.forEach { (value, label) ->
+            DropdownMenuItem(
+                text = { Text(label) },
+                onClick = {
+                    onVoiceChange(value)
+                    onDismiss()
+                },
+                colors =
+                    MenuDefaults.itemColors(
+                        textColor =
+                            if (value == currentVoice) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
+                    ),
+            )
         }
     }
 }

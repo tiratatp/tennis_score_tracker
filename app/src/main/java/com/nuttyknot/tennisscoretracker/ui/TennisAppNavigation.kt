@@ -18,6 +18,7 @@ import com.nuttyknot.tennisscoretracker.ui.help.HelpScreen
 import com.nuttyknot.tennisscoretracker.ui.score.ScoreScreen
 import com.nuttyknot.tennisscoretracker.ui.settings.SettingsScreen
 import com.nuttyknot.tennisscoretracker.ui.summary.MatchSummaryScreen
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @Suppress("FunctionName")
@@ -26,6 +27,7 @@ fun TennisAppNavigation(
     navController: NavHostController = rememberNavController(),
     scoreModel: ScoreModel,
     settingsManager: SettingsManager,
+    availableVoices: StateFlow<List<String>>,
     onRouteChange: (String) -> Unit = {},
 ) {
     val hasSeenHelp by settingsManager.hasSeenHelpFlow.collectAsState(initial = true)
@@ -60,7 +62,7 @@ fun TennisAppNavigation(
         }
     }
 
-    TennisNavHost(navController, scoreModel, settingsManager, scope)
+    TennisNavHost(navController, scoreModel, settingsManager, availableVoices, scope)
 }
 
 @Suppress("FunctionName")
@@ -69,6 +71,7 @@ private fun TennisNavHost(
     navController: NavHostController,
     scoreModel: ScoreModel,
     settingsManager: SettingsManager,
+    availableVoices: StateFlow<List<String>>,
     scope: kotlinx.coroutines.CoroutineScope,
 ) {
     NavHost(
@@ -91,6 +94,7 @@ private fun TennisNavHost(
             SettingsScreen(
                 scoreModel = scoreModel,
                 settingsManager = settingsManager,
+                availableVoices = availableVoices,
                 onNavigateBack = { navController.popBackStack() },
             )
         }
