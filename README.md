@@ -53,6 +53,7 @@ No account required. No internet needed. No ads. No tracking. All data stays on 
   <img src="screenshots/match-summary.png" width="300" alt="Match summary screen">
 </p>
 <p align="center">
+  <img src="screenshots/settings.png" width="300" alt="Settings screen">&nbsp;&nbsp;
   <img src="screenshots/help.png" width="300" alt="Help screen">
 </p>
 

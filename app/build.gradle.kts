@@ -143,6 +143,7 @@ tasks.register<Copy>("updateReadmeScreenshots") {
         include("*MatchSummaryPortrait*_matchover.png")
         include("*Tablet7*_inmatch.png")
         include("*Tablet10*_inmatch.png")
+        include("*SettingsPortrait*_defaultsettings.png")
         include("*SettingsTablet10*_defaultsettings.png")
         include("*HelpTablet10*_help.png")
         rename(".*ScoreLandscape.*_matchover\\.png", "score-landscape.png")
@@ -151,6 +152,7 @@ tasks.register<Copy>("updateReadmeScreenshots") {
         rename(".*MatchSummaryPortrait.*_matchover\\.png", "match-summary.png")
         rename(".*Tablet7.*_inmatch\\.png", "score-tablet-7.png")
         rename(".*Tablet10.*_inmatch\\.png", "score-tablet-10.png")
+        rename(".*SettingsPortrait.*_defaultsettings\\.png", "settings.png")
         rename(".*SettingsTablet10.*_defaultsettings\\.png", "settings-tablet-10.png")
         rename(".*HelpTablet10.*_help\\.png", "help-tablet-10.png")
     }
