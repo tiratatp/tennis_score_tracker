@@ -50,7 +50,9 @@ No account required. No internet needed. No ads. No tracking. All data stays on 
 </p>
 <p align="center">
   <img src="screenshots/score-portrait.png" width="300" alt="Score screen (portrait)">&nbsp;&nbsp;
-  <img src="screenshots/match-summary.png" width="300" alt="Match summary screen">&nbsp;&nbsp;
+  <img src="screenshots/match-summary.png" width="300" alt="Match summary screen">
+</p>
+<p align="center">
   <img src="screenshots/help.png" width="300" alt="Help screen">
 </p>
 
