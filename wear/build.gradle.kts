@@ -126,5 +126,9 @@ tasks.register<Copy>("updateReadmeScreenshots") {
         include("*_help.png")
         rename(".*_help\\.png", "watch-help.png")
     }
+    from("src/test/snapshots/images") {
+        include("*_matchover.png")
+        rename(".*_matchover\\.png", "watch-match-win.png")
+    }
     into("${rootProject.projectDir}/screenshots")
 }

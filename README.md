@@ -67,6 +67,7 @@ No account required. No internet needed. No ads. No tracking. All data stays on 
 
 <p align="center">
   <img src="screenshots/watch.png" width="300" alt="Wear OS watch app">&nbsp;&nbsp;
+  <img src="screenshots/watch-match-win.png" width="300" alt="Wear OS match win screen">&nbsp;&nbsp;
   <img src="screenshots/watch-help.png" width="300" alt="Wear OS help screen">
 </p>
 
