@@ -11,6 +11,7 @@ internal val SCREEN_PADDING = 8.dp
 internal val INNER_PADDING = 4.dp
 internal val SPACER_HEIGHT = 2.dp
 internal const val SCOREBOARD_MUTED_ALPHA = 0.5f
+internal const val TIME_TEXT_ALPHA = 0.35f
 internal const val COLOR_SKY_BLUE = 0xFF38BDF8
 internal const val COLOR_TENNIS_GREEN = 0xFF4CAF50
 internal val DEFAULT_PRIMARY_COLOR = Color(COLOR_SKY_BLUE)

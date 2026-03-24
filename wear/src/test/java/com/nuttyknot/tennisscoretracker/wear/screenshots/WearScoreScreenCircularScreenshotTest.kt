@@ -1,5 +1,7 @@
 package com.nuttyknot.tennisscoretracker.wear.screenshots
 
+import androidx.compose.runtime.Composable
+import androidx.wear.compose.material3.TimeSource
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
@@ -16,6 +18,12 @@ import org.junit.Test
 // Circular variants for UX/internal testing on round watch displays
 class WearScoreScreenCircularScreenshotTest {
     companion object {
+        private val FIXED_TIME_SOURCE =
+            object : TimeSource {
+                @Composable
+                override fun currentTime(): String = "2:30 PM"
+            }
+
         // Galaxy Watch 7 (44mm): 480x480 px, ~327 PPI, round
         private val GALAXY_WATCH_7_ROUND =
             DeviceConfig(
@@ -60,7 +68,7 @@ class WearScoreScreenCircularScreenshotTest {
                 WearScoreScreen(
                     scoreDisplay = score,
                     isConnected = true,
-                    currentTime = "2:30 PM",
+                    timeSource = FIXED_TIME_SOURCE,
                     onNewMatch = {},
                     onUserScored = {},
                     onOpponentScored = {},
@@ -91,7 +99,7 @@ class WearScoreScreenCircularScreenshotTest {
                 WearScoreScreen(
                     scoreDisplay = score,
                     isConnected = true,
-                    currentTime = "2:30 PM",
+                    timeSource = FIXED_TIME_SOURCE,
                     onNewMatch = {},
                     onUserScored = {},
                     onOpponentScored = {},
@@ -122,7 +130,7 @@ class WearScoreScreenCircularScreenshotTest {
                 WearScoreScreen(
                     scoreDisplay = score,
                     isConnected = true,
-                    currentTime = "2:30 PM",
+                    timeSource = FIXED_TIME_SOURCE,
                     onNewMatch = {},
                     onUserScored = {},
                     onOpponentScored = {},
@@ -153,7 +161,7 @@ class WearScoreScreenCircularScreenshotTest {
                 WearScoreScreen(
                     scoreDisplay = score,
                     isConnected = true,
-                    currentTime = "2:30 PM",
+                    timeSource = FIXED_TIME_SOURCE,
                     onNewMatch = {},
                     onUserScored = {},
                     onOpponentScored = {},
@@ -184,7 +192,7 @@ class WearScoreScreenCircularScreenshotTest {
                 WearScoreScreen(
                     scoreDisplay = score,
                     isConnected = true,
-                    currentTime = "2:30 PM",
+                    timeSource = FIXED_TIME_SOURCE,
                     onNewMatch = {},
                     onUserScored = {},
                     onOpponentScored = {},

@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package com.nuttyknot.tennisscoretracker.wear.ui
 
 import android.view.HapticFeedbackConstants
@@ -34,7 +36,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.CurvedTextStyle
+import androidx.wear.compose.material3.AppScaffold
+import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.TimeSource
+import androidx.wear.compose.material3.TimeText
+import androidx.wear.compose.material3.TimeTextDefaults
+import androidx.wear.compose.material3.timeTextCurvedText
 import com.nuttyknot.tennisscoretracker.shared.WearScoreDisplay
 
 private val SERVING_DOT_SIZE = 10.dp
@@ -53,10 +62,69 @@ fun WearScoreScreen(
     isConnected: Boolean,
     isAmbient: Boolean = false,
     showHelp: Boolean = false,
-    currentTime: String = "",
+    timeSource: TimeSource = TimeTextDefaults.rememberTimeSource(TimeTextDefaults.timeFormat()),
     onDismissHelp: () -> Unit = {},
     onShowHelp: () -> Unit = {},
     onNewMatch: () -> Unit = {},
+    onUserScored: () -> Unit,
+    onOpponentScored: () -> Unit,
+    onUndo: () -> Unit,
+) {
+    AppScaffold {
+        ScreenScaffold(timeText = { WearTimeText(timeSource) }) {
+            WearScoreContent(
+                scoreDisplay = scoreDisplay,
+                isConnected = isConnected,
+                isAmbient = isAmbient,
+                showHelp = showHelp,
+                onShowHelp = onShowHelp,
+                onDismissHelp = onDismissHelp,
+                onNewMatch = onNewMatch,
+                onUserScored = onUserScored,
+                onOpponentScored = onOpponentScored,
+                onUndo = onUndo,
+            )
+        }
+    }
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun WearTimeText(timeSource: TimeSource) {
+    val isRound = LocalConfiguration.current.isScreenRound
+    if (isRound) {
+        TimeText(timeSource = timeSource) { time ->
+            timeTextCurvedText(
+                time,
+                CurvedTextStyle(
+                    color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
+                    fontSize = DETAIL_FONT_SIZE,
+                    fontWeight = FontWeight.Normal,
+                ),
+            )
+        }
+    } else {
+        Text(
+            text = timeSource.currentTime(),
+            fontSize = DETAIL_FONT_SIZE,
+            color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Suppress("FunctionName", "LongParameterList")
+@Composable
+private fun WearScoreContent(
+    scoreDisplay: WearScoreDisplay,
+    isConnected: Boolean,
+    isAmbient: Boolean,
+    showHelp: Boolean,
+    onShowHelp: () -> Unit,
+    onDismissHelp: () -> Unit,
+    onNewMatch: () -> Unit,
     onUserScored: () -> Unit,
     onOpponentScored: () -> Unit,
     onUndo: () -> Unit,
@@ -68,9 +136,9 @@ fun WearScoreScreen(
                 .background(Color.Black),
     ) {
         if (isAmbient) {
-            AmbientScoreContent(scoreDisplay, currentTime)
+            AmbientScoreContent(scoreDisplay)
         } else {
-            ScoreContent(scoreDisplay, isConnected, currentTime, onNewMatch)
+            ScoreContent(scoreDisplay, isConnected, onNewMatch)
 
             if (isConnected && !scoreDisplay.isMatchOver) {
                 TapZones(onUserScored, onOpponentScored, onUndo)
@@ -84,7 +152,7 @@ fun WearScoreScreen(
                     Text(
                         text = "?",
                         fontSize = DETAIL_FONT_SIZE,
-                        color = Color.White.copy(alpha = 0.35f),
+                        color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
                         modifier =
                             Modifier
                                 .padding(bottom = SCREEN_PADDING)
@@ -99,7 +167,8 @@ fun WearScoreScreen(
 
             if (showHelp) {
                 val userColor = scoreDisplay.primaryColorArgb?.let { Color(it) } ?: DEFAULT_PRIMARY_COLOR
-                val opponentColor = scoreDisplay.secondaryColorArgb?.let { Color(it) } ?: DEFAULT_SECONDARY_COLOR
+                val opponentColor =
+                    scoreDisplay.secondaryColorArgb?.let { Color(it) } ?: DEFAULT_SECONDARY_COLOR
                 WearHelpOverlay(
                     userColor = userColor,
                     opponentColor = opponentColor,
@@ -112,10 +181,7 @@ fun WearScoreScreen(
 
 @Suppress("FunctionName")
 @Composable
-private fun AmbientScoreContent(
-    scoreDisplay: WearScoreDisplay,
-    currentTime: String,
-) {
+private fun AmbientScoreContent(scoreDisplay: WearScoreDisplay) {
     Column(
         modifier =
             Modifier
@@ -123,16 +189,6 @@ private fun AmbientScoreContent(
                 .padding(SCREEN_PADDING),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Time — fixed at very top of screen
-        if (currentTime.isNotEmpty()) {
-            Text(
-                text = currentTime,
-                fontSize = LABEL_FONT_SIZE,
-                fontFamily = FontFamily.Monospace,
-                color = Color.Gray,
-                textAlign = TextAlign.Center,
-            )
-        }
         // Score content — centered in remaining space
         Column(
             modifier = Modifier.weight(1f),
@@ -177,7 +233,6 @@ private fun AmbientScoreContent(
 private fun ScoreContent(
     scoreDisplay: WearScoreDisplay,
     isConnected: Boolean,
-    currentTime: String,
     onNewMatch: () -> Unit,
 ) {
     val userColor = scoreDisplay.primaryColorArgb?.let { Color(it) } ?: DEFAULT_PRIMARY_COLOR
@@ -190,16 +245,6 @@ private fun ScoreContent(
                 .padding(SCREEN_PADDING),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Time — fixed at very top of screen
-        if (currentTime.isNotEmpty()) {
-            Text(
-                text = currentTime,
-                fontSize = LABEL_FONT_SIZE,
-                color = Color.White.copy(alpha = SCOREBOARD_MUTED_ALPHA),
-                textAlign = TextAlign.Center,
-            )
-        }
-
         // Top section: status — pushed to bottom of its space
         Column(
             modifier = Modifier.weight(TOP_SECTION_WEIGHT),
