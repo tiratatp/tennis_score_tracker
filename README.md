@@ -80,7 +80,11 @@ No account required. No internet needed. No ads. No tracking. All data stays on 
 
 **Requires Android 8.0 or newer.** Wear OS app requires Android 11+ (API 30) on the watch.
 
-### Option A: Download the APK (easiest)
+### Option A: Install from the Play Store (Preferred)
+
+https://play.google.com/store/apps/details?id=com.nuttyknot.tennisscoretracker
+
+### Option B: Download the APK
 
 1. Go to the [Releases](https://github.com/tiratatp/tennis_score_tracker/releases/latest) page on GitHub
 2. Download the APK for your device:
@@ -89,7 +93,7 @@ No account required. No internet needed. No ads. No tracking. All data stays on 
 3. Open the file on your device and follow the prompts to install
    - You may need to allow "Install from unknown sources" in your device settings
 
-### Option B: Build from source
+### Option C: Build from source
 
 1. Clone this repository
 2. Connect your Android device via USB
