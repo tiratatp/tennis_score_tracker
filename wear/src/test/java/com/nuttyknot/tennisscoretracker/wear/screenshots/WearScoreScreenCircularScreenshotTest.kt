@@ -25,6 +25,7 @@ class WearScoreScreenCircularScreenshotTest {
                 ratio = ScreenRatio.NOTLONG,
                 size = ScreenSize.SMALL,
                 screenRound = ScreenRound.ROUND,
+                softButtons = false,
             )
     }
 

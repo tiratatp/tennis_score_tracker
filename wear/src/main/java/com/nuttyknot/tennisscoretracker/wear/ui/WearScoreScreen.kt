@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -457,6 +459,7 @@ private fun RowScope.PlayerLabel(
     color: Color,
     dotOnRight: Boolean = false,
 ) {
+    val maxNameWidth = LocalConfiguration.current.screenWidthDp.dp * NAME_MAX_WIDTH_FRACTION
     val dotColor = if (isServing) color else Color.Transparent
     val dot =
         @Composable {
@@ -484,7 +487,7 @@ private fun RowScope.PlayerLabel(
             color = color,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f, fill = false),
+            modifier = Modifier.weight(1f, fill = false).widthIn(max = maxNameWidth),
         )
         if (dotOnRight) dot()
     }
