@@ -59,6 +59,7 @@ fun TennisAppNavigation(
             }
         } else if (matchState.matchWinner == null) {
             hasNavigatedToSummary = false
+            navController.popBackStack(Routes.SCORE_SCREEN, inclusive = false)
         }
     }
 
