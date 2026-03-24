@@ -120,8 +120,8 @@ private fun AmbientScoreContent(
                 .fillMaxSize()
                 .padding(SCREEN_PADDING),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
     ) {
+        // Time — fixed at very top of screen
         if (currentTime.isNotEmpty()) {
             Text(
                 text = currentTime,
@@ -130,35 +130,41 @@ private fun AmbientScoreContent(
                 color = Color.Gray,
                 textAlign = TextAlign.Center,
             )
-            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
         }
-        Text(
-            text = "${scoreDisplay.userScore} - ${scoreDisplay.opponentScore}",
-            fontSize = SCORE_FONT_SIZE,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            color = Color.White,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(INNER_PADDING * 2),
+        // Score content — centered in remaining space
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-            scoreDisplay.setHistory.forEach { (user, opp) ->
-                Text(
-                    text = "$user-$opp",
-                    fontSize = DETAIL_FONT_SIZE,
-                    fontFamily = FontFamily.Monospace,
-                    color = Color.Gray,
-                )
-            }
-            if (!scoreDisplay.isMatchOver) {
-                Text(
-                    text = "${scoreDisplay.userGames}-${scoreDisplay.opponentGames}",
-                    fontSize = DETAIL_FONT_SIZE,
-                    fontFamily = FontFamily.Monospace,
-                    color = Color.Gray,
-                )
+            Text(
+                text = "${scoreDisplay.userScore} - ${scoreDisplay.opponentScore}",
+                fontSize = SCORE_FONT_SIZE,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(INNER_PADDING * 2),
+            ) {
+                scoreDisplay.setHistory.forEach { (user, opp) ->
+                    Text(
+                        text = "$user-$opp",
+                        fontSize = DETAIL_FONT_SIZE,
+                        fontFamily = FontFamily.Monospace,
+                        color = Color.Gray,
+                    )
+                }
+                if (!scoreDisplay.isMatchOver) {
+                    Text(
+                        text = "${scoreDisplay.userGames}-${scoreDisplay.opponentGames}",
+                        fontSize = DETAIL_FONT_SIZE,
+                        fontFamily = FontFamily.Monospace,
+                        color = Color.Gray,
+                    )
+                }
             }
         }
     }
@@ -182,22 +188,22 @@ private fun ScoreContent(
                 .padding(SCREEN_PADDING),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Top section: time + status — pushed to bottom of its space
+        // Time — fixed at very top of screen
+        if (currentTime.isNotEmpty()) {
+            Text(
+                text = currentTime,
+                fontSize = LABEL_FONT_SIZE,
+                color = Color.White.copy(alpha = SCOREBOARD_MUTED_ALPHA),
+                textAlign = TextAlign.Center,
+            )
+        }
+
+        // Top section: status — pushed to bottom of its space
         Column(
             modifier = Modifier.weight(TOP_SECTION_WEIGHT),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom,
         ) {
-            if (currentTime.isNotEmpty()) {
-                Text(
-                    text = currentTime,
-                    fontSize = LABEL_FONT_SIZE,
-                    color = Color.White.copy(alpha = SCOREBOARD_MUTED_ALPHA),
-                    textAlign = TextAlign.Center,
-                )
-                Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-            }
-
             val statusText =
                 if (scoreDisplay.isMatchOver && scoreDisplay.matchWinner != null) {
                     "${scoreDisplay.matchWinner} wins!"
