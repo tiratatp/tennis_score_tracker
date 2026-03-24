@@ -14,7 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.nuttyknot.tennisscoretracker.shared.R
 
 @Suppress("FunctionName")
 @Composable
@@ -26,13 +28,13 @@ fun AppFooter(modifier: Modifier = Modifier) {
     ) {
         Spacer(modifier = Modifier.height(32.dp))
         Text(
-            text = "made with ♥ by NuttyKnot",
+            text = stringResource(R.string.footer_made_by),
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
             style = MaterialTheme.typography.bodySmall,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Report a Bug",
+            text = stringResource(R.string.footer_report_bug),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.bodySmall,
             modifier =

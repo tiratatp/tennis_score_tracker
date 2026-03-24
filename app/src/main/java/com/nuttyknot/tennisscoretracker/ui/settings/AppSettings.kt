@@ -1,6 +1,9 @@
+@file:Suppress("TooManyFunctions")
+
 package com.nuttyknot.tennisscoretracker.ui.settings
 
 import android.view.KeyEvent
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,9 +28,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nuttyknot.tennisscoretracker.AppTheme
 import com.nuttyknot.tennisscoretracker.MatchFormat
+import com.nuttyknot.tennisscoretracker.shared.R
+
+@Composable
+fun matchFormatDisplayName(format: MatchFormat): String =
+    when (format) {
+        MatchFormat.STANDARD -> stringResource(R.string.match_format_standard)
+        MatchFormat.LEAGUE -> stringResource(R.string.match_format_league)
+        MatchFormat.FAST -> stringResource(R.string.match_format_fast)
+    }
+
+@Composable
+fun appThemeDisplayName(theme: AppTheme): String =
+    when (theme) {
+        AppTheme.GRAND_SLAM -> stringResource(R.string.theme_grand_slam)
+        AppTheme.MIAMI_NIGHT -> stringResource(R.string.theme_miami_night)
+        AppTheme.COLORBLIND_SAFE -> stringResource(R.string.theme_colorblind_safe)
+        AppTheme.SKY_BLUE -> stringResource(R.string.theme_sky_blue)
+    }
 
 @Suppress("FunctionName")
 @Composable
@@ -52,7 +74,7 @@ fun AppSettings(data: AppSettingsData) {
     )
 
     SettingsToggle(
-        label = "Score Announcements",
+        label = stringResource(R.string.settings_score_announcements),
         checked = data.ttsEnabled,
         onCheckedChange = data.onTtsEnabledChange,
     )
@@ -77,7 +99,7 @@ fun ThemeDropdown(
 
     Column {
         Text(
-            text = "Color Scheme",
+            text = stringResource(R.string.settings_color_scheme),
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleMedium,
         )
@@ -87,7 +109,7 @@ fun ThemeDropdown(
             onExpandedChange = { expanded = !expanded },
         ) {
             OutlinedTextField(
-                value = currentTheme.displayName,
+                value = appThemeDisplayName(currentTheme),
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -106,7 +128,7 @@ fun ThemeDropdown(
             ) {
                 AppTheme.entries.forEach { theme ->
                     DropdownMenuItem(
-                        text = { Text(theme.displayName) },
+                        text = { Text(appThemeDisplayName(theme)) },
                         onClick = {
                             onThemeChange(theme)
                             expanded = false
@@ -126,7 +148,7 @@ fun ThemeDropdown(
         }
         Spacer(modifier = Modifier.height(2.dp))
         Text(
-            text = "Choose a color scheme that suits your style or visibility needs.",
+            text = stringResource(R.string.settings_color_scheme_desc),
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             style = MaterialTheme.typography.bodySmall,
         )
@@ -145,15 +167,16 @@ fun KeycodeDropdown(
     val selectedOption = KEYCODE_OPTIONS.find { it.code == currentKeycode }
     val displayText =
         if (isDetecting) {
-            "Press any button..."
+            stringResource(R.string.settings_keycode_detecting)
         } else {
-            selectedOption?.let { "${it.name} (${it.code})" }
-                ?: "${KeyEvent.keyCodeToString(currentKeycode)} ($currentKeycode)"
+            selectedOption?.let {
+                "${stringResource(it.nameRes)} (${it.code})"
+            } ?: "${KeyEvent.keyCodeToString(currentKeycode)} ($currentKeycode)"
         }
 
     Column {
         Text(
-            text = "Target KeyCode",
+            text = stringResource(R.string.settings_target_keycode),
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleMedium,
         )
@@ -163,7 +186,7 @@ fun KeycodeDropdown(
         KeycodeDetectButton(isDetecting, onDetect, onCancelDetect)
         Spacer(modifier = Modifier.height(2.dp))
         Text(
-            text = "Select from the list, or tap Detect to auto-detect your remote's button.",
+            text = stringResource(R.string.settings_keycode_desc),
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             style = MaterialTheme.typography.bodySmall,
         )
@@ -227,7 +250,7 @@ private fun KeycodeDetectButton(
             onClick = onCancelDetect,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Cancel")
+            Text(stringResource(R.string.cancel))
         }
     } else {
         Button(
@@ -239,7 +262,7 @@ private fun KeycodeDetectButton(
                 ),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Detect Button")
+            Text(stringResource(R.string.settings_detect_button))
         }
     }
 }
@@ -256,14 +279,14 @@ fun ExposedDropdownMenuBoxScope.KeycodeMenu(
         expanded = true,
         onDismissRequest = onDismiss,
     ) {
-        var lastCategory = ""
+        var lastCategory = -1
         KEYCODE_OPTIONS.forEach { option ->
-            if (option.category != lastCategory) {
-                lastCategory = option.category
+            if (option.categoryRes != lastCategory) {
+                lastCategory = option.categoryRes
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = lastCategory,
+                            text = stringResource(lastCategory),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )
@@ -273,7 +296,9 @@ fun ExposedDropdownMenuBoxScope.KeycodeMenu(
                 )
             }
             DropdownMenuItem(
-                text = { Text("${option.name} (${option.code})") },
+                text = {
+                    Text("${stringResource(option.nameRes)} (${option.code})")
+                },
                 onClick = {
                     onKeycodeChange(option.code)
                     onDismiss()
@@ -293,33 +318,45 @@ fun ExposedDropdownMenuBoxScope.KeycodeMenu(
 }
 
 data class KeycodeOption(
-    val name: String,
+    @StringRes val nameRes: Int,
     val code: Int,
-    val category: String,
+    @StringRes val categoryRes: Int,
 )
 
 val KEYCODE_OPTIONS =
     listOf(
         // Camera Shutter Buttons
-        KeycodeOption("Volume Up", KeyEvent.KEYCODE_VOLUME_UP, "Camera Shutter Buttons"),
-        KeycodeOption("Enter", KeyEvent.KEYCODE_ENTER, "Camera Shutter Buttons"),
-        KeycodeOption("Volume Down", KeyEvent.KEYCODE_VOLUME_DOWN, "Camera Shutter Buttons"),
+        KeycodeOption(R.string.keycode_volume_up, KeyEvent.KEYCODE_VOLUME_UP, R.string.keycode_category_camera),
+        KeycodeOption(R.string.keycode_enter, KeyEvent.KEYCODE_ENTER, R.string.keycode_category_camera),
+        KeycodeOption(R.string.keycode_volume_down, KeyEvent.KEYCODE_VOLUME_DOWN, R.string.keycode_category_camera),
         // Media Remotes
-        KeycodeOption("Media Next", KeyEvent.KEYCODE_MEDIA_NEXT, "Media Remotes"),
-        KeycodeOption("Media Previous", KeyEvent.KEYCODE_MEDIA_PREVIOUS, "Media Remotes"),
-        KeycodeOption("Media Play/Pause", KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, "Media Remotes"),
-        KeycodeOption("Media Stop", KeyEvent.KEYCODE_MEDIA_STOP, "Media Remotes"),
+        KeycodeOption(R.string.keycode_media_next, KeyEvent.KEYCODE_MEDIA_NEXT, R.string.keycode_category_media),
+        KeycodeOption(
+            R.string.keycode_media_previous,
+            KeyEvent.KEYCODE_MEDIA_PREVIOUS,
+            R.string.keycode_category_media,
+        ),
+        KeycodeOption(
+            R.string.keycode_media_play_pause,
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+            R.string.keycode_category_media,
+        ),
+        KeycodeOption(R.string.keycode_media_stop, KeyEvent.KEYCODE_MEDIA_STOP, R.string.keycode_category_media),
         // Presentation Clickers
-        KeycodeOption("Page Up", KeyEvent.KEYCODE_PAGE_UP, "Presentation Clickers"),
-        KeycodeOption("Page Down", KeyEvent.KEYCODE_PAGE_DOWN, "Presentation Clickers"),
-        KeycodeOption("D-Pad Left", KeyEvent.KEYCODE_DPAD_LEFT, "Presentation Clickers"),
-        KeycodeOption("D-Pad Right", KeyEvent.KEYCODE_DPAD_RIGHT, "Presentation Clickers"),
-        KeycodeOption("Space", KeyEvent.KEYCODE_SPACE, "Presentation Clickers"),
+        KeycodeOption(R.string.keycode_page_up, KeyEvent.KEYCODE_PAGE_UP, R.string.keycode_category_presentation),
+        KeycodeOption(R.string.keycode_page_down, KeyEvent.KEYCODE_PAGE_DOWN, R.string.keycode_category_presentation),
+        KeycodeOption(R.string.keycode_dpad_left, KeyEvent.KEYCODE_DPAD_LEFT, R.string.keycode_category_presentation),
+        KeycodeOption(
+            R.string.keycode_dpad_right,
+            KeyEvent.KEYCODE_DPAD_RIGHT,
+            R.string.keycode_category_presentation,
+        ),
+        KeycodeOption(R.string.keycode_space, KeyEvent.KEYCODE_SPACE, R.string.keycode_category_presentation),
         // VR / Mini Gamepads
-        KeycodeOption("Button A", KeyEvent.KEYCODE_BUTTON_A, "VR / Mini Gamepads"),
-        KeycodeOption("Button B", KeyEvent.KEYCODE_BUTTON_B, "VR / Mini Gamepads"),
-        KeycodeOption("Button C", KeyEvent.KEYCODE_BUTTON_C, "VR / Mini Gamepads"),
-        KeycodeOption("Escape", KeyEvent.KEYCODE_ESCAPE, "VR / Mini Gamepads"),
+        KeycodeOption(R.string.keycode_button_a, KeyEvent.KEYCODE_BUTTON_A, R.string.keycode_category_gamepad),
+        KeycodeOption(R.string.keycode_button_b, KeyEvent.KEYCODE_BUTTON_B, R.string.keycode_category_gamepad),
+        KeycodeOption(R.string.keycode_button_c, KeyEvent.KEYCODE_BUTTON_C, R.string.keycode_category_gamepad),
+        KeycodeOption(R.string.keycode_escape, KeyEvent.KEYCODE_ESCAPE, R.string.keycode_category_gamepad),
     )
 
 data class AppSettingsData(
@@ -351,14 +388,14 @@ fun MatchFormatDropdown(
     var expanded by remember { mutableStateOf(false) }
     val helpText =
         if (enabled) {
-            "Choose the match format. Changes apply on new match."
+            stringResource(R.string.settings_match_format_help)
         } else {
-            "Reset the current match to change format."
+            stringResource(R.string.settings_match_format_locked)
         }
 
     Column {
         Text(
-            text = "Match Format",
+            text = stringResource(R.string.settings_match_format),
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleMedium,
         )
@@ -388,7 +425,7 @@ private fun MatchFormatMenuBox(
         onExpandedChange = { if (enabled) onExpandedChange(!expanded) },
     ) {
         OutlinedTextField(
-            value = currentFormat.displayName,
+            value = matchFormatDisplayName(currentFormat),
             onValueChange = {},
             readOnly = true,
             enabled = enabled,
@@ -410,7 +447,7 @@ private fun MatchFormatMenuBox(
         ) {
             MatchFormat.entries.forEach { format ->
                 DropdownMenuItem(
-                    text = { Text(format.displayName) },
+                    text = { Text(matchFormatDisplayName(format)) },
                     onClick = {
                         onFormatChange(format)
                         onExpandedChange(false)
@@ -439,11 +476,12 @@ fun AnnouncerVoiceDropdown(
     onVoiceChange: (String) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val displayValue = if (currentVoice.isEmpty()) "Default" else currentVoice
+    val defaultLabel = stringResource(R.string.settings_voice_default)
+    val displayValue = if (currentVoice.isEmpty()) defaultLabel else currentVoice
 
     Column {
         Text(
-            text = "Announcer Voice",
+            text = stringResource(R.string.settings_announcer_voice),
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleMedium,
         )
@@ -466,22 +504,23 @@ fun AnnouncerVoiceDropdown(
                     ),
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
             )
-            VoiceMenuItems(expanded, currentVoice, availableVoices, onVoiceChange) { expanded = false }
+            VoiceMenuItems(expanded, currentVoice, availableVoices, defaultLabel, onVoiceChange) { expanded = false }
         }
     }
 }
 
-@Suppress("FunctionName")
+@Suppress("FunctionName", "LongParameterList")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ExposedDropdownMenuBoxScope.VoiceMenuItems(
     expanded: Boolean,
     currentVoice: String,
     availableVoices: List<String>,
+    defaultLabel: String,
     onVoiceChange: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val options = listOf("" to "Default") + availableVoices.map { it to it }
+    val options = listOf("" to defaultLabel) + availableVoices.map { it to it }
     ExposedDropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,

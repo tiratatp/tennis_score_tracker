@@ -14,11 +14,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nuttyknot.tennisscoretracker.AppTheme
 import com.nuttyknot.tennisscoretracker.MatchFormat
 import com.nuttyknot.tennisscoretracker.ScoreModel
 import com.nuttyknot.tennisscoretracker.SettingsManager
+import com.nuttyknot.tennisscoretracker.shared.R
 import com.nuttyknot.tennisscoretracker.ui.AppFooter
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -207,13 +209,13 @@ internal fun SettingsLayout(
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        SettingsSection(title = "Players") {
+        SettingsSection(title = stringResource(R.string.settings_players)) {
             PlayerSettings(playerData)
         }
-        SettingsSection(title = "App") {
+        SettingsSection(title = stringResource(R.string.settings_app)) {
             AppSettings(appData)
         }
-        CollapsibleSettingsSection(title = "Advanced") {
+        CollapsibleSettingsSection(title = stringResource(R.string.settings_advanced)) {
             LatencySettings(latencyData)
         }
         AppFooter()

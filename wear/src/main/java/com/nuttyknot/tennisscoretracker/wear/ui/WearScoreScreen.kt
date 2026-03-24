@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,6 +45,7 @@ import androidx.wear.compose.material3.TimeSource
 import androidx.wear.compose.material3.TimeText
 import androidx.wear.compose.material3.TimeTextDefaults
 import androidx.wear.compose.material3.timeTextCurvedText
+import com.nuttyknot.tennisscoretracker.shared.R
 import com.nuttyknot.tennisscoretracker.shared.WearScoreDisplay
 
 private val SERVING_DOT_SIZE = 10.dp
@@ -150,7 +152,7 @@ private fun WearScoreContent(
                     contentAlignment = Alignment.BottomCenter,
                 ) {
                     Text(
-                        text = "?",
+                        text = stringResource(R.string.help_button),
                         fontSize = DETAIL_FONT_SIZE,
                         color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
                         modifier =
@@ -253,7 +255,7 @@ private fun ScoreContent(
         ) {
             val statusText =
                 if (scoreDisplay.isMatchOver && scoreDisplay.matchWinner != null) {
-                    "${scoreDisplay.matchWinner} wins!"
+                    stringResource(R.string.winner_announcement, scoreDisplay.matchWinner!!)
                 } else {
                     " "
                 }
@@ -300,7 +302,7 @@ private fun ScoreFooter(
         val view = LocalView.current
         Spacer(modifier = Modifier.height(INNER_PADDING))
         Text(
-            text = "New Match",
+            text = stringResource(R.string.new_match),
             fontSize = LABEL_FONT_SIZE,
             color = Color.White,
             textAlign = TextAlign.Center,
@@ -319,7 +321,7 @@ private fun ScoreFooter(
     } else if (!isConnected) {
         Spacer(modifier = Modifier.height(SPACER_HEIGHT))
         Text(
-            text = "Not connected",
+            text = stringResource(R.string.not_connected),
             fontSize = LABEL_FONT_SIZE,
             color = Color(COLOR_DISCONNECTED_RED),
             textAlign = TextAlign.Center,
@@ -404,12 +406,12 @@ private fun PlayerNames(
         horizontalArrangement = Arrangement.spacedBy(SCORE_GAP),
     ) {
         PlayerLabel(
-            name = scoreDisplay.userName.ifEmpty { "You" },
+            name = scoreDisplay.userName.ifEmpty { stringResource(R.string.default_user_name) },
             isServing = showServing && scoreDisplay.isUserServing,
             color = userColor,
         )
         PlayerLabel(
-            name = scoreDisplay.opponentName.ifEmpty { "Opp" },
+            name = scoreDisplay.opponentName.ifEmpty { stringResource(R.string.default_opponent_name_short) },
             isServing = showServing && !scoreDisplay.isUserServing,
             color = opponentColor,
             dotOnRight = true,

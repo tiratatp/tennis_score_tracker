@@ -11,7 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import com.nuttyknot.tennisscoretracker.TennisMatchState
+import com.nuttyknot.tennisscoretracker.shared.R
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,10 +22,10 @@ internal fun MatchSummaryPreview(state: TennisMatchState) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Match Summary") },
+                title = { Text(stringResource(R.string.match_summary_title)) },
                 navigationIcon = {
                     IconButton(onClick = {}) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors =

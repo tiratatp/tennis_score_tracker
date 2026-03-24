@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nuttyknot.tennisscoretracker.ScoreModel
 import com.nuttyknot.tennisscoretracker.TennisMatchState
+import com.nuttyknot.tennisscoretracker.shared.R
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,6 +97,8 @@ private fun ScoreScreenContent(
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val defaultUserName = stringResource(R.string.default_user_name)
+    val defaultOpponentName = stringResource(R.string.default_opponent_name)
 
     BoxWithConstraints(
         modifier =
@@ -117,8 +121,8 @@ private fun ScoreScreenContent(
             TapZones(
                 isLandscape = isLandscape,
                 matchWinner = state.matchWinner,
-                userName = state.userName.ifEmpty { "You" },
-                opponentName = state.opponentName.ifEmpty { "Opponent" },
+                userName = state.userName.ifEmpty { defaultUserName },
+                opponentName = state.opponentName.ifEmpty { defaultOpponentName },
                 onUserScored = { scoreModel.incrementUserScore() },
                 onOpponentScored = { scoreModel.incrementOpponentScore() },
                 onUndo = { scoreModel.undo() },
@@ -127,17 +131,18 @@ private fun ScoreScreenContent(
     }
 }
 
+@Composable
 internal fun getStatusText(state: TennisMatchState): String? {
     return when {
-        state.matchWinner != null -> "MATCH OVER"
-        state.setWinner != null -> "SET OVER"
-        state.isMatchTiebreak -> "MATCH TIEBREAK"
-        state.isDeuce -> "DEUCE"
+        state.matchWinner != null -> stringResource(R.string.status_match_over)
+        state.setWinner != null -> stringResource(R.string.status_set_over)
+        state.isMatchTiebreak -> stringResource(R.string.status_match_tiebreak)
+        state.isDeuce -> stringResource(R.string.status_deuce)
         else -> null
     }
 }
 
-@Suppress("FunctionName")
+@Suppress("FunctionName", "LongMethod")
 @Composable
 internal fun LandscapeScoreContent(
     state: TennisMatchState,
@@ -150,6 +155,8 @@ internal fun LandscapeScoreContent(
     val rawSize = maxHeight / ScoreScreenConstants.LANDSCAPE_TEXT_SIZE_RATIO.toFloat()
     val maxSafeSize = (maxWidth - middleColumnWidth.value) / ScoreScreenConstants.LANDSCAPE_MAX_SAFE_SIZE_FACTOR
     val mainTextSize = minOf(rawSize, maxSafeSize).sp
+    val defaultUserName = stringResource(R.string.default_user_name)
+    val defaultOpponentNameShort = stringResource(R.string.default_opponent_name_short)
     Row(
         modifier = Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -165,7 +172,7 @@ internal fun LandscapeScoreContent(
                     ScoreDisplayData(
                         score = state.userScore.display,
                         isServing = state.isUserServing,
-                        name = state.userName.ifEmpty { "You" },
+                        name = state.userName.ifEmpty { defaultUserName },
                     ),
                 mainTextSize = mainTextSize,
                 color = MaterialTheme.colorScheme.primary,
@@ -198,7 +205,7 @@ internal fun LandscapeScoreContent(
                     ScoreDisplayData(
                         score = state.opponentScore.display,
                         isServing = !state.isUserServing,
-                        name = state.opponentName.ifEmpty { "Opp" },
+                        name = state.opponentName.ifEmpty { defaultOpponentNameShort },
                     ),
                 mainTextSize = mainTextSize,
                 color = MaterialTheme.colorScheme.secondary,
@@ -209,7 +216,7 @@ internal fun LandscapeScoreContent(
     }
 }
 
-@Suppress("FunctionName")
+@Suppress("FunctionName", "LongMethod")
 @Composable
 internal fun PortraitScoreContent(
     state: TennisMatchState,
@@ -220,6 +227,9 @@ internal fun PortraitScoreContent(
     val rawSize = maxHeight / ScoreScreenConstants.PORTRAIT_TEXT_SIZE_RATIO.toFloat()
     val maxSafeSize = maxWidth / ScoreScreenConstants.PORTRAIT_MAX_SAFE_SIZE_FACTOR
     val mainTextSize = minOf(rawSize, maxSafeSize).sp
+    val defaultUserName = stringResource(R.string.default_user_name)
+    val defaultOpponentName = stringResource(R.string.default_opponent_name)
+    val defaultOpponentNameShort = stringResource(R.string.default_opponent_name_short)
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -253,8 +263,8 @@ internal fun PortraitScoreContent(
             isMatchOver = state.matchWinner != null,
             statusText = getStatusText(state),
             onViewSummary = onNavigateToSummary,
-            userName = state.userName.ifEmpty { "You" },
-            opponentName = state.opponentName.ifEmpty { "Opp" },
+            userName = state.userName.ifEmpty { defaultUserName },
+            opponentName = state.opponentName.ifEmpty { defaultOpponentNameShort },
             isUserServing = state.isUserServing,
             matchFormat = state.matchFormat,
         )
@@ -299,7 +309,7 @@ private fun TapZones(
         playerName: String,
         modifier: Modifier,
     ) {
-        val description = "Score point for $playerName. Long press to undo."
+        val description = stringResource(R.string.score_point_description, playerName)
         Box(
             modifier =
                 modifier

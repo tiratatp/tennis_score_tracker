@@ -25,10 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import com.nuttyknot.tennisscoretracker.MatchFormat
+import com.nuttyknot.tennisscoretracker.shared.R
 
 @Suppress("FunctionName", "LongParameterList")
 @Composable
@@ -94,7 +96,7 @@ fun ScoreboardTable(
                     disabledContentColor = Color.Transparent,
                 ),
         ) {
-            Text("Match Summary")
+            Text(stringResource(R.string.match_summary_button))
         }
     }
 }

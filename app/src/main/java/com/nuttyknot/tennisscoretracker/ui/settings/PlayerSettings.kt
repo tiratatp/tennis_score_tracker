@@ -1,22 +1,29 @@
 package com.nuttyknot.tennisscoretracker.ui.settings
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import com.nuttyknot.tennisscoretracker.shared.R
+
+private const val MAX_NAME_LENGTH = 30
 
 @Suppress("FunctionName")
 @Composable
 fun PlayerSettings(data: PlayerSettingsData) {
+    val context = LocalContext.current
     SettingsItem(
-        label = "Your Name",
+        label = stringResource(R.string.settings_your_name),
         value = data.userName,
         onValueChange = data.onUserNameChange,
-        description = "Your name for announcements.",
+        description = stringResource(R.string.settings_your_name_desc),
         config =
             SettingsItemConfig(
                 keyboardType = KeyboardType.Text,
                 validate = { v ->
                     when {
-                        v.length > 30 -> "Name must be 30 characters or less"
+                        v.length > MAX_NAME_LENGTH ->
+                            context.getString(R.string.validation_name_too_long, MAX_NAME_LENGTH)
                         else -> null
                     }
                 },
@@ -24,16 +31,17 @@ fun PlayerSettings(data: PlayerSettingsData) {
     )
 
     SettingsItem(
-        label = "Opponent Name",
+        label = stringResource(R.string.settings_opponent_name),
         value = data.opponentName,
         onValueChange = data.onOpponentNameChange,
-        description = "Opponent's name for announcements.",
+        description = stringResource(R.string.settings_opponent_name_desc),
         config =
             SettingsItemConfig(
                 keyboardType = KeyboardType.Text,
                 validate = { v ->
                     when {
-                        v.length > 30 -> "Name must be 30 characters or less"
+                        v.length > MAX_NAME_LENGTH ->
+                            context.getString(R.string.validation_name_too_long, MAX_NAME_LENGTH)
                         else -> null
                     }
                 },
@@ -41,7 +49,7 @@ fun PlayerSettings(data: PlayerSettingsData) {
     )
 
     SettingsToggle(
-        label = "You start serving",
+        label = stringResource(R.string.settings_you_start_serving),
         checked = data.initialServerIsUser,
         onCheckedChange = data.onInitialServerChange,
     )

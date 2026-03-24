@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TennisDroid</string>
+
+    <!-- Navigation -->
+    <string name="back">Back</string>
+
+    <!-- Score screen status -->
+    <string name="status_match_over">MATCH OVER</string>
+    <string name="status_set_over">SET OVER</string>
+    <string name="status_match_tiebreak">MATCH TIEBREAK</string>
+    <string name="status_deuce">DEUCE</string>
+
+    <!-- Default player names -->
+    <string name="default_user_name">You</string>
+    <string name="default_opponent_name">Opponent</string>
+    <string name="default_opponent_name_short">Opp</string>
+
+    <!-- Score screen accessibility -->
+    <string name="score_point_description">Score point for %1$s. Long press to undo.</string>
+
+    <!-- Score top bar -->
+    <string name="help">Help</string>
+    <string name="reset">Reset</string>
+    <string name="settings">Settings</string>
+
+    <!-- Reset dialog -->
+    <string name="reset_score_title">Reset Score?</string>
+    <string name="reset_score_message">Are you sure you want to reset the current match score?</string>
+    <string name="reset_action">RESET</string>
+    <string name="cancel_action">CANCEL</string>
+
+    <!-- Scoreboard -->
+    <string name="match_summary_button">Match Summary</string>
+
+    <!-- Help screen (phone) -->
+    <string name="help_title">Help &amp; Instructions</string>
+    <string name="help_welcome">Welcome to TennisDroid</string>
+    <string name="help_got_it">Got it</string>
+    <string name="help_scoring_gestures">Scoring Gestures</string>
+    <string name="help_scoring_gestures_desc">Tap on either player\'s score area to award a point.</string>
+    <string name="help_tap_your_side">Tap Your Side</string>
+    <string name="help_award_your_point">Award Your Point</string>
+    <string name="help_tap_your_side_desc">Tap on your side to award yourself a point.</string>
+    <string name="help_tap_opponent_side">Tap Opponent Side</string>
+    <string name="help_award_opponent_point">Award Opponent\'s Point</string>
+    <string name="help_tap_opponent_desc">Tap on the opponent\'s side to award them a point.</string>
+    <string name="help_long_press">Long Press</string>
+    <string name="help_undo">Undo</string>
+    <string name="help_long_press_desc">Hold down to undo the last action.</string>
+    <string name="help_hardware_buttons">Hardware Buttons</string>
+    <string name="help_hardware_buttons_desc">Use a Bluetooth remote with click, double-click, and long-press to score hands-free.</string>
+    <string name="help_hardware_button_actions">Click = your point, double-click = opponent\'s point, long-press = undo.</string>
+    <string name="help_hardware_button_types">Volume Down or Bluetooth Camera Shutter button can be used.</string>
+    <string name="help_hardware_button_keycode">If your button doesn\'t work, change the Target KeyCode in Settings.</string>
+    <string name="help_match_format">Match Format</string>
+    <string name="help_match_format_desc">Standard tennis rules are applied automatically.</string>
+    <string name="help_best_of_3">Best of 3 sets.</string>
+    <string name="help_tiebreak">Tiebreak is played at 6-6 in each set.</string>
+    <string name="help_voice_announcements">Voice Announcements</string>
+    <string name="help_voice_announcements_desc">Scores are announced aloud after each point.</string>
+    <string name="help_volume_tip">Turn up the volume or pair a Bluetooth speaker for best results.</string>
+
+    <!-- Help overlay (wear) -->
+    <string name="help_how_to_play">How to Play</string>
+    <string name="help_long_press_undo">Long press = undo</string>
+    <string name="help_tap_dismiss">Tap to dismiss</string>
+    <string name="help_tap_left">← Tap</string>
+    <string name="help_your_point">Your point</string>
+    <string name="help_tap_right">Tap →</string>
+    <string name="help_opponent_point">Opponent\'s point</string>
+    <string name="help_button">?</string>
+
+    <!-- Settings screen sections -->
+    <string name="settings_players">Players</string>
+    <string name="settings_app">App</string>
+    <string name="settings_advanced">Advanced</string>
+    <string name="collapse">Collapse</string>
+    <string name="expand">Expand</string>
+
+    <!-- Player settings -->
+    <string name="settings_your_name">Your Name</string>
+    <string name="settings_your_name_desc">Your name for announcements.</string>
+    <string name="settings_opponent_name">Opponent Name</string>
+    <string name="settings_opponent_name_desc">Opponent\'s name for announcements.</string>
+    <string name="settings_you_start_serving">You start serving</string>
+    <string name="validation_name_too_long">Name must be %1$d characters or less</string>
+
+    <!-- App settings -->
+    <string name="settings_score_announcements">Score Announcements</string>
+    <string name="settings_color_scheme">Color Scheme</string>
+    <string name="settings_color_scheme_desc">Choose a color scheme that suits your style or visibility needs.</string>
+    <string name="settings_target_keycode">Target KeyCode</string>
+    <string name="settings_keycode_detecting">Press any button\u2026</string>
+    <string name="settings_keycode_desc">Select from the list, or tap Detect to auto-detect your remote\'s button.</string>
+    <string name="settings_detect_button">Detect Button</string>
+    <string name="cancel">Cancel</string>
+    <string name="settings_match_format">Match Format</string>
+    <string name="settings_match_format_help">Choose the match format. Changes apply on new match.</string>
+    <string name="settings_match_format_locked">Reset the current match to change format.</string>
+    <string name="settings_announcer_voice">Announcer Voice</string>
+    <string name="settings_voice_default">Default</string>
+
+
+    <!-- Latency settings -->
+    <string name="settings_double_click_latency">Double Click Latency (ms)</string>
+    <string name="settings_double_click_desc">Max time window for a double click. Default is %1$d.</string>
+    <string name="settings_long_press_latency">Long Press Latency (ms)</string>
+    <string name="settings_long_press_desc">Min time window to trigger long press. Default is %1$d.</string>
+    <string name="validation_latency_required">Latency is required</string>
+    <string name="validation_must_be_number">Must be a valid number</string>
+    <string name="validation_min_ms">Must be at least %1$d ms</string>
+    <string name="validation_max_ms">Must be %1$d ms or less</string>
+    <string name="validation_greater_than_double_click">Must be greater than double click latency (%1$d ms)</string>
+
+    <!-- Match format display names -->
+    <string name="match_format_standard">Standard Match (Best of 3 Sets)</string>
+    <string name="match_format_league">League Match (3rd Set Tiebreak)</string>
+    <string name="match_format_fast">Fast Match (8-Game Pro Set, No-Ad)</string>
+
+    <!-- Theme display names -->
+    <string name="theme_grand_slam">The Grand Slam (Yellow &amp; White)</string>
+    <string name="theme_miami_night">Miami Night (Cyan &amp; Magenta)</string>
+    <string name="theme_colorblind_safe">Colorblind Safe (Orange &amp; Blue)</string>
+    <string name="theme_sky_blue">Sky Blue (Blue &amp; White)</string>
+
+    <!-- Keycode option categories -->
+    <string name="keycode_category_camera">Camera Shutter Buttons</string>
+    <string name="keycode_category_media">Media Remotes</string>
+    <string name="keycode_category_presentation">Presentation Clickers</string>
+    <string name="keycode_category_gamepad">VR / Mini Gamepads</string>
+
+    <!-- Keycode option names -->
+    <string name="keycode_volume_up">Volume Up</string>
+    <string name="keycode_enter">Enter</string>
+    <string name="keycode_volume_down">Volume Down</string>
+    <string name="keycode_media_next">Media Next</string>
+    <string name="keycode_media_previous">Media Previous</string>
+    <string name="keycode_media_play_pause">Media Play/Pause</string>
+    <string name="keycode_media_stop">Media Stop</string>
+    <string name="keycode_page_up">Page Up</string>
+    <string name="keycode_page_down">Page Down</string>
+    <string name="keycode_dpad_left">D-Pad Left</string>
+    <string name="keycode_dpad_right">D-Pad Right</string>
+    <string name="keycode_space">Space</string>
+    <string name="keycode_button_a">Button A</string>
+    <string name="keycode_button_b">Button B</string>
+    <string name="keycode_button_c">Button C</string>
+    <string name="keycode_escape">Escape</string>
+
+    <!-- Footer -->
+    <string name="footer_made_by">made with ♥ by NuttyKnot</string>
+    <string name="footer_report_bug">Report a Bug</string>
+
+    <!-- Match summary -->
+    <string name="match_summary_title">Match Summary</string>
+    <string name="winner_announcement">%1$s wins!</string>
+    <string name="new_match">New Match</string>
+
+    <!-- Wear-only -->
+    <string name="not_connected">Not connected</string>
+</resources>

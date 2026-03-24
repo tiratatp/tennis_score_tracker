@@ -27,11 +27,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nuttyknot.tennisscoretracker.ScoreModel
 import com.nuttyknot.tennisscoretracker.TennisMatchState
+import com.nuttyknot.tennisscoretracker.shared.R
 import com.nuttyknot.tennisscoretracker.ui.score.Scoreboard
 
 @Suppress("FunctionName")
@@ -47,10 +49,10 @@ fun MatchSummaryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Match Summary") },
+                title = { Text(stringResource(R.string.match_summary_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors =
@@ -76,7 +78,9 @@ internal fun MatchSummaryContent(
     onNewMatch: () -> Unit,
     paddingValues: PaddingValues,
 ) {
-    val isUserWinner = state.matchWinner == state.userName.ifEmpty { "You" }
+    val defaultUserName = stringResource(R.string.default_user_name)
+    val defaultOpponentName = stringResource(R.string.default_opponent_name)
+    val isUserWinner = state.matchWinner == state.userName.ifEmpty { defaultUserName }
 
     Column(
         modifier =
@@ -98,7 +102,7 @@ internal fun MatchSummaryContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "${state.matchWinner ?: ""} wins!",
+            text = stringResource(R.string.winner_announcement, state.matchWinner ?: ""),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
@@ -123,8 +127,8 @@ internal fun MatchSummaryContent(
                     MaterialTheme.colorScheme.primary
                 },
             isMatchOver = true,
-            userName = state.userName.ifEmpty { "You" },
-            opponentName = state.opponentName.ifEmpty { "Opponent" },
+            userName = state.userName.ifEmpty { defaultUserName },
+            opponentName = state.opponentName.ifEmpty { defaultOpponentName },
             matchFormat = state.matchFormat,
         )
 
@@ -133,7 +137,7 @@ internal fun MatchSummaryContent(
         Button(
             onClick = onNewMatch,
         ) {
-            Text("New Match", fontSize = 18.sp)
+            Text(stringResource(R.string.new_match), fontSize = 18.sp)
         }
     }
 }

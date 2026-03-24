@@ -14,6 +14,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.nuttyknot.tennisscoretracker.shared.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("FunctionName")
@@ -24,26 +26,26 @@ fun ScoreTopBar(
     onResetClick: () -> Unit,
 ) {
     TopAppBar(
-        title = { Text("TennisDroid", color = MaterialTheme.colorScheme.onBackground) },
+        title = { Text(stringResource(R.string.app_name), color = MaterialTheme.colorScheme.onBackground) },
         actions = {
             IconButton(onClick = onNavigateToHelp) {
                 Icon(
                     imageVector = Icons.Default.Info,
-                    contentDescription = "Help",
+                    contentDescription = stringResource(R.string.help),
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
             IconButton(onClick = onResetClick) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
-                    contentDescription = "Reset",
+                    contentDescription = stringResource(R.string.reset),
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
             IconButton(onClick = onNavigateToSettings) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
+                    contentDescription = stringResource(R.string.settings),
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
@@ -62,16 +64,16 @@ fun ResetConfirmationDialog(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text("Reset Score?") },
-            text = { Text("Are you sure you want to reset the current match score?") },
+            title = { Text(stringResource(R.string.reset_score_title)) },
+            text = { Text(stringResource(R.string.reset_score_message)) },
             confirmButton = {
                 TextButton(onClick = onConfirm) {
-                    Text("RESET", color = MaterialTheme.colorScheme.primary)
+                    Text(stringResource(R.string.reset_action), color = MaterialTheme.colorScheme.primary)
                 }
             },
             dismissButton = {
                 TextButton(onClick = onDismiss) {
-                    Text("CANCEL", color = MaterialTheme.colorScheme.onBackground)
+                    Text(stringResource(R.string.cancel_action), color = MaterialTheme.colorScheme.onBackground)
                 }
             },
             containerColor = MaterialTheme.colorScheme.surface,

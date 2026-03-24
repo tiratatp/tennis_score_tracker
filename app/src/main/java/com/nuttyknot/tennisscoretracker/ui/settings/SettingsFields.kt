@@ -32,8 +32,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.nuttyknot.tennisscoretracker.shared.R
 
 @Suppress("FunctionName")
 @Composable
@@ -198,7 +200,12 @@ fun CollapsibleSettingsSection(
                         } else {
                             Icons.Default.KeyboardArrowDown
                         },
-                    contentDescription = if (expanded) "Collapse" else "Expand",
+                    contentDescription =
+                        if (expanded) {
+                            stringResource(R.string.collapse)
+                        } else {
+                            stringResource(R.string.expand)
+                        },
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }

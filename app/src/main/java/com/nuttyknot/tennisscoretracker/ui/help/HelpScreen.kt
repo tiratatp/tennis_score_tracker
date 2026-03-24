@@ -30,9 +30,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nuttyknot.tennisscoretracker.shared.R
 import com.nuttyknot.tennisscoretracker.ui.AppFooter
 
 @Suppress("FunctionName")
@@ -43,10 +45,10 @@ fun HelpScreen(onDismiss: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Help & Instructions") },
+                title = { Text(stringResource(R.string.help_title)) },
                 navigationIcon = {
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
             )
@@ -84,7 +86,7 @@ private fun HelpScreenContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Welcome to TennisDroid",
+            text = stringResource(R.string.help_welcome),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
         )
@@ -103,7 +105,7 @@ private fun HelpScreenContent(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(56.dp),
         ) {
-            Text("Got it", fontSize = 18.sp)
+            Text(stringResource(R.string.help_got_it), fontSize = 18.sp)
         }
 
         AppFooter()
@@ -114,30 +116,29 @@ private fun HelpScreenContent(
 @Composable
 private fun ScoringGestures() {
     HelpSection(
-        title = "Scoring Gestures",
-        description =
-            "Tap on either player's score area to award a point.",
+        title = stringResource(R.string.help_scoring_gestures),
+        description = stringResource(R.string.help_scoring_gestures_desc),
     )
 
     GestureItem(
         icon = Icons.Default.KeyboardArrowUp,
-        label = "Tap Your Side",
-        action = "Award Your Point",
-        description = "Tap on your side to award yourself a point.",
+        label = stringResource(R.string.help_tap_your_side),
+        action = stringResource(R.string.help_award_your_point),
+        description = stringResource(R.string.help_tap_your_side_desc),
     )
 
     GestureItem(
         icon = Icons.Default.KeyboardArrowUp,
-        label = "Tap Opponent Side",
-        action = "Award Opponent's Point",
-        description = "Tap on the opponent's side to award them a point.",
+        label = stringResource(R.string.help_tap_opponent_side),
+        action = stringResource(R.string.help_award_opponent_point),
+        description = stringResource(R.string.help_tap_opponent_desc),
     )
 
     GestureItem(
         icon = Icons.Default.Refresh,
-        label = "Long Press",
-        action = "Undo",
-        description = "Hold down to undo the last action.",
+        label = stringResource(R.string.help_long_press),
+        action = stringResource(R.string.help_undo),
+        description = stringResource(R.string.help_long_press_desc),
     )
 
     Spacer(modifier = Modifier.height(16.dp))
@@ -147,21 +148,20 @@ private fun ScoringGestures() {
 @Composable
 private fun HardwareButtons() {
     HelpSection(
-        title = "Hardware Buttons",
-        description =
-            "Use a Bluetooth remote with click, double-click, and long-press to score hands-free.",
+        title = stringResource(R.string.help_hardware_buttons),
+        description = stringResource(R.string.help_hardware_buttons_desc),
     )
 
     InfoRow(
-        text = "Click = your point, double-click = opponent's point, long-press = undo.",
+        text = stringResource(R.string.help_hardware_button_actions),
     )
 
     InfoRow(
-        text = "Volume Down or Bluetooth Camera Shutter button can be used.",
+        text = stringResource(R.string.help_hardware_button_types),
     )
 
     Text(
-        text = "If your button doesn't work, change the Target KeyCode in Settings.",
+        text = stringResource(R.string.help_hardware_button_keycode),
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -172,12 +172,12 @@ private fun HardwareButtons() {
 @Composable
 private fun MatchFormat() {
     HelpSection(
-        title = "Match Format",
-        description = "Standard tennis rules are applied automatically.",
+        title = stringResource(R.string.help_match_format),
+        description = stringResource(R.string.help_match_format_desc),
     )
 
-    InfoRow(text = "Best of 3 sets.")
-    InfoRow(text = "Tiebreak is played at 6-6 in each set.")
+    InfoRow(text = stringResource(R.string.help_best_of_3))
+    InfoRow(text = stringResource(R.string.help_tiebreak))
 
     Spacer(modifier = Modifier.height(24.dp))
 }
@@ -186,11 +186,11 @@ private fun MatchFormat() {
 @Composable
 private fun VoiceAnnouncements() {
     HelpSection(
-        title = "Voice Announcements",
-        description = "Scores are announced aloud after each point.",
+        title = stringResource(R.string.help_voice_announcements),
+        description = stringResource(R.string.help_voice_announcements_desc),
     )
 
-    InfoRow(text = "Turn up the volume or pair a Bluetooth speaker for best results.")
+    InfoRow(text = stringResource(R.string.help_volume_tip))
 
     Spacer(modifier = Modifier.height(24.dp))
 }

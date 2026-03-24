@@ -19,11 +19,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
+import com.nuttyknot.tennisscoretracker.shared.R
 
 @Suppress("FunctionName")
 @Composable
@@ -56,7 +58,7 @@ internal fun WearHelpOverlay(
                     ),
         ) {
             Text(
-                text = "How to Play",
+                text = stringResource(R.string.help_how_to_play),
                 fontSize = DETAIL_FONT_SIZE,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -66,14 +68,14 @@ internal fun WearHelpOverlay(
             HelpTapZones(userColor, opponentColor, modifier = Modifier.height(HELP_TAP_ZONE_MAX_HEIGHT))
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "Long press = undo",
+                text = stringResource(R.string.help_long_press_undo),
                 fontSize = 12.sp,
                 color = Color.White.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Tap to dismiss",
+                text = stringResource(R.string.help_tap_dismiss),
                 fontSize = LABEL_FONT_SIZE,
                 color = Color.White.copy(alpha = 0.4f),
                 textAlign = TextAlign.Center,
@@ -107,7 +109,7 @@ private fun HelpTapZones(
                     .padding(horizontal = 4.dp),
         ) {
             Text(
-                text = "← Tap",
+                text = stringResource(R.string.help_tap_left),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = userColor,
@@ -115,7 +117,7 @@ private fun HelpTapZones(
                 modifier = Modifier.fillMaxWidth(),
             )
             Text(
-                text = "Your point",
+                text = stringResource(R.string.help_your_point),
                 fontSize = 12.sp,
                 color = userColor,
                 textAlign = TextAlign.Center,
@@ -136,7 +138,7 @@ private fun HelpTapZones(
                     .padding(horizontal = 4.dp),
         ) {
             Text(
-                text = "Tap →",
+                text = stringResource(R.string.help_tap_right),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = opponentColor,
@@ -144,7 +146,7 @@ private fun HelpTapZones(
                 modifier = Modifier.fillMaxWidth(),
             )
             Text(
-                text = "Opponent's point",
+                text = stringResource(R.string.help_opponent_point),
                 fontSize = 12.sp,
                 color = opponentColor,
                 textAlign = TextAlign.Center,
