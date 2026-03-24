@@ -24,11 +24,13 @@ After every point, the app calls out the score like a real chair umpire — "Fif
 - **League** — Best-of-3 sets; 3rd set is a 10-point match tiebreak (common in recreational leagues)
 - **Fast** — Single 8-game pro set with no-ad scoring (perfect for quick matches)
 
-All formats include proper tiebreak rules, deuce/advantage handling, set tracking, and full match history.
+All formats include proper tiebreak rules, deuce/advantage handling, set tracking, and full match history. The scoreboard tracks who's serving with a visual indicator and automatically alternates each game — including proper tiebreak serving rotation.
 
 ## Wear OS Companion
 
 See the live score on your watch and score directly from your wrist. Tap the left side for your point, right side for opponent, long press to undo. The watch syncs in real time with your phone and automatically matches your chosen color theme.
+
+Ambient mode keeps the score visible at a glance with a low-power always-on display.
 
 ## Customization
 
@@ -88,8 +90,8 @@ https://play.google.com/store/apps/details?id=com.nuttyknot.tennisscoretracker
 
 1. Go to the [Releases](https://github.com/tiratatp/tennis_score_tracker/releases/latest) page on GitHub
 2. Download the APK for your device:
-   - **`tennisdroid-<version>.apk`** — Phone app. Install on your Android phone or tablet.
-   - **`tennisdroid-wear-<version>.apk`** — Wear OS app. Install on your Android watch for live score display and tap-to-score. Requires the phone app to be installed and paired.
+   - **`tennisdroid-<version>-release.apk`** — Phone app. Install on your Android phone or tablet.
+   - **`tennisdroid-wear-<version>-release.apk`** — Wear OS app. Install on your Android watch for live score display and tap-to-score. Requires the phone app to be installed and paired.
 3. Open the file on your device and follow the prompts to install
    - You may need to allow "Install from unknown sources" in your device settings
 
