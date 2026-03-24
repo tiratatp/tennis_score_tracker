@@ -32,6 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -143,7 +145,7 @@ private fun WearScoreContent(
             ScoreContent(scoreDisplay, isConnected, onNewMatch)
 
             if (isConnected && !scoreDisplay.isMatchOver) {
-                TapZones(onUserScored, onOpponentScored, onUndo)
+                TapZones(scoreDisplay, onUserScored, onOpponentScored, onUndo)
             }
 
             if (!showHelp) {
@@ -453,17 +455,25 @@ private fun PointScore(
 @Suppress("FunctionName")
 @Composable
 private fun TapZones(
+    scoreDisplay: WearScoreDisplay,
     onUserScored: () -> Unit,
     onOpponentScored: () -> Unit,
     onUndo: () -> Unit,
 ) {
     val view = LocalView.current
+    val userName = scoreDisplay.userName.ifEmpty { stringResource(R.string.default_user_name) }
+    val opponentName = scoreDisplay.opponentName.ifEmpty { stringResource(R.string.default_opponent_name_short) }
+    val userDescription = stringResource(R.string.score_point_description, userName)
+    val opponentDescription = stringResource(R.string.score_point_description, opponentName)
     Row(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier =
                 Modifier
                     .fillMaxHeight()
                     .weight(1f)
+                    .semantics {
+                        contentDescription = userDescription
+                    }
                     .combinedClickable(
                         onClick = {
                             view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
@@ -482,6 +492,9 @@ private fun TapZones(
                 Modifier
                     .fillMaxHeight()
                     .weight(1f)
+                    .semantics {
+                        contentDescription = opponentDescription
+                    }
                     .combinedClickable(
                         onClick = {
                             view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
