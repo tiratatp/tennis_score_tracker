@@ -6,6 +6,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2" apply false
     id("app.cash.paparazzi") version "1.3.5" apply false
+    id("com.github.triplet.play") version "3.13.0" apply false
 }
 
 tasks.register("installGitHook") {

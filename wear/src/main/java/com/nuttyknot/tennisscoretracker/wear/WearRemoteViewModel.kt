@@ -57,13 +57,13 @@ class WearRemoteViewModel(application: Application) :
     private fun startCapabilityListener() {
         capabilityClient.addListener(
             this,
-            WearConstants.CAPABILITY_PHONE_APP,
+            BuildConfig.CAPABILITY_PHONE_APP,
         )
         viewModelScope.launch {
             try {
                 val info =
                     capabilityClient.getCapability(
-                        WearConstants.CAPABILITY_PHONE_APP,
+                        BuildConfig.CAPABILITY_PHONE_APP,
                         CapabilityClient.FILTER_REACHABLE,
                     ).await()
                 updateConnectionFromCapability(info)

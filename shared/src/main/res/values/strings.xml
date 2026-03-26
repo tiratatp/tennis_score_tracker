@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">TennisDroid</string>
-
     <!-- Navigation -->
     <string name="back">Back</string>
 
@@ -36,7 +34,6 @@
 
     <!-- Help screen (phone) -->
     <string name="help_title">Help &amp; Instructions</string>
-    <string name="help_welcome">Welcome to TennisDroid</string>
     <string name="help_got_it">Got it</string>
     <string name="help_scoring_gestures">Scoring Gestures</string>
     <string name="help_scoring_gestures_desc">Tap on either player\'s score area to award a point.</string>
@@ -55,7 +52,6 @@
     <string name="help_hardware_button_types">Volume Down or Bluetooth Camera Shutter button can be used.</string>
     <string name="help_hardware_button_keycode">If your button doesn\'t work, change the Target KeyCode in Settings.</string>
     <string name="help_match_format">Match Format</string>
-    <string name="help_match_format_desc">Standard tennis rules are applied automatically.</string>
     <string name="help_best_of_3">Best of 3 sets.</string>
     <string name="help_tiebreak">Tiebreak is played at 6-6 in each set.</string>
     <string name="help_voice_announcements">Voice Announcements</string>
@@ -167,7 +163,6 @@
     <string name="footer_made_by">made with ♥ by NuttyKnot</string>
     <string name="footer_report_bug">Report a Bug</string>
     <string name="footer_share_app">Share App</string>
-    <string name="footer_share_message">TennisDroid: Smart tennis scoreboard — Bluetooth remote, voice announcements &amp; watch sync.\n\nhttps://play.google.com/store/apps/details?id=com.nuttyknot.tennisscoretracker</string>
 
     <!-- Match summary -->
     <string name="match_summary_title">Match Summary</string>

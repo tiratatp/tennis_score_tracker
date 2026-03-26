@@ -6,14 +6,12 @@ import com.android.ide.common.rendering.api.SessionParams
 import com.android.resources.Density
 import com.android.resources.ScreenOrientation
 import com.nuttyknot.tennisscoretracker.AppTheme
-import com.nuttyknot.tennisscoretracker.MatchState
-import com.nuttyknot.tennisscoretracker.PlayerScore
+import com.nuttyknot.tennisscoretracker.BuildConfig
 import com.nuttyknot.tennisscoretracker.ui.score.ScoreScreenPreview
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
 import org.junit.Rule
 import org.junit.Test
 
-// 2023 US Open Final: Gauff d. Sabalenka 2-6, 6-3, 6-2
 class ScoreTablet10ScreenshotTest {
     @get:Rule
     val paparazzi =
@@ -32,20 +30,7 @@ class ScoreTablet10ScreenshotTest {
 
     @Test
     fun inmatch() {
-        // 3rd set, Gauff serving at 40-15, games 5-2
-        val state =
-            MatchState(
-                userScore = PlayerScore.Forty,
-                opponentScore = PlayerScore.Fifteen,
-                userGames = 5,
-                opponentGames = 2,
-                userSets = 1,
-                opponentSets = 1,
-                setHistory = listOf(2 to 6, 6 to 3),
-                isUserServing = true,
-                userName = "Gauff",
-                opponentName = "Sabalenka",
-            )
+        val state = SportTestData.inMatchForSport(BuildConfig.SPORT)
         paparazzi.snapshot("inmatch") {
             TennisScoreTrackerTheme(appTheme = AppTheme.MIAMI_NIGHT) {
                 ScoreScreenPreview(state)

@@ -5,13 +5,12 @@ plugins {
     id("app.cash.paparazzi")
 }
 
-fun gitVersionCode(): Int {
+fun gitTagCount(): Int {
     val result =
         providers.exec {
             commandLine("git", "tag", "--list", "v*")
         }.standardOutput.asText.get().trim()
-    val base = if (result.isEmpty()) 1 else result.lines().size
-    return base * 10 + 2 // wear suffix
+    return if (result.isEmpty()) 1 else result.lines().size
 }
 
 fun gitVersionName(): String {
@@ -44,8 +43,42 @@ android {
         // targetSdk 35 breaks Paparazzi 1.3.5 screenshot tests
         // (NoSuchMethodError: StaticLayout$Builder.setUseBoundsForWidth)
         targetSdk = 34
-        versionCode = gitVersionCode()
+        versionCode = gitTagCount() * 100 + 2
         versionName = gitVersionName()
+    }
+
+    flavorDimensions += "sport"
+    productFlavors {
+        create("tennis") {
+            dimension = "sport"
+            applicationId = "com.nuttyknot.tennisscoretracker"
+            buildConfigField("String", "CAPABILITY_PHONE_APP", "\"tennis_score_tracker_phone\"")
+        }
+        create("badminton") {
+            dimension = "sport"
+            applicationId = "com.nuttyknot.badmintonscoretracker"
+            buildConfigField("String", "CAPABILITY_PHONE_APP", "\"badminton_score_tracker_phone\"")
+        }
+        create("pickleball") {
+            dimension = "sport"
+            applicationId = "com.nuttyknot.pickleballscoretracker"
+            buildConfigField("String", "CAPABILITY_PHONE_APP", "\"pickleball_score_tracker_phone\"")
+        }
+    }
+
+    androidComponents {
+        onVariants { variant ->
+            val sportOffset =
+                when {
+                    variant.flavorName?.contains("tennis") == true -> 0
+                    variant.flavorName?.contains("badminton") == true -> 1
+                    variant.flavorName?.contains("pickleball") == true -> 2
+                    else -> 0
+                }
+            variant.outputs.forEach { output ->
+                output.versionCode.set(gitTagCount() * 100 + sportOffset * 10 + 2)
+            }
+        }
     }
 
     buildTypes {
@@ -77,6 +110,7 @@ android {
         }
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
     packaging {
@@ -111,8 +145,10 @@ dependencies {
 
 // Ensure linters run before the wear app is installed for debugging
 tasks.whenTaskAdded {
-    if (name == "installDebug") {
-        dependsOn("ktlintCheck", "lintDebug", "detekt")
+    val match = Regex("install(Tennis|Badminton|Pickleball)Debug").matchEntire(name)
+    if (match != null) {
+        val flavor = match.groupValues[1]
+        dependsOn("ktlintCheck", "lint${flavor}Debug", "detekt")
     }
 }
 

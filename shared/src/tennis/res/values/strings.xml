@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TennisDroid</string>
+    <string name="help_welcome">Welcome to TennisDroid</string>
+    <string name="help_match_format_desc">Standard tennis rules are applied automatically.</string>
+    <string name="footer_share_message">TennisDroid: Smart tennis scoreboard — Bluetooth remote, voice announcements &amp; watch sync.\n\nhttps://play.google.com/store/apps/details?id=com.nuttyknot.tennisscoretracker</string>
+</resources>

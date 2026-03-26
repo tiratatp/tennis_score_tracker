@@ -225,6 +225,11 @@ internal fun SettingsLayout(
             AppSettings(appData)
         }
         CollapsibleSettingsSection(title = stringResource(R.string.settings_advanced)) {
+            SportDropdown(
+                currentSport = appData.currentSport,
+                onSportChange = appData.onSportChange,
+                enabled = !appData.isSportLocked,
+            )
             LatencySettings(latencyData)
         }
         AppFooter()

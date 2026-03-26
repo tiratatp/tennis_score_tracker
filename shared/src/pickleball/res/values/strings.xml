@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PickleballDroid</string>
+    <string name="help_welcome">Welcome to PickleballDroid</string>
+    <string name="help_match_format_desc">USA Pickleball rules are applied automatically.</string>
+    <string name="footer_share_message">PickleballDroid: Smart pickleball scoreboard — Bluetooth remote, voice announcements &amp; watch sync.\n\nhttps://play.google.com/store/apps/details?id=com.nuttyknot.pickleballscoretracker</string>
+</resources>

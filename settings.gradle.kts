@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TennisDroid"
+rootProject.name = "ScoreTracker"
 include(":app")
 include(":shared")
 include(":wear")

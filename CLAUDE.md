@@ -3,15 +3,20 @@
 ## Build Commands
 
 ```bash
-./gradlew :app:assembleDebug     # Build phone debug APK
-./gradlew testDebugUnitTest      # Run unit tests
-./gradlew ktlintCheck detekt     # Run linters (ktlint + detekt)
-./gradlew :app:installDebug      # Install phone app (also runs tests + linters via task dependency)
-./gradlew :wear:assembleDebug    # Build wear APK
-./gradlew :wear:installDebug     # Install wear app on watch
+./gradlew :app:assembleTennisDebug       # Build tennis phone APK
+./gradlew :app:assembleBadmintonDebug     # Build badminton phone APK
+./gradlew :app:assemblePickleballDebug    # Build pickleball phone APK
+./gradlew :app:installTennisDebug         # Install tennis app
+./gradlew :wear:installTennisDebug        # Install tennis wear app
+./gradlew :app:testTennisDebugUnitTest    # Run tests for tennis flavor
+./gradlew :app:testDebugUnitTest          # Run tests for all flavors
+./gradlew ktlintCheck detekt              # Run linters (ktlint + detekt)
+./gradlew assembleDebug                   # Build all flavors (phone + wear)
 ```
 
-`:app:installDebug` depends on `testDebugUnitTest`, `ktlintCheck`, `lintDebug`, and `detekt` — all checks run automatically before install.
+Install tasks depend on `test{Flavor}DebugUnitTest`, `ktlintCheck`, `lint{Flavor}Debug`, and `detekt` — all checks run automatically before install.
+
+Three product flavors (`tennis`, `badminton`, `pickleball`) across all modules. Each produces a separate APK with distinct applicationId, app name, icon, and sport default.
 
 ## Linting
 

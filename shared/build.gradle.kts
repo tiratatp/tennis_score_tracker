@@ -11,6 +11,13 @@ android {
         minSdk = 26
     }
 
+    flavorDimensions += "sport"
+    productFlavors {
+        create("tennis") { dimension = "sport" }
+        create("badminton") { dimension = "sport" }
+        create("pickleball") { dimension = "sport" }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17

@@ -69,12 +69,6 @@ fun appThemeDisplayName(theme: AppTheme): String =
 @Suppress("FunctionName")
 @Composable
 fun AppSettings(data: AppSettingsData) {
-    SportDropdown(
-        currentSport = data.currentSport,
-        onSportChange = data.onSportChange,
-        enabled = !data.isSportLocked,
-    )
-
     MatchFormatDropdown(
         currentFormat = data.currentMatchFormat,
         onFormatChange = data.onMatchFormatChange,

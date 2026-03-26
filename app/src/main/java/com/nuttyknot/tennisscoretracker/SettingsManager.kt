@@ -46,8 +46,8 @@ class SettingsManager(private val context: Context) {
         const val DEFAULT_INITIAL_SERVER_IS_USER = true
         const val DEFAULT_HAS_SEEN_HELP = false
         val DEFAULT_APP_THEME = AppTheme.SKY_BLUE
-        val DEFAULT_SPORT = Sport.TENNIS
-        val DEFAULT_MATCH_FORMAT = MatchFormat.STANDARD
+        val DEFAULT_SPORT = Sport.valueOf(BuildConfig.SPORT)
+        val DEFAULT_MATCH_FORMAT = MatchFormat.entries.first { it.sport == DEFAULT_SPORT }
         const val DEFAULT_TTS_ENABLED = true
         const val DEFAULT_ANNOUNCER_VOICE = ""
     }
