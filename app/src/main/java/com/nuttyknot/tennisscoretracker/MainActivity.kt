@@ -180,16 +180,18 @@ class MainActivity : ComponentActivity() {
             }
         }
         lifecycleScope.launch {
-            var isFirst = true
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsManager.announcerVoiceFlow.collectLatest { voiceName ->
-                    ttsManager.setVoice(voiceName)
-                    if (!isFirst) {
-                        val preview = scoreModel.matchState.value.announcement ?: VOICE_PREVIEW
-                        ttsManager.announce(preview)
+                var isFirst = true
+                settingsManager.announcerVoiceFlow
+                    .distinctUntilChanged()
+                    .collectLatest { voiceName ->
+                        ttsManager.setVoice(voiceName)
+                        if (!isFirst) {
+                            val preview = scoreModel.matchState.value.announcement ?: VOICE_PREVIEW
+                            ttsManager.announce(preview)
+                        }
+                        isFirst = false
                     }
-                    isFirst = false
-                }
             }
         }
     }
