@@ -4,30 +4,35 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Shuttlecock cork (top) -->
+    <!-- Background circle -->
     <path
         android:fillColor="#FF6B00"
-        android:pathData="M54,34a6,6 0,1 1,0 0.01z" />
+        android:pathData="M54,54m-26,0a26,26 0,1 1,52 0a26,26 0,1 1,-52 0" />
 
-    <!-- Shuttlecock skirt -->
+    <!-- Shuttlecock cork -->
     <path
-        android:fillColor="#FF6B00"
-        android:pathData="M48,40L42,72Q54,78 66,72L60,40z" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,37m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
 
-    <!-- Skirt detail lines -->
+    <!-- Shuttlecock skirt (trapezoid) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M49,41 L42,72 L66,72 L59,41Z" />
+
+    <!-- Feather separation lines -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
+        android:strokeColor="#FF6B00"
         android:strokeWidth="1.5"
-        android:pathData="M50,40L46,72" />
+        android:pathData="M50,42 L44,72" />
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
+        android:strokeColor="#FF6B00"
         android:strokeWidth="1.5"
-        android:pathData="M54,40L54,74" />
+        android:pathData="M54,42 L54,72" />
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
+        android:strokeColor="#FF6B00"
         android:strokeWidth="1.5"
-        android:pathData="M58,40L62,72" />
+        android:pathData="M58,42 L64,72" />
 </vector>

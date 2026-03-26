@@ -35,7 +35,9 @@ dependencies {
 }
 
 tasks.whenTaskAdded {
-    if (name == "assembleDebug") {
-        dependsOn("testDebugUnitTest")
+    val match = Regex("assemble(Tennis|Badminton|Pickleball)Debug").matchEntire(name)
+    if (match != null) {
+        val flavor = match.groupValues[1]
+        dependsOn("test${flavor}DebugUnitTest")
     }
 }
