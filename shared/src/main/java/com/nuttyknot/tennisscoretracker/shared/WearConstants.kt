@@ -10,6 +10,7 @@ object WearConstants {
     const val CMD_OPPONENT_SCORED = "opponent_scored"
     const val CMD_UNDO = "undo"
     const val CMD_RESET = "reset"
+    const val CMD_LAUNCH_APP = "launch_app"
 
     const val CAPABILITY_PHONE_APP = "tennis_score_tracker_phone"
 }

@@ -67,6 +67,9 @@ class WearRemoteViewModel(application: Application) :
                         CapabilityClient.FILTER_REACHABLE,
                     ).await()
                 updateConnectionFromCapability(info)
+                if (cachedNodeId != null) {
+                    sendCommand(WearConstants.CMD_LAUNCH_APP)
+                }
             } catch (e: ApiException) {
                 Log.e(TAG, "Error querying capability", e)
                 _isConnected.value = false
