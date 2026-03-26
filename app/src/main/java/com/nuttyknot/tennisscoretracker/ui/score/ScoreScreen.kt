@@ -36,8 +36,9 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nuttyknot.tennisscoretracker.MatchState
 import com.nuttyknot.tennisscoretracker.ScoreModel
-import com.nuttyknot.tennisscoretracker.TennisMatchState
+import com.nuttyknot.tennisscoretracker.Sport
 import com.nuttyknot.tennisscoretracker.shared.R
 
 @Suppress("FunctionName")
@@ -90,7 +91,7 @@ fun ScoreScreen(
 @Suppress("FunctionName")
 @Composable
 private fun ScoreScreenContent(
-    state: TennisMatchState,
+    state: MatchState,
     scoreModel: ScoreModel,
     paddingValues: androidx.compose.foundation.layout.PaddingValues,
     onNavigateToSummary: () -> Unit,
@@ -132,10 +133,15 @@ private fun ScoreScreenContent(
 }
 
 @Composable
-internal fun getStatusText(state: TennisMatchState): String? {
+internal fun getStatusText(state: MatchState): String? {
     return when {
         state.matchWinner != null -> stringResource(R.string.status_match_over)
-        state.setWinner != null -> stringResource(R.string.status_set_over)
+        state.setWinner != null ->
+            if (state.matchFormat.sport == Sport.TENNIS) {
+                stringResource(R.string.status_set_over)
+            } else {
+                stringResource(R.string.status_game_over)
+            }
         state.isMatchTiebreak -> stringResource(R.string.status_match_tiebreak)
         state.isDeuce -> stringResource(R.string.status_deuce)
         else -> null
@@ -145,7 +151,7 @@ internal fun getStatusText(state: TennisMatchState): String? {
 @Suppress("FunctionName", "LongMethod")
 @Composable
 internal fun LandscapeScoreContent(
-    state: TennisMatchState,
+    state: MatchState,
     maxHeight: Float,
     maxWidth: Float,
     onNavigateToSummary: () -> Unit,
@@ -219,7 +225,7 @@ internal fun LandscapeScoreContent(
 @Suppress("FunctionName", "LongMethod")
 @Composable
 internal fun PortraitScoreContent(
-    state: TennisMatchState,
+    state: MatchState,
     maxHeight: Float,
     maxWidth: Float,
     onNavigateToSummary: () -> Unit,

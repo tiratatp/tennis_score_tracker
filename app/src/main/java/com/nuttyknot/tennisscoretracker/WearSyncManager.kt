@@ -35,7 +35,7 @@ private fun AppTheme.secondaryArgb(): Int =
     }.toArgb()
 
 fun WearScoreDisplay.Companion.fromMatchState(
-    state: TennisMatchState,
+    state: MatchState,
     appTheme: AppTheme,
 ): WearScoreDisplay =
     WearScoreDisplay(
@@ -71,7 +71,7 @@ class WearSyncManager(
     }
 
     fun pushState(
-        state: TennisMatchState,
+        state: MatchState,
         appTheme: AppTheme,
     ) {
         val display = WearScoreDisplay.fromMatchState(state, appTheme)

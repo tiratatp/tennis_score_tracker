@@ -10,11 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.nuttyknot.tennisscoretracker.TennisMatchState
+import com.nuttyknot.tennisscoretracker.MatchState
 
 @Suppress("FunctionName")
 @Composable
-internal fun ScoreScreenPreview(state: TennisMatchState) {
+internal fun ScoreScreenPreview(state: MatchState) {
     Scaffold(
         topBar = {
             ScoreTopBar(

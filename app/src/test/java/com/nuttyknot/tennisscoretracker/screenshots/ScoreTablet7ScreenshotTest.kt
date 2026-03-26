@@ -6,8 +6,8 @@ import com.android.ide.common.rendering.api.SessionParams
 import com.android.resources.Density
 import com.android.resources.ScreenOrientation
 import com.nuttyknot.tennisscoretracker.AppTheme
+import com.nuttyknot.tennisscoretracker.MatchState
 import com.nuttyknot.tennisscoretracker.PlayerScore
-import com.nuttyknot.tennisscoretracker.TennisMatchState
 import com.nuttyknot.tennisscoretracker.ui.score.ScoreScreenPreview
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
 import org.junit.Rule
@@ -34,7 +34,7 @@ class ScoreTablet7ScreenshotTest {
     fun inmatch() {
         // 5th set, Federer serving at 40-30, games 5-3
         val state =
-            TennisMatchState(
+            MatchState(
                 userScore = PlayerScore.Forty,
                 opponentScore = PlayerScore.Thirty,
                 userGames = 5,

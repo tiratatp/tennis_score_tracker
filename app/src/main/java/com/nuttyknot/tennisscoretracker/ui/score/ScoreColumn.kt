@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import com.nuttyknot.tennisscoretracker.MatchFormat
+import com.nuttyknot.tennisscoretracker.Sport
 import com.nuttyknot.tennisscoretracker.shared.R
 
 @Suppress("FunctionName", "LongParameterList")
@@ -118,9 +119,12 @@ fun Scoreboard(
 ) {
     val fontSize = ScoreScreenConstants.SCOREBOARD_FONT_SIZE * scaleFactor
 
+    val showCurrentGames = matchFormat.sport == Sport.TENNIS
+
     val maxSetColumns =
-        when (matchFormat) {
-            MatchFormat.FAST -> 0
+        when {
+            matchFormat == MatchFormat.FAST -> 0
+            matchFormat.sport != Sport.TENNIS -> 0
             else -> 2
         }
 
@@ -140,6 +144,7 @@ fun Scoreboard(
             maxSetColumns = maxSetColumns,
             isMatchOver = isMatchOver,
             scaleFactor = scaleFactor,
+            showCurrentGames = showCurrentGames,
         )
 
         Spacer(modifier = Modifier.height(ScoreScreenConstants.SCOREBOARD_ROW_GAP * scaleFactor))
@@ -156,6 +161,7 @@ fun Scoreboard(
             maxSetColumns = maxSetColumns,
             isMatchOver = isMatchOver,
             scaleFactor = scaleFactor,
+            showCurrentGames = showCurrentGames,
         )
     }
 
@@ -181,6 +187,7 @@ private fun ScoreboardRow(
     maxSetColumns: Int = 0,
     isMatchOver: Boolean = false,
     scaleFactor: Float = 1f,
+    showCurrentGames: Boolean = true,
 ) {
     val columnGap = ScoreScreenConstants.SCOREBOARD_COLUMN_GAP * scaleFactor
     val dotSize = ScoreScreenConstants.SCOREBOARD_SERVING_DOT_SIZE * scaleFactor
@@ -236,7 +243,7 @@ private fun ScoreboardRow(
                 fontFamily = ScoreScreenConstants.JetBrainsMonoFamily,
             )
         }
-        if (!isMatchOver) {
+        if (!isMatchOver && showCurrentGames) {
             Spacer(modifier = Modifier.width(columnGap))
             Text(
                 text = "$currentGames",

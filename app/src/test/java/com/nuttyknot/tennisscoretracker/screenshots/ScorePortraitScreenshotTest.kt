@@ -4,8 +4,8 @@ import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
 import com.nuttyknot.tennisscoretracker.AppTheme
+import com.nuttyknot.tennisscoretracker.MatchState
 import com.nuttyknot.tennisscoretracker.PlayerScore
-import com.nuttyknot.tennisscoretracker.TennisMatchState
 import com.nuttyknot.tennisscoretracker.ui.score.ScoreScreenPreview
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
 import org.junit.Rule
@@ -26,7 +26,7 @@ class ScorePortraitScreenshotTest {
     fun matchOver() {
         // 2008 Wimbledon Men's Final result: Nadal d. Federer 6-4, 6-4, 6-7, 6-7, 9-7
         val state =
-            TennisMatchState(
+            MatchState(
                 userScore = PlayerScore.Love,
                 opponentScore = PlayerScore.Love,
                 userGames = 9,
@@ -49,7 +49,7 @@ class ScorePortraitScreenshotTest {
     @Test
     fun inMatch() {
         val state =
-            TennisMatchState(
+            MatchState(
                 userScore = PlayerScore.Forty,
                 opponentScore = PlayerScore.Fifteen,
                 userGames = 9,

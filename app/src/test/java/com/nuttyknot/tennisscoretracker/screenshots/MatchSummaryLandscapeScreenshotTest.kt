@@ -5,8 +5,8 @@ import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
 import com.android.resources.ScreenOrientation
 import com.nuttyknot.tennisscoretracker.AppTheme
+import com.nuttyknot.tennisscoretracker.MatchState
 import com.nuttyknot.tennisscoretracker.PlayerScore
-import com.nuttyknot.tennisscoretracker.TennisMatchState
 import com.nuttyknot.tennisscoretracker.ui.summary.MatchSummaryPreview
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
 import org.junit.Rule
@@ -27,7 +27,7 @@ class MatchSummaryLandscapeScreenshotTest {
     fun matchOver() {
         // 2001 Wimbledon Final result: Venus d. Henin 6-1, 3-6, 6-0
         val state =
-            TennisMatchState(
+            MatchState(
                 userScore = PlayerScore.Love,
                 opponentScore = PlayerScore.Love,
                 userGames = 6,

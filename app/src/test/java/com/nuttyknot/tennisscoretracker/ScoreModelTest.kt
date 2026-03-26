@@ -737,6 +737,82 @@ class ScoreModelTest {
     }
 
     @Test
+    fun `test badminton rally scoring produces announcement`() {
+        scoreModel.updateMatchParameters(matchFormat = MatchFormat.BWF_STANDARD)
+        scoreModel.reset()
+
+        scoreModel.incrementUserScore()
+        assertEquals("One Zero", state().announcement)
+
+        scoreModel.incrementOpponentScore()
+        assertEquals("One All", state().announcement)
+    }
+
+    @Test
+    fun `test badminton game and match win produces announcement`() {
+        scoreModel.updateMatchParameters(matchFormat = MatchFormat.BWF_STANDARD)
+        scoreModel.reset()
+
+        // User wins first game 21-0
+        repeat(21) { scoreModel.incrementUserScore() }
+        assertEquals("First Game, Player 1, Twenty-one Zero", state().announcement)
+
+        // After game win, game winner serves next game (BWF Law 11.4)
+        scoreModel.startNextSet()
+        assertEquals("Second Game, Player 1 to serve.", state().announcement)
+
+        // User wins second game 21-0 -> match win
+        repeat(21) { scoreModel.incrementUserScore() }
+        assertEquals("Match, Player 1. Twenty-one Zero, Twenty-one Zero", state().announcement)
+    }
+
+    @Test
+    fun `test pickleball rally scoring produces announcement`() {
+        scoreModel.updateMatchParameters(matchFormat = MatchFormat.PB_RALLY_11)
+        scoreModel.reset()
+
+        scoreModel.incrementUserScore()
+        assertEquals("One Zero", state().announcement)
+    }
+
+    @Test
+    fun `test pickleball sideout produces announcement`() {
+        scoreModel.updateMatchParameters(matchFormat = MatchFormat.PB_SIDEOUT)
+        scoreModel.reset()
+
+        // User is serving, opponent scores -> side-out
+        scoreModel.incrementOpponentScore()
+        assertNotNull(state().announcement)
+        assertTrue(state().announcement!!.startsWith("Side out."))
+    }
+
+    @Test
+    fun `test pickleball sideout server scoring produces announcement`() {
+        scoreModel.updateMatchParameters(matchFormat = MatchFormat.PB_SIDEOUT)
+        scoreModel.reset()
+
+        // User is serving, user scores -> point
+        scoreModel.incrementUserScore()
+        assertEquals("One Zero", state().announcement)
+    }
+
+    @Test
+    fun `test pickleball game and match win produces announcement`() {
+        scoreModel.updateMatchParameters(matchFormat = MatchFormat.PB_RALLY_11)
+        scoreModel.reset()
+
+        // User wins first game 11-0
+        repeat(11) { scoreModel.incrementUserScore() }
+        assertEquals("First Game, Player 1, Eleven Zero", state().announcement)
+
+        scoreModel.startNextSet()
+
+        // User wins second game 11-0 -> match win
+        repeat(11) { scoreModel.incrementUserScore() }
+        assertEquals("Match, Player 1. Eleven Zero, Eleven Zero", state().announcement)
+    }
+
+    @Test
     fun `test updateMatchParameters clears announcement`() {
         scoreModel.incrementUserScore()
         assertNotNull(state().announcement)

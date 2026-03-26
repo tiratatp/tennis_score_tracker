@@ -20,6 +20,7 @@ import com.nuttyknot.tennisscoretracker.AppTheme
 import com.nuttyknot.tennisscoretracker.MatchFormat
 import com.nuttyknot.tennisscoretracker.ScoreModel
 import com.nuttyknot.tennisscoretracker.SettingsManager
+import com.nuttyknot.tennisscoretracker.Sport
 import com.nuttyknot.tennisscoretracker.shared.R
 import com.nuttyknot.tennisscoretracker.ui.AppFooter
 import kotlinx.coroutines.flow.StateFlow
@@ -84,6 +85,7 @@ private fun collectSettingsState(
         initial = SettingsManager.DEFAULT_INITIAL_SERVER_IS_USER,
     )
     val appTheme by settingsManager.appThemeFlow.collectAsState(initial = SettingsManager.DEFAULT_APP_THEME)
+    val sport by settingsManager.sportFlow.collectAsState(initial = SettingsManager.DEFAULT_SPORT)
     val matchFormat by settingsManager.matchFormatFlow.collectAsState(initial = SettingsManager.DEFAULT_MATCH_FORMAT)
     val ttsEnabled by settingsManager.ttsEnabledFlow.collectAsState(initial = SettingsManager.DEFAULT_TTS_ENABLED)
     val announcerVoice by settingsManager.announcerVoiceFlow.collectAsState(
@@ -102,6 +104,7 @@ private fun collectSettingsState(
         currentDoubleClick = currentDoubleClick,
         currentLongPress = currentLongPress,
         appTheme = appTheme,
+        sport = sport,
         matchFormat = matchFormat,
         ttsEnabled = ttsEnabled,
         announcerVoice = announcerVoice,
@@ -119,6 +122,7 @@ private data class SettingsState(
     val currentDoubleClick: Long,
     val currentLongPress: Long,
     val appTheme: AppTheme,
+    val sport: Sport = Sport.TENNIS,
     val matchFormat: MatchFormat,
     val ttsEnabled: Boolean,
     val announcerVoice: String,
@@ -150,6 +154,8 @@ private fun buildSettingsData(
         AppSettingsData(
             currentKeycode = state.currentKeycode,
             currentTheme = state.appTheme,
+            currentSport = state.sport,
+            isSportLocked = state.isMatchInProgress,
             currentMatchFormat = state.matchFormat,
             isMatchFormatLocked = state.isMatchInProgress,
             ttsEnabled = state.ttsEnabled,
@@ -161,6 +167,9 @@ private fun buildSettingsData(
             },
             onThemeChange = { theme ->
                 coroutineScope.launch { settingsManager.updateAppTheme(theme) }
+            },
+            onSportChange = { sport ->
+                coroutineScope.launch { settingsManager.updateSport(sport) }
             },
             onMatchFormatChange = { format ->
                 coroutineScope.launch { settingsManager.updateMatchFormat(format) }

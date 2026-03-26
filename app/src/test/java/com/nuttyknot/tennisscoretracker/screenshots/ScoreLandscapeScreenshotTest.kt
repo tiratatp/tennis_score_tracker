@@ -5,8 +5,8 @@ import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
 import com.android.resources.ScreenOrientation
 import com.nuttyknot.tennisscoretracker.AppTheme
+import com.nuttyknot.tennisscoretracker.MatchState
 import com.nuttyknot.tennisscoretracker.PlayerScore
-import com.nuttyknot.tennisscoretracker.TennisMatchState
 import com.nuttyknot.tennisscoretracker.ui.score.ScoreScreenPreview
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
 import org.junit.Rule
@@ -27,7 +27,7 @@ class ScoreLandscapeScreenshotTest {
     fun matchOver() {
         // 2003 Wimbledon Final result: Serena d. Venus 4-6, 6-4, 6-2
         val state =
-            TennisMatchState(
+            MatchState(
                 userScore = PlayerScore.Love,
                 opponentScore = PlayerScore.Love,
                 userGames = 6,
@@ -50,7 +50,7 @@ class ScoreLandscapeScreenshotTest {
     @Test
     fun inMatch() {
         val state =
-            TennisMatchState(
+            MatchState(
                 userScore = PlayerScore.Forty,
                 opponentScore = PlayerScore.Love,
                 userGames = 6,

@@ -8,6 +8,7 @@
     <!-- Score screen status -->
     <string name="status_match_over">MATCH OVER</string>
     <string name="status_set_over">SET OVER</string>
+    <string name="status_game_over">GAME OVER</string>
     <string name="status_match_tiebreak">MATCH TIEBREAK</string>
     <string name="status_deuce">DEUCE</string>
 
@@ -86,6 +87,14 @@
     <string name="settings_you_start_serving">You start serving</string>
     <string name="validation_name_too_long">Name must be %1$d characters or less</string>
 
+    <!-- Sport settings -->
+    <string name="settings_sport">Sport</string>
+    <string name="settings_sport_help">Choose the sport. Changes apply on new match.</string>
+    <string name="settings_sport_locked">Reset the current match to change sport.</string>
+    <string name="sport_tennis">Tennis</string>
+    <string name="sport_badminton">Badminton</string>
+    <string name="sport_pickleball">Pickleball</string>
+
     <!-- App settings -->
     <string name="settings_score_announcements">Score Announcements</string>
     <string name="settings_color_scheme">Color Scheme</string>
@@ -117,6 +126,12 @@
     <string name="match_format_standard">Standard Match (Best of 3 Sets)</string>
     <string name="match_format_league">League Match (3rd Set Tiebreak)</string>
     <string name="match_format_fast">Fast Match (8-Game Pro Set, No-Ad)</string>
+    <string name="match_format_bwf_standard">BWF Standard (Best of 3 to 21)</string>
+    <string name="match_format_bwf_short">Short Format (Best of 5 to 11)</string>
+    <string name="match_format_pb_rally_11">Rally Scoring (to 11, Best of 3)</string>
+    <string name="match_format_pb_rally_15">Rally Scoring (to 15, Best of 3)</string>
+    <string name="match_format_pb_rally_21">Rally Scoring (to 21, Best of 3)</string>
+    <string name="match_format_pb_sideout">Side-Out Singles (to 11, Best of 3)</string>
 
     <!-- Theme display names -->
     <string name="theme_grand_slam">The Grand Slam (Yellow &amp; White)</string>

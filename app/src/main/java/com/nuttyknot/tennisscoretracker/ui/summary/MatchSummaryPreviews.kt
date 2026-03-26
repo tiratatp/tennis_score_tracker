@@ -12,13 +12,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import com.nuttyknot.tennisscoretracker.TennisMatchState
+import com.nuttyknot.tennisscoretracker.MatchState
 import com.nuttyknot.tennisscoretracker.shared.R
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MatchSummaryPreview(state: TennisMatchState) {
+internal fun MatchSummaryPreview(state: MatchState) {
     Scaffold(
         topBar = {
             TopAppBar(

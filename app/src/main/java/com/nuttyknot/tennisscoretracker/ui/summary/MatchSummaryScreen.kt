@@ -31,8 +31,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nuttyknot.tennisscoretracker.MatchState
 import com.nuttyknot.tennisscoretracker.ScoreModel
-import com.nuttyknot.tennisscoretracker.TennisMatchState
 import com.nuttyknot.tennisscoretracker.shared.R
 import com.nuttyknot.tennisscoretracker.ui.score.Scoreboard
 
@@ -74,7 +74,7 @@ fun MatchSummaryScreen(
 @Suppress("FunctionName")
 @Composable
 internal fun MatchSummaryContent(
-    state: TennisMatchState,
+    state: MatchState,
     onNewMatch: () -> Unit,
     paddingValues: PaddingValues,
 ) {

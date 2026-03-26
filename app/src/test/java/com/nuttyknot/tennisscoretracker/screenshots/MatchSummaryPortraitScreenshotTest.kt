@@ -4,8 +4,8 @@ import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams
 import com.nuttyknot.tennisscoretracker.AppTheme
+import com.nuttyknot.tennisscoretracker.MatchState
 import com.nuttyknot.tennisscoretracker.PlayerScore
-import com.nuttyknot.tennisscoretracker.TennisMatchState
 import com.nuttyknot.tennisscoretracker.ui.summary.MatchSummaryPreview
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
 import org.junit.Rule
@@ -26,7 +26,7 @@ class MatchSummaryPortraitScreenshotTest {
     fun matchOver() {
         // 2022 Australian Open Final result: Nadal d. Medvedev 2-6, 6-7, 6-4, 6-4, 7-5
         val state =
-            TennisMatchState(
+            MatchState(
                 userScore = PlayerScore.Love,
                 opponentScore = PlayerScore.Love,
                 userGames = 7,

@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 @Suppress("FunctionName")
 @Composable
-fun TennisAppNavigation(
+fun AppNavigation(
     navController: NavHostController = rememberNavController(),
     scoreModel: ScoreModel,
     settingsManager: SettingsManager,
@@ -57,18 +57,18 @@ fun TennisAppNavigation(
             navController.navigate(Routes.MATCH_SUMMARY_SCREEN) {
                 launchSingleTop = true
             }
-        } else if (matchState.matchWinner == null) {
+        } else if (matchState.matchWinner == null && hasNavigatedToSummary) {
             hasNavigatedToSummary = false
             navController.popBackStack(Routes.SCORE_SCREEN, inclusive = false)
         }
     }
 
-    TennisNavHost(navController, scoreModel, settingsManager, availableVoices, scope)
+    AppNavHost(navController, scoreModel, settingsManager, availableVoices, scope)
 }
 
 @Suppress("FunctionName")
 @Composable
-private fun TennisNavHost(
+private fun AppNavHost(
     navController: NavHostController,
     scoreModel: ScoreModel,
     settingsManager: SettingsManager,

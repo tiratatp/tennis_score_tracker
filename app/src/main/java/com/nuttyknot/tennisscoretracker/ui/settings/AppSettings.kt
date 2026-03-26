@@ -32,7 +32,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nuttyknot.tennisscoretracker.AppTheme
 import com.nuttyknot.tennisscoretracker.MatchFormat
+import com.nuttyknot.tennisscoretracker.Sport
 import com.nuttyknot.tennisscoretracker.shared.R
+
+@Composable
+fun sportDisplayName(sport: Sport): String =
+    when (sport) {
+        Sport.TENNIS -> stringResource(R.string.sport_tennis)
+        Sport.BADMINTON -> stringResource(R.string.sport_badminton)
+        Sport.PICKLEBALL -> stringResource(R.string.sport_pickleball)
+    }
 
 @Composable
 fun matchFormatDisplayName(format: MatchFormat): String =
@@ -40,6 +49,12 @@ fun matchFormatDisplayName(format: MatchFormat): String =
         MatchFormat.STANDARD -> stringResource(R.string.match_format_standard)
         MatchFormat.LEAGUE -> stringResource(R.string.match_format_league)
         MatchFormat.FAST -> stringResource(R.string.match_format_fast)
+        MatchFormat.BWF_STANDARD -> stringResource(R.string.match_format_bwf_standard)
+        MatchFormat.BWF_SHORT -> stringResource(R.string.match_format_bwf_short)
+        MatchFormat.PB_RALLY_11 -> stringResource(R.string.match_format_pb_rally_11)
+        MatchFormat.PB_RALLY_15 -> stringResource(R.string.match_format_pb_rally_15)
+        MatchFormat.PB_RALLY_21 -> stringResource(R.string.match_format_pb_rally_21)
+        MatchFormat.PB_SIDEOUT -> stringResource(R.string.match_format_pb_sideout)
     }
 
 @Composable
@@ -54,10 +69,17 @@ fun appThemeDisplayName(theme: AppTheme): String =
 @Suppress("FunctionName")
 @Composable
 fun AppSettings(data: AppSettingsData) {
+    SportDropdown(
+        currentSport = data.currentSport,
+        onSportChange = data.onSportChange,
+        enabled = !data.isSportLocked,
+    )
+
     MatchFormatDropdown(
         currentFormat = data.currentMatchFormat,
         onFormatChange = data.onMatchFormatChange,
         enabled = !data.isMatchFormatLocked,
+        sport = data.currentSport,
     )
 
     ThemeDropdown(
@@ -362,6 +384,8 @@ val KEYCODE_OPTIONS =
 data class AppSettingsData(
     val currentKeycode: Int,
     val currentTheme: AppTheme,
+    val currentSport: Sport = Sport.TENNIS,
+    val isSportLocked: Boolean = false,
     val currentMatchFormat: MatchFormat,
     val isMatchFormatLocked: Boolean = false,
     val ttsEnabled: Boolean = true,
@@ -370,12 +394,90 @@ data class AppSettingsData(
     val isDetectingKeycode: Boolean = false,
     val onKeycodeChange: (Int) -> Unit,
     val onThemeChange: (AppTheme) -> Unit,
+    val onSportChange: (Sport) -> Unit = {},
     val onMatchFormatChange: (MatchFormat) -> Unit,
     val onTtsEnabledChange: (Boolean) -> Unit = {},
     val onAnnouncerVoiceChange: (String) -> Unit = {},
     val onDetectKeycode: () -> Unit = {},
     val onCancelDetectKeycode: () -> Unit = {},
 )
+
+@Suppress("FunctionName", "LongMethod")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SportDropdown(
+    currentSport: Sport,
+    onSportChange: (Sport) -> Unit,
+    enabled: Boolean = true,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val helpText =
+        if (enabled) {
+            stringResource(R.string.settings_sport_help)
+        } else {
+            stringResource(R.string.settings_sport_locked)
+        }
+
+    Column {
+        Text(
+            text = stringResource(R.string.settings_sport),
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { if (enabled) expanded = !expanded },
+        ) {
+            OutlinedTextField(
+                value = sportDisplayName(currentSport),
+                onValueChange = {},
+                readOnly = true,
+                enabled = enabled,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        disabledTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                        disabledBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
+                    ),
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                Sport.entries.forEach { sport ->
+                    DropdownMenuItem(
+                        text = { Text(sportDisplayName(sport)) },
+                        onClick = {
+                            onSportChange(sport)
+                            expanded = false
+                        },
+                        colors =
+                            MenuDefaults.itemColors(
+                                textColor =
+                                    if (sport == currentSport) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
+                                    },
+                            ),
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = helpText,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -384,6 +486,7 @@ fun MatchFormatDropdown(
     currentFormat: MatchFormat,
     onFormatChange: (MatchFormat) -> Unit,
     enabled: Boolean = true,
+    sport: Sport = Sport.TENNIS,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val helpText =
@@ -400,7 +503,7 @@ fun MatchFormatDropdown(
             style = MaterialTheme.typography.titleMedium,
         )
         Spacer(modifier = Modifier.height(4.dp))
-        MatchFormatMenuBox(currentFormat, onFormatChange, enabled, expanded) { expanded = it }
+        MatchFormatMenuBox(currentFormat, onFormatChange, enabled, expanded, sport) { expanded = it }
         Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = helpText,
@@ -410,7 +513,7 @@ fun MatchFormatDropdown(
     }
 }
 
-@Suppress("FunctionName")
+@Suppress("FunctionName", "LongParameterList")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MatchFormatMenuBox(
@@ -418,6 +521,7 @@ private fun MatchFormatMenuBox(
     onFormatChange: (MatchFormat) -> Unit,
     enabled: Boolean,
     expanded: Boolean,
+    sport: Sport,
     onExpandedChange: (Boolean) -> Unit,
 ) {
     ExposedDropdownMenuBox(
@@ -445,7 +549,7 @@ private fun MatchFormatMenuBox(
             expanded = expanded,
             onDismissRequest = { onExpandedChange(false) },
         ) {
-            MatchFormat.entries.forEach { format ->
+            MatchFormat.entries.filter { it.sport == sport }.forEach { format ->
                 DropdownMenuItem(
                     text = { Text(matchFormatDisplayName(format)) },
                     onClick = {

@@ -32,9 +32,11 @@ class SettingsManager(private val context: Context) {
         val INITIAL_SERVER_IS_USER = androidx.datastore.preferences.core.booleanPreferencesKey("initial_server_is_user")
         val HAS_SEEN_HELP = androidx.datastore.preferences.core.booleanPreferencesKey("has_seen_help")
         val APP_THEME = androidx.datastore.preferences.core.stringPreferencesKey("app_theme")
+        val SPORT = stringPreferencesKey("sport")
         val MATCH_FORMAT = stringPreferencesKey("match_format")
         val TTS_ENABLED = booleanPreferencesKey("tts_enabled")
         val ANNOUNCER_VOICE = stringPreferencesKey("announcer_voice")
+        val MATCH_STATE_JSON = stringPreferencesKey("match_state_json")
 
         const val DEFAULT_KEYCODE = KeyEvent.KEYCODE_VOLUME_UP
         const val DEFAULT_DOUBLE_CLICK_LATENCY = 300L
@@ -44,6 +46,7 @@ class SettingsManager(private val context: Context) {
         const val DEFAULT_INITIAL_SERVER_IS_USER = true
         const val DEFAULT_HAS_SEEN_HELP = false
         val DEFAULT_APP_THEME = AppTheme.SKY_BLUE
+        val DEFAULT_SPORT = Sport.TENNIS
         val DEFAULT_MATCH_FORMAT = MatchFormat.STANDARD
         const val DEFAULT_TTS_ENABLED = true
         const val DEFAULT_ANNOUNCER_VOICE = ""
@@ -108,6 +111,12 @@ class SettingsManager(private val context: Context) {
             AppTheme.entries.find { it.name == themeName } ?: DEFAULT_APP_THEME
         }
 
+    val sportFlow: Flow<Sport> =
+        context.dataStore.data.map { preferences ->
+            val sportName = preferences[SPORT] ?: DEFAULT_SPORT.name
+            Sport.entries.find { it.name == sportName } ?: DEFAULT_SPORT
+        }
+
     val matchFormatFlow: Flow<MatchFormat> =
         context.dataStore.data.map { preferences ->
             val formatName = preferences[MATCH_FORMAT] ?: DEFAULT_MATCH_FORMAT.name
@@ -123,6 +132,23 @@ class SettingsManager(private val context: Context) {
         context.dataStore.data.map { preferences ->
             preferences[ANNOUNCER_VOICE] ?: DEFAULT_ANNOUNCER_VOICE
         }
+
+    val matchStateFlow: Flow<MatchState?> =
+        context.dataStore.data.map { preferences ->
+            preferences[MATCH_STATE_JSON]?.let { json ->
+                try {
+                    matchStateFromJsonString(json)
+                } catch (_: Exception) {
+                    null
+                }
+            }
+        }
+
+    suspend fun saveMatchState(state: MatchState) {
+        context.dataStore.edit { preferences ->
+            preferences[MATCH_STATE_JSON] = state.toJsonString()
+        }
+    }
 
     suspend fun updateKeycode(keycode: Int) {
         context.dataStore.edit { preferences ->
@@ -172,6 +198,15 @@ class SettingsManager(private val context: Context) {
         }
     }
 
+    suspend fun updateSport(sport: Sport) {
+        context.dataStore.edit { preferences ->
+            preferences[SPORT] = sport.name
+            // Reset format to sport's default when sport changes
+            val defaultFormat = MatchFormat.entries.first { it.sport == sport }
+            preferences[MATCH_FORMAT] = defaultFormat.name
+        }
+    }
+
     suspend fun updateMatchFormat(format: MatchFormat) {
         context.dataStore.edit { preferences ->
             preferences[MATCH_FORMAT] = format.name
@@ -189,12 +224,6 @@ class SettingsManager(private val context: Context) {
             preferences[ANNOUNCER_VOICE] = voice
         }
     }
-}
-
-enum class MatchFormat(val displayName: String) {
-    STANDARD("Standard Match (Best of 3 Sets)"),
-    LEAGUE("League Match (3rd Set Tiebreak)"),
-    FAST("Fast Match (8-Game Pro Set, No-Ad)"),
 }
 
 enum class AppTheme(val displayName: String, val aliasName: String) {

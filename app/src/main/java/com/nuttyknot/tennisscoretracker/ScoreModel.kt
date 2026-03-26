@@ -3,32 +3,46 @@ package com.nuttyknot.tennisscoretracker
 import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.nuttyknot.tennisscoretracker.announcements.generateAnnouncement
+import com.nuttyknot.tennisscoretracker.scoring.FormatConfig
+import com.nuttyknot.tennisscoretracker.scoring.RallyScoring
+import com.nuttyknot.tennisscoretracker.scoring.TennisScoring
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-class ScoreModel(private val savedStateHandle: SavedStateHandle = SavedStateHandle()) : ViewModel() {
+class ScoreModel(
+    private val savedStateHandle: SavedStateHandle = SavedStateHandle(),
+    private val settingsManager: SettingsManager? = null,
+) : ViewModel() {
     private val _matchState =
         MutableStateFlow(
-            savedStateHandle.get<Bundle>(SAVED_STATE_KEY)?.let {
-                tennisMatchStateFromBundle(it)
-            } ?: TennisMatchState(),
+            restoreState(),
         )
-    val matchState: StateFlow<TennisMatchState> = _matchState.asStateFlow()
+    val matchState: StateFlow<MatchState> = _matchState.asStateFlow()
 
-    private val historyStack = ArrayDeque<TennisMatchState>()
+    private val historyStack = ArrayDeque<MatchState>()
     private val processor = Processor()
 
-    private data class FormatConfig(
-        val gamesToWinSet: Int,
-        val gamesToWinSetLong: Int,
-        val setsToWinMatch: Int,
-        val useAdvantageScoring: Boolean,
-        val useMatchTiebreak: Boolean,
-        val matchTiebreakPoints: Int,
-        val regularTiebreakPoints: Int,
-    )
+    @Suppress("TooGenericExceptionCaught")
+    private fun restoreState(): MatchState {
+        settingsManager?.let { sm ->
+            try {
+                val persisted = runBlocking { sm.matchStateFlow.first() }
+                if (persisted != null) return persisted
+            } catch (_: Exception) {
+                // Fall through to SavedStateHandle
+            }
+        }
+        return savedStateHandle.get<Bundle>(SAVED_STATE_KEY)?.let {
+            matchStateFromBundle(it)
+        } ?: MatchState()
+    }
 
     private data class MatchConfig(
         val userName: String = "",
@@ -54,42 +68,10 @@ class ScoreModel(private val savedStateHandle: SavedStateHandle = SavedStateHand
 
     private fun saveState() {
         savedStateHandle[SAVED_STATE_KEY] = _matchState.value.toBundle()
+        settingsManager?.let { sm ->
+            viewModelScope.launch { sm.saveMatchState(_matchState.value) }
+        }
     }
-
-    private val formatConfig: FormatConfig
-        get() =
-            when (config.matchFormat) {
-                MatchFormat.STANDARD ->
-                    FormatConfig(
-                        gamesToWinSet = GAMES_TO_WIN_SET_STANDARD,
-                        gamesToWinSetLong = GAMES_TO_WIN_SET_STANDARD + 1,
-                        setsToWinMatch = SETS_TO_WIN_MATCH_STANDARD,
-                        useAdvantageScoring = true,
-                        useMatchTiebreak = false,
-                        matchTiebreakPoints = MATCH_TIEBREAK_POINTS,
-                        regularTiebreakPoints = REGULAR_TIEBREAK_POINTS,
-                    )
-                MatchFormat.LEAGUE ->
-                    FormatConfig(
-                        gamesToWinSet = GAMES_TO_WIN_SET_STANDARD,
-                        gamesToWinSetLong = GAMES_TO_WIN_SET_STANDARD + 1,
-                        setsToWinMatch = SETS_TO_WIN_MATCH_STANDARD,
-                        useAdvantageScoring = true,
-                        useMatchTiebreak = true,
-                        matchTiebreakPoints = MATCH_TIEBREAK_POINTS,
-                        regularTiebreakPoints = REGULAR_TIEBREAK_POINTS,
-                    )
-                MatchFormat.FAST ->
-                    FormatConfig(
-                        gamesToWinSet = GAMES_TO_WIN_SET_FAST,
-                        gamesToWinSetLong = GAMES_TO_WIN_SET_FAST + 1,
-                        setsToWinMatch = 1,
-                        useAdvantageScoring = false,
-                        useMatchTiebreak = false,
-                        matchTiebreakPoints = MATCH_TIEBREAK_POINTS,
-                        regularTiebreakPoints = REGULAR_TIEBREAK_POINTS,
-                    )
-            }
 
     fun updateMatchParameters(
         userName: String? = null,
@@ -108,15 +90,21 @@ class ScoreModel(private val savedStateHandle: SavedStateHandle = SavedStateHand
         _matchState.update { currentState ->
             val canUpdateServer = currentState.isScoreZero && initialServerIsUser != null
             val canUpdateFormat = currentState.isScoreZero && matchFormat != null
+            val newScore = if (canUpdateFormat) initialScoreForFormat(matchFormat!!) else null
             currentState.copy(
                 userName = userName ?: currentState.userName,
                 opponentName = opponentName ?: currentState.opponentName,
                 isUserServing = if (canUpdateServer) initialServerIsUser!! else currentState.isUserServing,
+                userScore = newScore ?: currentState.userScore,
+                opponentScore = newScore ?: currentState.opponentScore,
                 matchFormat = if (canUpdateFormat) matchFormat!! else currentState.matchFormat,
                 announcement = null,
             )
         }
     }
+
+    private fun initialScoreForFormat(format: MatchFormat): PlayerScore =
+        if (format.sport != Sport.TENNIS) PlayerScore.TiebreakScore(0) else PlayerScore.Love
 
     fun incrementUserScore() = scorePoint(userScored = true)
 
@@ -139,8 +127,17 @@ class ScoreModel(private val savedStateHandle: SavedStateHandle = SavedStateHand
 
     fun reset() {
         historyStack.clear()
+        val fc = FormatConfig.forFormat(config.matchFormat)
+        val initialScore =
+            if (fc.isRallyScoring || fc.isSideOutScoring) {
+                PlayerScore.TiebreakScore(0)
+            } else {
+                PlayerScore.Love
+            }
         _matchState.value =
-            TennisMatchState(
+            MatchState(
+                userScore = initialScore,
+                opponentScore = initialScore,
                 userName = config.userName,
                 opponentName = config.opponentName,
                 isUserServing = config.initialServerIsUser,
@@ -163,9 +160,9 @@ class ScoreModel(private val savedStateHandle: SavedStateHandle = SavedStateHand
 
     private inner class Processor {
         fun calculateNextState(
-            currentState: TennisMatchState,
+            currentState: MatchState,
             userScored: Boolean,
-        ): TennisMatchState {
+        ): MatchState {
             if (currentState.setWinner != null) return prepareNextSet(currentState)
 
             val baseState =
@@ -181,37 +178,33 @@ class ScoreModel(private val savedStateHandle: SavedStateHandle = SavedStateHand
         }
 
         private fun calculateScore(
-            baseState: TennisMatchState,
+            baseState: MatchState,
             userScored: Boolean,
-        ): TennisMatchState {
-            val fc = formatConfig
-
-            if (baseState.isMatchTiebreak) {
-                return handleTiebreakScoring(baseState, userScored, fc.matchTiebreakPoints)
-            }
-
-            val scoringPlayerScore = if (userScored) baseState.userScore else baseState.opponentScore
-            val otherPlayerScore = if (userScored) baseState.opponentScore else baseState.userScore
+        ): MatchState {
+            val fc = FormatConfig.forFormat(config.matchFormat)
 
             return when {
-                baseState.userGames == fc.gamesToWinSet &&
-                    baseState.opponentGames == fc.gamesToWinSet ->
-                    handleTiebreakScoring(baseState, userScored, fc.regularTiebreakPoints)
-                baseState.isDeuce && !fc.useAdvantageScoring -> winGame(baseState, userScored)
-                baseState.isDeuce -> ScoringLogic.handleDeuceScoring(baseState, userScored)
-                scoringPlayerScore is PlayerScore.Advantage -> winGame(baseState, userScored)
-                otherPlayerScore is PlayerScore.Advantage -> ScoringLogic.handleBackToDeuce(baseState)
-                scoringPlayerScore == PlayerScore.Forty -> winGame(baseState, userScored)
-                else -> ScoringLogic.handleRegularScoring(baseState, userScored, scoringPlayerScore)
+                fc.isRallyScoring ->
+                    RallyScoring.calculateRallyScore(baseState, userScored, fc, config.matchFormat.sport)
+                fc.isSideOutScoring ->
+                    RallyScoring.calculateSideOutScore(baseState, userScored, fc)
+                baseState.isMatchTiebreak ->
+                    TennisScoring.handleTiebreakScoring(baseState, userScored, fc.matchTiebreakPoints, fc)
+                else -> TennisScoring.calculateScore(baseState, userScored, fc)
             }
         }
 
-        fun prepareNextSet(currentState: TennisMatchState): TennisMatchState {
-            val fc = formatConfig
+        fun prepareNextSet(currentState: MatchState): MatchState {
+            val fc = FormatConfig.forFormat(config.matchFormat)
             val isMatchTiebreak =
                 fc.useMatchTiebreak &&
                     currentState.userSets == 1 && currentState.opponentSets == 1
-            val initialScore = if (isMatchTiebreak) PlayerScore.TiebreakScore(0) else PlayerScore.Love
+            val initialScore =
+                if (fc.isRallyScoring || fc.isSideOutScoring || isMatchTiebreak) {
+                    PlayerScore.TiebreakScore(0)
+                } else {
+                    PlayerScore.Love
+                }
 
             return currentState.copy(
                 userScore = initialScore,
@@ -224,254 +217,9 @@ class ScoreModel(private val savedStateHandle: SavedStateHandle = SavedStateHand
                 isMatchTiebreak = isMatchTiebreak,
             ).let { it.copy(announcement = generateAnnouncement(it)) }
         }
-
-        private fun handleTiebreakScoring(
-            state: TennisMatchState,
-            userScored: Boolean,
-            winThreshold: Int,
-        ): TennisMatchState {
-            val userCurrent = (state.userScore as? PlayerScore.TiebreakScore)?.points ?: 0
-            val oppCurrent = (state.opponentScore as? PlayerScore.TiebreakScore)?.points ?: 0
-
-            val newUserPoints = if (userScored) userCurrent + 1 else userCurrent
-            val newOppPoints = if (userScored) oppCurrent else oppCurrent + 1
-
-            val isTiebreakWon =
-                (
-                    newUserPoints >= winThreshold ||
-                        newOppPoints >= winThreshold
-                ) &&
-                    kotlin.math.abs(newUserPoints - newOppPoints) >= GAME_DIFFERENCE_FOR_SET
-
-            val totalOldPoints = userCurrent + oppCurrent
-
-            return if (isTiebreakWon) {
-                val winnerName =
-                    if (newUserPoints > newOppPoints) {
-                        state.userName.ifEmpty { "You" }
-                    } else {
-                        state.opponentName.ifEmpty { "Opponent" }
-                    }
-
-                handleTiebreakWin(
-                    state,
-                    newUserPoints,
-                    newOppPoints,
-                    totalOldPoints,
-                    winnerName,
-                )
-            } else {
-                handleTiebreakContinue(
-                    state,
-                    newUserPoints,
-                    newOppPoints,
-                    totalOldPoints,
-                )
-            }
-        }
-
-        private fun winGame(
-            currentState: TennisMatchState,
-            userScored: Boolean,
-        ): TennisMatchState {
-            val fc = formatConfig
-            val userGamesForCheck = if (userScored) currentState.userGames + 1 else currentState.userGames
-            val opponentGamesForCheck = if (userScored) currentState.opponentGames else currentState.opponentGames + 1
-            val winnerName =
-                if (userScored) {
-                    currentState.userName.ifEmpty { "You" }
-                } else {
-                    currentState.opponentName.ifEmpty { "Opponent" }
-                }
-
-            return if (isSetWon(userGamesForCheck, opponentGamesForCheck)) {
-                handleSetWin(
-                    currentState,
-                    userGamesForCheck,
-                    opponentGamesForCheck,
-                    userScored,
-                    winnerName,
-                )
-            } else {
-                val isNextTiebreak =
-                    userGamesForCheck == fc.gamesToWinSet &&
-                        opponentGamesForCheck == fc.gamesToWinSet
-                val initialScore = if (isNextTiebreak) PlayerScore.TiebreakScore(0) else PlayerScore.Love
-
-                val gameWonState =
-                    currentState.copy(
-                        userScore = initialScore,
-                        opponentScore = initialScore,
-                        userGames = userGamesForCheck,
-                        opponentGames = opponentGamesForCheck,
-                        isUserServing = !currentState.isUserServing,
-                        gameWinner = winnerName,
-                    )
-                gameWonState.copy(announcement = generateAnnouncement(gameWonState))
-            }
-        }
-
-        private fun isSetWon(
-            userGames: Int,
-            opponentGames: Int,
-        ): Boolean {
-            val fc = formatConfig
-            val higher = maxOf(userGames, opponentGames)
-            val diff = kotlin.math.abs(userGames - opponentGames)
-            return (higher >= fc.gamesToWinSet && diff >= GAME_DIFFERENCE_FOR_SET) ||
-                higher == fc.gamesToWinSetLong
-        }
-
-        private fun handleSetWin(
-            currentState: TennisMatchState,
-            userGames: Int,
-            opponentGames: Int,
-            isUserWinner: Boolean,
-            winnerName: String,
-        ): TennisMatchState {
-            val fc = formatConfig
-            val newSetHistory = currentState.setHistory + (userGames to opponentGames)
-            val newUserSets = if (isUserWinner) currentState.userSets + 1 else currentState.userSets
-            val newOpponentSets = if (isUserWinner) currentState.opponentSets else currentState.opponentSets + 1
-
-            val isMatchWon =
-                newUserSets >= fc.setsToWinMatch ||
-                    newOpponentSets >= fc.setsToWinMatch
-
-            val nextState =
-                currentState.copy(
-                    userScore = PlayerScore.Love,
-                    opponentScore = PlayerScore.Love,
-                    userGames = userGames,
-                    opponentGames = opponentGames,
-                    userSets = newUserSets,
-                    opponentSets = newOpponentSets,
-                    setHistory = newSetHistory,
-                    matchWinner = if (isMatchWon) winnerName else null,
-                    setWinner = if (!isMatchWon) winnerName else null,
-                    isNewSet = !isMatchWon,
-                    isUserServing = !currentState.isUserServing,
-                )
-            return nextState.copy(announcement = generateAnnouncement(nextState))
-        }
-
-        /**
-         * Recovers the initial tiebreak server from the current server and point count.
-         * The tiebreak server pattern repeats every 4 points: same, flipped, flipped, same.
-         */
-        private fun initialTiebreakServer(
-            currentServer: Boolean,
-            currentPointIndex: Int,
-        ): Boolean =
-            when (currentPointIndex % TIEBREAK_SERVER_CYCLE) {
-                0, TIEBREAK_CYCLE_SAME_END -> currentServer
-                else -> !currentServer
-            }
-
-        private fun handleTiebreakWin(
-            state: TennisMatchState,
-            newUserPoints: Int,
-            newOppPoints: Int,
-            totalOldPoints: Int,
-            winnerName: String,
-        ): TennisMatchState {
-            val isUserWinner = newUserPoints > newOppPoints
-            val tiebreakFirstServer = initialTiebreakServer(state.isUserServing, totalOldPoints)
-
-            val userGamesFinal: Int
-            val oppGamesFinal: Int
-            if (state.isMatchTiebreak) {
-                userGamesFinal = if (isUserWinner) 1 else 0
-                oppGamesFinal = if (isUserWinner) 0 else 1
-            } else {
-                val fc = formatConfig
-                userGamesFinal = if (isUserWinner) fc.gamesToWinSetLong else fc.gamesToWinSet
-                oppGamesFinal = if (isUserWinner) fc.gamesToWinSet else fc.gamesToWinSetLong
-            }
-
-            return handleSetWin(
-                state.copy(isUserServing = tiebreakFirstServer),
-                userGamesFinal,
-                oppGamesFinal,
-                isUserWinner,
-                winnerName,
-            )
-        }
-
-        private fun handleTiebreakContinue(
-            state: TennisMatchState,
-            newUserPoints: Int,
-            newOppPoints: Int,
-            totalOldPoints: Int,
-        ): TennisMatchState {
-            // Server switches when totalOldPoints is even (after 1st point, then every 2 points)
-            val nextState =
-                state.copy(
-                    userScore = PlayerScore.TiebreakScore(newUserPoints),
-                    opponentScore = PlayerScore.TiebreakScore(newOppPoints),
-                    isUserServing =
-                        if (totalOldPoints % 2 == 0) !state.isUserServing else state.isUserServing,
-                )
-            return nextState.copy(announcement = generateAnnouncement(nextState))
-        }
-    }
-
-    private object ScoringLogic {
-        fun handleDeuceScoring(
-            state: TennisMatchState,
-            userScored: Boolean,
-        ): TennisMatchState {
-            val nextState =
-                if (userScored) {
-                    state.copy(userScore = PlayerScore.Advantage)
-                } else {
-                    state.copy(opponentScore = PlayerScore.Advantage)
-                }
-            return nextState.copy(announcement = generateAnnouncement(nextState))
-        }
-
-        fun handleBackToDeuce(state: TennisMatchState): TennisMatchState {
-            val nextState =
-                state.copy(
-                    userScore = PlayerScore.Forty,
-                    opponentScore = PlayerScore.Forty,
-                )
-            return nextState.copy(announcement = generateAnnouncement(nextState))
-        }
-
-        fun handleRegularScoring(
-            state: TennisMatchState,
-            userScored: Boolean,
-            scoringPlayerScore: PlayerScore,
-        ): TennisMatchState {
-            val nextScore =
-                when (scoringPlayerScore) {
-                    PlayerScore.Love -> PlayerScore.Fifteen
-                    PlayerScore.Fifteen -> PlayerScore.Thirty
-                    PlayerScore.Thirty -> PlayerScore.Forty
-                    else -> scoringPlayerScore
-                }
-
-            val newState =
-                if (userScored) {
-                    state.copy(userScore = nextScore)
-                } else {
-                    state.copy(opponentScore = nextScore)
-                }
-
-            return newState.copy(announcement = generateAnnouncement(newState))
-        }
     }
 
     companion object {
         private const val SAVED_STATE_KEY = "tennis_match_state"
-        private const val GAMES_TO_WIN_SET_STANDARD = 6
-        private const val GAMES_TO_WIN_SET_FAST = 8
-        private const val GAME_DIFFERENCE_FOR_SET = 2
-        private const val SETS_TO_WIN_MATCH_STANDARD = 2
-        private const val REGULAR_TIEBREAK_POINTS = 7
-        private const val MATCH_TIEBREAK_POINTS = 10
-        private const val TIEBREAK_SERVER_CYCLE = 4
-        private const val TIEBREAK_CYCLE_SAME_END = 3
     }
 }

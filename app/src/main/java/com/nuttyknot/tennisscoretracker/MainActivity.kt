@@ -17,13 +17,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.nuttyknot.tennisscoretracker.shared.WearConstants
+import com.nuttyknot.tennisscoretracker.ui.AppNavigation
 import com.nuttyknot.tennisscoretracker.ui.Routes
 import com.nuttyknot.tennisscoretracker.ui.SystemBarsEffect
-import com.nuttyknot.tennisscoretracker.ui.TennisAppNavigation
 import com.nuttyknot.tennisscoretracker.ui.theme.TennisScoreTrackerTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -32,8 +35,19 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private val scoreModel: ScoreModel by viewModels()
-    private lateinit var settingsManager: SettingsManager
+    private val settingsManager by lazy { SettingsManager(this) }
+    private val scoreModel: ScoreModel by viewModels {
+        object : AbstractSavedStateViewModelFactory(this, null) {
+            override fun <T : ViewModel> create(
+                key: String,
+                modelClass: Class<T>,
+                handle: SavedStateHandle,
+            ): T {
+                @Suppress("UNCHECKED_CAST")
+                return ScoreModel(handle, settingsManager) as T
+            }
+        }
+    }
     private lateinit var ttsManager: TtsManager
     private lateinit var keyEventManager: KeyEventManager
     private lateinit var wearSyncManager: WearSyncManager
@@ -89,7 +103,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    TennisAppNavigation(
+                    AppNavigation(
                         scoreModel = scoreModel,
                         settingsManager = settingsManager,
                         availableVoices = ttsManager.availableVoices,
@@ -103,7 +117,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun initializeManagers() {
-        settingsManager = SettingsManager(this)
         ttsManager = TtsManager(this)
 
         keyEventManager =
