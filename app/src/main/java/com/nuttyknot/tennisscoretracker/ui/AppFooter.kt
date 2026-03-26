@@ -49,5 +49,26 @@ fun AppFooter(modifier: Modifier = Modifier) {
                     context.startActivity(intent)
                 },
         )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.footer_share_app),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodySmall,
+            modifier =
+                Modifier.clickable {
+                    val shareIntent =
+                        Intent.createChooser(
+                            Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    context.getString(R.string.footer_share_message),
+                                )
+                            },
+                            null,
+                        )
+                    context.startActivity(shareIntent)
+                },
+        )
     }
 }

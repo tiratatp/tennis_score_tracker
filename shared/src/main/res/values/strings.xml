@@ -166,6 +166,8 @@
     <!-- Footer -->
     <string name="footer_made_by">made with ♥ by NuttyKnot</string>
     <string name="footer_report_bug">Report a Bug</string>
+    <string name="footer_share_app">Share App</string>
+    <string name="footer_share_message">TennisDroid: Smart tennis scoreboard — Bluetooth remote, voice announcements &amp; watch sync.\n\nhttps://play.google.com/store/apps/details?id=com.nuttyknot.tennisscoretracker</string>
 
     <!-- Match summary -->
     <string name="match_summary_title">Match Summary</string>
