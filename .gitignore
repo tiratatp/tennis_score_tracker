@@ -53,3 +53,8 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Generated Play Store screenshots (produced in CI)
+app/src/*/play/listings/en-US/graphics/phone-screenshots/
+app/src/*/play/listings/en-US/graphics/tablet-screenshots/
+app/src/*/play/listings/en-US/graphics/large-tablet-screenshots/

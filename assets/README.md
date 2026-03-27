@@ -73,6 +73,21 @@ python3 generate_feature_graphic.py tennis       # single flavor
 The script reads screenshots from `screenshots/{flavor}/` and outputs to
 `app/src/{flavor}/play/listings/en-US/graphics/feature-graphic/`.
 
+### Play Store Screenshots (Automated)
+
+Gradle tasks generate Paparazzi screenshots and copy them into the
+`gradle-play-publisher` directory structure for upload:
+
+```bash
+./gradlew :app:preparePlayStoreScreenshotsTennis    # Generate + copy screenshots
+./gradlew :app:publishTennisReleaseBundle            # Publish AAB + metadata + screenshots
+```
+
+In CI, on tag push the workflow runs `preparePlayStoreScreenshots{Flavor}`,
+`update{Flavor}Screenshots`, `generate_feature_graphic.py`, and
+`publishReleaseBundle` sequentially per flavor (flavors share the same
+Paparazzi snapshot output directory, so they cannot run in parallel).
+
 ### Wear Icons
 
 ```bash

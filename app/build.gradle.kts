@@ -135,6 +135,20 @@ android {
 play {
     track.set("internal")
     defaultToAppBundles.set(true)
+    val saJson = System.getenv("PLAY_STORE_SERVICE_ACCOUNT_JSON")
+    if (!saJson.isNullOrBlank()) {
+        val saFile = layout.buildDirectory.file("service-account.json")
+        serviceAccountCredentials.set(
+            saFile.map { f ->
+                f.also {
+                    it.asFile.apply {
+                        parentFile.mkdirs()
+                        writeText(saJson)
+                    }
+                }
+            },
+        )
+    }
 }
 
 dependencies {
@@ -184,8 +198,11 @@ tasks.whenTaskAdded {
 }
 
 android.productFlavors.forEach { flavor ->
-    tasks.register<Copy>("update${flavor.name.replaceFirstChar { it.uppercase() }}Screenshots") {
-        dependsOn("recordPaparazzi${flavor.name.replaceFirstChar { it.uppercase() }}Debug")
+    val flavorCap = flavor.name.replaceFirstChar { it.uppercase() }
+    val playGraphicsDir = "src/${flavor.name}/play/listings/en-US/graphics"
+
+    tasks.register<Copy>("update${flavorCap}Screenshots") {
+        dependsOn("recordPaparazzi${flavorCap}Debug")
         from("src/test/snapshots/images") {
             include("*ScoreLandscape*_matchover.png")
             include("*ScorePortrait*_inmatch.png")
@@ -207,5 +224,58 @@ android.productFlavors.forEach { flavor ->
             rename(".*HelpTablet10.*_help\\.png", "help-tablet-10.png")
         }
         into("${rootProject.projectDir}/screenshots/${flavor.name}")
+    }
+
+    // Phone screenshots for Play Store listing
+    tasks.register<Sync>("preparePlayStorePhoneScreenshots$flavorCap") {
+        dependsOn("recordPaparazzi${flavorCap}Debug")
+        from("src/test/snapshots/images") {
+            include("*ScorePortrait*_inmatch.png")
+            include("*ScoreLandscape*_matchover.png")
+            include("*MatchSummaryPortrait*_matchover.png")
+            include("*SettingsPortrait*_defaultsettings.png")
+            include("*HelpScreenshotTest*_help.png")
+            rename(".*ScorePortrait.*\\.png", "1_score-portrait.png")
+            rename(".*ScoreLandscape.*\\.png", "2_score-landscape.png")
+            rename(".*MatchSummaryPortrait.*\\.png", "3_match-summary.png")
+            rename(".*SettingsPortrait.*\\.png", "4_settings.png")
+            rename(".*HelpScreenshotTest.*\\.png", "5_help.png")
+        }
+        into("$playGraphicsDir/phone-screenshots")
+    }
+
+    // 7" tablet screenshots for Play Store listing
+    tasks.register<Sync>("preparePlayStoreTablet7Screenshots$flavorCap") {
+        dependsOn("recordPaparazzi${flavorCap}Debug")
+        from("src/test/snapshots/images") {
+            include("*Tablet7*_inmatch.png")
+            rename(".*Tablet7.*\\.png", "1_score-tablet-7.png")
+        }
+        into("$playGraphicsDir/tablet-screenshots")
+    }
+
+    // 10" tablet screenshots for Play Store listing
+    tasks.register<Sync>("preparePlayStoreTablet10Screenshots$flavorCap") {
+        dependsOn("recordPaparazzi${flavorCap}Debug")
+        from("src/test/snapshots/images") {
+            include("*Tablet10*_inmatch.png")
+            include("*SettingsTablet10*_defaultsettings.png")
+            include("*HelpTablet10*_help.png")
+            rename(".*Tablet10.*_inmatch\\.png", "1_score-tablet-10.png")
+            rename(".*SettingsTablet10.*\\.png", "2_settings-tablet-10.png")
+            rename(".*HelpTablet10.*\\.png", "3_help-tablet-10.png")
+        }
+        into("$playGraphicsDir/large-tablet-screenshots")
+    }
+
+    // Aggregate task for all Play Store screenshots
+    tasks.register("preparePlayStoreScreenshots$flavorCap") {
+        dependsOn(
+            "preparePlayStorePhoneScreenshots$flavorCap",
+            "preparePlayStoreTablet7Screenshots$flavorCap",
+            "preparePlayStoreTablet10Screenshots$flavorCap",
+        )
+        group = "publishing"
+        description = "Generates and copies all Play Store screenshots for ${flavor.name}"
     }
 }

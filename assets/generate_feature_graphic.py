@@ -252,10 +252,12 @@ def get_fonts():
     roboto_bold_paths = [
         "/Library/Fonts/Roboto-Bold.ttf",
         "/usr/share/fonts/truetype/roboto/Roboto-Bold.ttf",
+        "/usr/share/fonts/truetype/roboto/hinted/Roboto-Bold.ttf",
     ]
     roboto_regular_paths = [
         "/Library/Fonts/Roboto-Regular.ttf",
         "/usr/share/fonts/truetype/roboto/Roboto-Regular.ttf",
+        "/usr/share/fonts/truetype/roboto/hinted/Roboto-Regular.ttf",
     ]
     helvetica = "/System/Library/Fonts/Helvetica.ttc"
 

@@ -12,6 +12,8 @@
 ./gradlew :app:testDebugUnitTest          # Run tests for all flavors
 ./gradlew ktlintCheck detekt              # Run linters (ktlint + detekt)
 ./gradlew assembleDebug                   # Build all flavors (phone + wear)
+./gradlew :app:preparePlayStoreScreenshotsTennis    # Generate + copy screenshots for Play Store
+./gradlew :app:publishTennisReleaseBundle            # Publish AAB + metadata + screenshots
 ```
 
 Install tasks depend on `test{Flavor}DebugUnitTest`, `ktlintCheck`, `lint{Flavor}Debug`, and `detekt` — all checks run automatically before install.
