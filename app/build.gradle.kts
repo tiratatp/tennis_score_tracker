@@ -197,12 +197,18 @@ tasks.whenTaskAdded {
     }
 }
 
+val allFlavorTestTasks =
+    android.productFlavors.map { f ->
+        "test${f.name.replaceFirstChar { it.uppercase() }}DebugUnitTest"
+    }
+
 android.productFlavors.forEach { flavor ->
     val flavorCap = flavor.name.replaceFirstChar { it.uppercase() }
     val playGraphicsDir = "src/${flavor.name}/play/listings/en-US/graphics"
 
     tasks.register<Copy>("update${flavorCap}Screenshots") {
         dependsOn("recordPaparazzi${flavorCap}Debug")
+        mustRunAfter(allFlavorTestTasks)
         from("src/test/snapshots/images") {
             include("*ScoreLandscape*_matchover.png")
             include("*ScorePortrait*_inmatch.png")
@@ -229,6 +235,7 @@ android.productFlavors.forEach { flavor ->
     // Phone screenshots for Play Store listing
     tasks.register<Sync>("preparePlayStorePhoneScreenshots$flavorCap") {
         dependsOn("recordPaparazzi${flavorCap}Debug")
+        mustRunAfter(allFlavorTestTasks)
         from("src/test/snapshots/images") {
             include("*ScorePortrait*_inmatch.png")
             include("*ScoreLandscape*_matchover.png")
@@ -247,6 +254,7 @@ android.productFlavors.forEach { flavor ->
     // 7" tablet screenshots for Play Store listing
     tasks.register<Sync>("preparePlayStoreTablet7Screenshots$flavorCap") {
         dependsOn("recordPaparazzi${flavorCap}Debug")
+        mustRunAfter(allFlavorTestTasks)
         from("src/test/snapshots/images") {
             include("*Tablet7*_inmatch.png")
             rename(".*Tablet7.*\\.png", "1_score-tablet-7.png")
@@ -257,6 +265,7 @@ android.productFlavors.forEach { flavor ->
     // 10" tablet screenshots for Play Store listing
     tasks.register<Sync>("preparePlayStoreTablet10Screenshots$flavorCap") {
         dependsOn("recordPaparazzi${flavorCap}Debug")
+        mustRunAfter(allFlavorTestTasks)
         from("src/test/snapshots/images") {
             include("*Tablet10*_inmatch.png")
             include("*SettingsTablet10*_defaultsettings.png")
