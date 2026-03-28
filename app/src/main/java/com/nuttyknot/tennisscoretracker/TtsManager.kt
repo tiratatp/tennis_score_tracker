@@ -63,6 +63,8 @@ class TtsManager(
                                     abandonFocus()
                                 }
 
+                                @Deprecated("Deprecated in Java")
+                                @Suppress("OVERRIDE_DEPRECATION")
                                 override fun onError(utteranceId: String?) {
                                     abandonFocus()
                                 }

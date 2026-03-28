@@ -334,9 +334,9 @@ fun ExposedDropdownMenuBoxScope.KeycodeMenu(
 }
 
 data class KeycodeOption(
-    @StringRes val nameRes: Int,
+    @param:StringRes val nameRes: Int,
     val code: Int,
-    @StringRes val categoryRes: Int,
+    @param:StringRes val categoryRes: Int,
 )
 
 val KEYCODE_OPTIONS =

@@ -17,12 +17,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.nuttyknot.tennisscoretracker.shared.WearConstants
 import com.nuttyknot.tennisscoretracker.ui.AppNavigation
 import com.nuttyknot.tennisscoretracker.ui.Routes
@@ -37,14 +37,9 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     private val settingsManager by lazy { SettingsManager(this) }
     private val scoreModel: ScoreModel by viewModels {
-        object : AbstractSavedStateViewModelFactory(this, null) {
-            override fun <T : ViewModel> create(
-                key: String,
-                modelClass: Class<T>,
-                handle: SavedStateHandle,
-            ): T {
-                @Suppress("UNCHECKED_CAST")
-                return ScoreModel(handle, settingsManager) as T
+        viewModelFactory {
+            initializer {
+                ScoreModel(createSavedStateHandle(), settingsManager)
             }
         }
     }
