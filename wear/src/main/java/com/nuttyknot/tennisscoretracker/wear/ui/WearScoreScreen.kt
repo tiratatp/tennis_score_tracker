@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.material3.AppScaffold
@@ -65,6 +67,8 @@ fun WearScoreScreen(
     scoreDisplay: WearScoreDisplay,
     isConnected: Boolean,
     isAmbient: Boolean = false,
+    burnInProtectionRequired: Boolean = false,
+    ambientOffset: IntOffset = IntOffset.Zero,
     showHelp: Boolean = false,
     timeSource: TimeSource = TimeTextDefaults.rememberTimeSource(TimeTextDefaults.timeFormat()),
     onDismissHelp: () -> Unit = {},
@@ -80,6 +84,8 @@ fun WearScoreScreen(
                 scoreDisplay = scoreDisplay,
                 isConnected = isConnected,
                 isAmbient = isAmbient,
+                burnInProtectionRequired = burnInProtectionRequired,
+                ambientOffset = ambientOffset,
                 showHelp = showHelp,
                 onShowHelp = onShowHelp,
                 onDismissHelp = onDismissHelp,
@@ -125,6 +131,8 @@ private fun WearScoreContent(
     scoreDisplay: WearScoreDisplay,
     isConnected: Boolean,
     isAmbient: Boolean,
+    burnInProtectionRequired: Boolean,
+    ambientOffset: IntOffset,
     showHelp: Boolean,
     onShowHelp: () -> Unit,
     onDismissHelp: () -> Unit,
@@ -140,7 +148,11 @@ private fun WearScoreContent(
                 .background(Color.Black),
     ) {
         if (isAmbient) {
-            AmbientScoreContent(scoreDisplay)
+            AmbientScoreContent(
+                scoreDisplay = scoreDisplay,
+                burnInProtectionRequired = burnInProtectionRequired,
+                ambientOffset = ambientOffset,
+            )
         } else {
             ScoreContent(scoreDisplay, isConnected, onNewMatch)
 
@@ -185,10 +197,20 @@ private fun WearScoreContent(
 
 @Suppress("FunctionName")
 @Composable
-private fun AmbientScoreContent(scoreDisplay: WearScoreDisplay) {
+private fun AmbientScoreContent(
+    scoreDisplay: WearScoreDisplay,
+    burnInProtectionRequired: Boolean,
+    ambientOffset: IntOffset,
+) {
+    val offsetModifier =
+        if (burnInProtectionRequired) {
+            Modifier.offset { ambientOffset }
+        } else {
+            Modifier
+        }
     Column(
         modifier =
-            Modifier
+            offsetModifier
                 .fillMaxSize()
                 .padding(SCREEN_PADDING),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -196,8 +218,8 @@ private fun AmbientScoreContent(scoreDisplay: WearScoreDisplay) {
         // Top spacer — same weight as interactive top section
         Spacer(modifier = Modifier.weight(TOP_SECTION_WEIGHT))
 
-        // Invisible player names — maintains same vertical position as interactive
-        PlayerNames(scoreDisplay, Color.Transparent, Color.Transparent, showServing = false)
+        // Player names with serving dot in white
+        PlayerNames(scoreDisplay, Color.White, Color.Gray)
 
         // Bottom section — same weight as interactive, pushed to top
         Column(
