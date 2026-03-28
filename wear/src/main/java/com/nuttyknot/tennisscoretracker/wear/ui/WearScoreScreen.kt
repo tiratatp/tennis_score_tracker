@@ -206,7 +206,7 @@ private fun AmbientScoreContent(scoreDisplay: WearScoreDisplay) {
             verticalArrangement = Arrangement.Top,
         ) {
             Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-            PointScore(scoreDisplay, Color.White, Color.White)
+            PointScore(scoreDisplay, Color.White, Color.Gray)
             Spacer(modifier = Modifier.height(SPACER_HEIGHT))
             WearScoreboardTable(scoreDisplay, Color.White, Color.Gray)
         }
