@@ -22,16 +22,28 @@ import kotlinx.coroutines.flow.map
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 @Suppress("TooManyFunctions")
-class SettingsManager(private val context: Context) {
+class SettingsManager(
+    private val context: Context,
+) {
     companion object {
         val KEYCODE = intPreferencesKey("keycode")
         val DOUBLE_CLICK_LATENCY = longPreferencesKey("double_click_latency")
         val LONG_PRESS_LATENCY = longPreferencesKey("long_press_latency")
-        val USER_NAME = androidx.datastore.preferences.core.stringPreferencesKey("user_name")
-        val OPPONENT_NAME = androidx.datastore.preferences.core.stringPreferencesKey("opponent_name")
-        val INITIAL_SERVER_IS_USER = androidx.datastore.preferences.core.booleanPreferencesKey("initial_server_is_user")
-        val HAS_SEEN_HELP = androidx.datastore.preferences.core.booleanPreferencesKey("has_seen_help")
-        val APP_THEME = androidx.datastore.preferences.core.stringPreferencesKey("app_theme")
+        val USER_NAME =
+            androidx.datastore.preferences.core
+                .stringPreferencesKey("user_name")
+        val OPPONENT_NAME =
+            androidx.datastore.preferences.core
+                .stringPreferencesKey("opponent_name")
+        val INITIAL_SERVER_IS_USER =
+            androidx.datastore.preferences.core
+                .booleanPreferencesKey("initial_server_is_user")
+        val HAS_SEEN_HELP =
+            androidx.datastore.preferences.core
+                .booleanPreferencesKey("has_seen_help")
+        val APP_THEME =
+            androidx.datastore.preferences.core
+                .stringPreferencesKey("app_theme")
         val SPORT = stringPreferencesKey("sport")
         val MATCH_FORMAT = stringPreferencesKey("match_format")
         val TTS_ENABLED = booleanPreferencesKey("tts_enabled")
@@ -226,7 +238,10 @@ class SettingsManager(private val context: Context) {
     }
 }
 
-enum class AppTheme(val displayName: String, val aliasName: String) {
+enum class AppTheme(
+    val displayName: String,
+    val aliasName: String,
+) {
     GRAND_SLAM("The Grand Slam (Yellow & White)", ".MainActivityGrandSlam"),
     MIAMI_NIGHT("Miami Night (Cyan & Magenta)", ".MainActivityMiamiNight"),
     COLORBLIND_SAFE("Colorblind Safe (Orange & Blue)", ".MainActivityColorblindSafe"),

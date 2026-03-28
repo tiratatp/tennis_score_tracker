@@ -46,7 +46,10 @@ internal fun numberToWords(n: Int): String =
         else -> n.toString()
     }
 
-sealed class PlayerScore(val display: String, val tts: String = display) {
+sealed class PlayerScore(
+    val display: String,
+    val tts: String = display,
+) {
     object Love : PlayerScore("0", "Love")
 
     object Fifteen : PlayerScore("15")
@@ -57,8 +60,9 @@ sealed class PlayerScore(val display: String, val tts: String = display) {
 
     object Advantage : PlayerScore("AD", "Advantage")
 
-    data class TiebreakScore(val points: Int) :
-        PlayerScore(points.toString(), numberToWords(points))
+    data class TiebreakScore(
+        val points: Int,
+    ) : PlayerScore(points.toString(), numberToWords(points))
 
     override fun toString(): String = display
 }
@@ -167,32 +171,33 @@ fun matchStateFromBundle(bundle: Bundle): MatchState {
 }
 
 fun MatchState.toJsonString(): String =
-    JSONObject().apply {
-        put("userScore", ScoreSerialization.serialize(userScore))
-        put("opponentScore", ScoreSerialization.serialize(opponentScore))
-        put("userGames", userGames)
-        put("opponentGames", opponentGames)
-        put("userSets", userSets)
-        put("opponentSets", opponentSets)
-        put("isUserServing", isUserServing)
-        put("userName", userName)
-        put("opponentName", opponentName)
-        put("matchFormat", matchFormat.name)
-        put("isMatchTiebreak", isMatchTiebreak)
-        put(
-            "setHistory",
-            JSONArray().apply {
-                setHistory.forEach { (user, opp) ->
-                    put(
-                        JSONArray().apply {
-                            put(user)
-                            put(opp)
-                        },
-                    )
-                }
-            },
-        )
-    }.toString()
+    JSONObject()
+        .apply {
+            put("userScore", ScoreSerialization.serialize(userScore))
+            put("opponentScore", ScoreSerialization.serialize(opponentScore))
+            put("userGames", userGames)
+            put("opponentGames", opponentGames)
+            put("userSets", userSets)
+            put("opponentSets", opponentSets)
+            put("isUserServing", isUserServing)
+            put("userName", userName)
+            put("opponentName", opponentName)
+            put("matchFormat", matchFormat.name)
+            put("isMatchTiebreak", isMatchTiebreak)
+            put(
+                "setHistory",
+                JSONArray().apply {
+                    setHistory.forEach { (user, opp) ->
+                        put(
+                            JSONArray().apply {
+                                put(user)
+                                put(opp)
+                            },
+                        )
+                    }
+                },
+            )
+        }.toString()
 
 fun matchStateFromJsonString(json: String): MatchState {
     val obj = JSONObject(json)

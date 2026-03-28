@@ -316,12 +316,10 @@ private fun ScoreFooter(
                     .background(
                         color = Color(COLOR_TENNIS_GREEN),
                         shape = RoundedCornerShape(PILL_CORNER_PERCENT),
-                    )
-                    .clickable {
+                    ).clickable {
                         view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                         onNewMatch()
-                    }
-                    .padding(horizontal = BUTTON_HORIZONTAL_PADDING, vertical = BUTTON_VERTICAL_PADDING),
+                    }.padding(horizontal = BUTTON_HORIZONTAL_PADDING, vertical = BUTTON_VERTICAL_PADDING),
         )
     } else if (!isConnected) {
         Spacer(modifier = Modifier.height(SPACER_HEIGHT))
@@ -476,8 +474,7 @@ private fun TapZones(
                     .weight(1f)
                     .semantics {
                         contentDescription = userDescription
-                    }
-                    .combinedClickable(
+                    }.combinedClickable(
                         onClick = {
                             view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                             onUserScored()
@@ -497,8 +494,7 @@ private fun TapZones(
                     .weight(1f)
                     .semantics {
                         contentDescription = opponentDescription
-                    }
-                    .combinedClickable(
+                    }.combinedClickable(
                         onClick = {
                             view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                             onOpponentScored()

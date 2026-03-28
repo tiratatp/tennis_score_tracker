@@ -5,7 +5,8 @@ import com.nuttyknot.tennisscoretracker.PlayerScore
 
 internal fun generateTennisAnnouncement(state: MatchState): String {
     val isNewSetLoveAll =
-        state.isNewSet && state.userScore == PlayerScore.Love &&
+        state.isNewSet &&
+            state.userScore == PlayerScore.Love &&
             state.opponentScore == PlayerScore.Love
     return when {
         state.matchWinner != null -> generateMatchWinningAnnouncement(state)

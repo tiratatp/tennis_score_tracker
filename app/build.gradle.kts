@@ -8,17 +8,23 @@ plugins {
 
 fun gitTagCount(): Int {
     val result =
-        providers.exec {
-            commandLine("git", "tag", "--list", "v*")
-        }.standardOutput.asText.get().trim()
+        providers
+            .exec {
+                commandLine("git", "tag", "--list", "v*")
+            }.standardOutput.asText
+            .get()
+            .trim()
     return if (result.isEmpty()) 1 else result.lines().size
 }
 
 fun gitVersionName(): String {
     val result =
-        providers.exec {
-            commandLine("git", "describe", "--tags", "--always")
-        }.standardOutput.asText.get().trim()
+        providers
+            .exec {
+                commandLine("git", "describe", "--tags", "--always")
+            }.standardOutput.asText
+            .get()
+            .trim()
     return result.removePrefix("v").ifEmpty { "0.1" }
 }
 

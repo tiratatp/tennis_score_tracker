@@ -23,8 +23,9 @@ import kotlinx.coroutines.tasks.await
 import org.json.JSONException
 
 @Suppress("TooManyFunctions")
-class WearRemoteViewModel(application: Application) :
-    AndroidViewModel(application),
+class WearRemoteViewModel(
+    application: Application,
+) : AndroidViewModel(application),
     DataClient.OnDataChangedListener,
     CapabilityClient.OnCapabilityChangedListener {
     private val messageClient: MessageClient = Wearable.getMessageClient(application)
@@ -68,10 +69,11 @@ class WearRemoteViewModel(application: Application) :
         viewModelScope.launch {
             try {
                 val info =
-                    capabilityClient.getCapability(
-                        BuildConfig.CAPABILITY_PHONE_APP,
-                        CapabilityClient.FILTER_REACHABLE,
-                    ).await()
+                    capabilityClient
+                        .getCapability(
+                            BuildConfig.CAPABILITY_PHONE_APP,
+                            CapabilityClient.FILTER_REACHABLE,
+                        ).await()
                 updateConnectionFromCapability(info)
             } catch (e: ApiException) {
                 Log.e(TAG, "Error querying capability", e)
@@ -163,7 +165,9 @@ class WearRemoteViewModel(application: Application) :
         val dataItem = event.dataItem
         if (dataItem.uri.path != WearConstants.PATH_SCORE) return
         val json =
-            DataMapItem.fromDataItem(dataItem).dataMap
+            DataMapItem
+                .fromDataItem(dataItem)
+                .dataMap
                 .getString(WearConstants.KEY_SCORE_JSON) ?: return
         try {
             _scoreDisplay.value = WearScoreDisplay.fromJson(json)
@@ -177,11 +181,12 @@ class WearRemoteViewModel(application: Application) :
         viewModelScope.launch {
             try {
                 val nodeId = cachedNodeId ?: return@launch
-                messageClient.sendMessage(
-                    nodeId,
-                    WearConstants.PATH_COMMAND,
-                    command.toByteArray(),
-                ).await()
+                messageClient
+                    .sendMessage(
+                        nodeId,
+                        WearConstants.PATH_COMMAND,
+                        command.toByteArray(),
+                    ).await()
             } catch (e: ApiException) {
                 Log.e(TAG, "Error sending command: $command", e)
                 _isConnected.value = false

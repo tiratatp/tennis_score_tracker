@@ -109,8 +109,7 @@ private fun ScoreScreenContent(
                 .padding(
                     horizontal = 16.dp,
                     vertical = if (isLandscape) 0.dp else 16.dp,
-                )
-                .semantics { liveRegion = LiveRegionMode.Polite },
+                ).semantics { liveRegion = LiveRegionMode.Polite },
     ) {
         if (isLandscape) {
             LandscapeScoreContent(state, maxHeight.value, maxWidth.value, onNavigateToSummary)
@@ -133,8 +132,8 @@ private fun ScoreScreenContent(
 }
 
 @Composable
-internal fun getStatusText(state: MatchState): String? {
-    return when {
+internal fun getStatusText(state: MatchState): String? =
+    when {
         state.matchWinner != null -> stringResource(R.string.status_match_over)
         state.setWinner != null ->
             if (state.matchFormat.sport == Sport.TENNIS) {
@@ -146,7 +145,6 @@ internal fun getStatusText(state: MatchState): String? {
         state.isDeuce -> stringResource(R.string.status_deuce)
         else -> null
     }
-}
 
 @Suppress("FunctionName", "LongMethod")
 @Composable
@@ -321,8 +319,7 @@ private fun TapZones(
                 modifier
                     .semantics {
                         contentDescription = description
-                    }
-                    .combinedClickable(
+                    }.combinedClickable(
                         onClick = {
                             view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                             onClick()

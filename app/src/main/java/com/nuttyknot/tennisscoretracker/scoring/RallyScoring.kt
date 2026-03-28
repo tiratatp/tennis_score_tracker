@@ -61,11 +61,12 @@ object RallyScoring {
         }
 
         val newServing = updateServing(baseState, userScored)
-        return baseState.copy(
-            userScore = PlayerScore.TiebreakScore(newUserPts),
-            opponentScore = PlayerScore.TiebreakScore(newOppPts),
-            isUserServing = newServing,
-        ).let { it.copy(announcement = generateAnnouncement(it)) }
+        return baseState
+            .copy(
+                userScore = PlayerScore.TiebreakScore(newUserPts),
+                opponentScore = PlayerScore.TiebreakScore(newOppPts),
+                isUserServing = newServing,
+            ).let { it.copy(announcement = generateAnnouncement(it)) }
     }
 
     private fun isRallyGameWon(

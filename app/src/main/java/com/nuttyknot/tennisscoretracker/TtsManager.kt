@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.Locale
 
-class TtsManager(context: Context) {
+class TtsManager(
+    context: Context,
+) {
     private var tts: TextToSpeech? = null
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private lateinit var audioAttributes: AudioAttributes
@@ -46,7 +48,8 @@ class TtsManager(context: Context) {
                         tts?.setPitch(UMPIRE_PITCH)
 
                         audioAttributes =
-                            AudioAttributes.Builder()
+                            AudioAttributes
+                                .Builder()
                                 .setUsage(AudioAttributes.USAGE_MEDIA)
                                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                                 .build()
@@ -104,7 +107,8 @@ class TtsManager(context: Context) {
         if (!isInitialized) return
 
         val request =
-            AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+            AudioFocusRequest
+                .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
                 .setAudioAttributes(audioAttributes)
                 .setOnAudioFocusChangeListener(focusListener)
                 .build()

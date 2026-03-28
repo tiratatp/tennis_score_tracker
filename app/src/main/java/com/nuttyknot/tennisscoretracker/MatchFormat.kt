@@ -1,6 +1,9 @@
 package com.nuttyknot.tennisscoretracker
 
-enum class MatchFormat(val displayName: String, val sport: Sport) {
+enum class MatchFormat(
+    val displayName: String,
+    val sport: Sport,
+) {
     // Tennis
     STANDARD("Standard Match (Best of 3 Sets)", Sport.TENNIS),
     LEAGUE("League Match (3rd Set Tiebreak)", Sport.TENNIS),

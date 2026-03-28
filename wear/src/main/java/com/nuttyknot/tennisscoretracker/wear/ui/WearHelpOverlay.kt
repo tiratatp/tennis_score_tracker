@@ -105,8 +105,7 @@ private fun HelpTapZones(
                     .background(
                         color = userColor.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(8.dp),
-                    )
-                    .padding(horizontal = 4.dp),
+                    ).padding(horizontal = 4.dp),
         ) {
             Text(
                 text = stringResource(R.string.help_tap_left),
@@ -134,8 +133,7 @@ private fun HelpTapZones(
                     .background(
                         color = opponentColor.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(8.dp),
-                    )
-                    .padding(horizontal = 4.dp),
+                    ).padding(horizontal = 4.dp),
         ) {
             Text(
                 text = stringResource(R.string.help_tap_right),

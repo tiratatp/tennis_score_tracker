@@ -69,57 +69,75 @@ data class FormatConfig(
                     )
                 MatchFormat.BWF_STANDARD ->
                     FormatConfig(
-                        gamesToWinSet = 0, gamesToWinSetLong = 0,
+                        gamesToWinSet = 0,
+                        gamesToWinSetLong = 0,
                         setsToWinMatch = SETS_TO_WIN_MATCH_STANDARD,
-                        useAdvantageScoring = false, useMatchTiebreak = false,
-                        matchTiebreakPoints = 0, regularTiebreakPoints = 0,
+                        useAdvantageScoring = false,
+                        useMatchTiebreak = false,
+                        matchTiebreakPoints = 0,
+                        regularTiebreakPoints = 0,
                         isRallyScoring = true,
                         pointsToWinGame = BWF_STANDARD_POINTS,
                         pointsCap = BWF_STANDARD_CAP,
                     )
                 MatchFormat.BWF_SHORT ->
                     FormatConfig(
-                        gamesToWinSet = 0, gamesToWinSetLong = 0,
+                        gamesToWinSet = 0,
+                        gamesToWinSetLong = 0,
                         setsToWinMatch = BWF_SHORT_GAMES_TO_WIN,
-                        useAdvantageScoring = false, useMatchTiebreak = false,
-                        matchTiebreakPoints = 0, regularTiebreakPoints = 0,
+                        useAdvantageScoring = false,
+                        useMatchTiebreak = false,
+                        matchTiebreakPoints = 0,
+                        regularTiebreakPoints = 0,
                         isRallyScoring = true,
                         pointsToWinGame = BWF_SHORT_POINTS,
                         pointsCap = BWF_SHORT_CAP,
                     )
                 MatchFormat.PB_RALLY_11 ->
                     FormatConfig(
-                        gamesToWinSet = 0, gamesToWinSetLong = 0,
+                        gamesToWinSet = 0,
+                        gamesToWinSetLong = 0,
                         setsToWinMatch = SETS_TO_WIN_MATCH_STANDARD,
-                        useAdvantageScoring = false, useMatchTiebreak = false,
-                        matchTiebreakPoints = 0, regularTiebreakPoints = 0,
+                        useAdvantageScoring = false,
+                        useMatchTiebreak = false,
+                        matchTiebreakPoints = 0,
+                        regularTiebreakPoints = 0,
                         isRallyScoring = true,
                         pointsToWinGame = PB_POINTS_11,
                     )
                 MatchFormat.PB_RALLY_15 ->
                     FormatConfig(
-                        gamesToWinSet = 0, gamesToWinSetLong = 0,
+                        gamesToWinSet = 0,
+                        gamesToWinSetLong = 0,
                         setsToWinMatch = SETS_TO_WIN_MATCH_STANDARD,
-                        useAdvantageScoring = false, useMatchTiebreak = false,
-                        matchTiebreakPoints = 0, regularTiebreakPoints = 0,
+                        useAdvantageScoring = false,
+                        useMatchTiebreak = false,
+                        matchTiebreakPoints = 0,
+                        regularTiebreakPoints = 0,
                         isRallyScoring = true,
                         pointsToWinGame = PB_POINTS_15,
                     )
                 MatchFormat.PB_RALLY_21 ->
                     FormatConfig(
-                        gamesToWinSet = 0, gamesToWinSetLong = 0,
+                        gamesToWinSet = 0,
+                        gamesToWinSetLong = 0,
                         setsToWinMatch = SETS_TO_WIN_MATCH_STANDARD,
-                        useAdvantageScoring = false, useMatchTiebreak = false,
-                        matchTiebreakPoints = 0, regularTiebreakPoints = 0,
+                        useAdvantageScoring = false,
+                        useMatchTiebreak = false,
+                        matchTiebreakPoints = 0,
+                        regularTiebreakPoints = 0,
                         isRallyScoring = true,
                         pointsToWinGame = PB_POINTS_21,
                     )
                 MatchFormat.PB_SIDEOUT ->
                     FormatConfig(
-                        gamesToWinSet = 0, gamesToWinSetLong = 0,
+                        gamesToWinSet = 0,
+                        gamesToWinSetLong = 0,
                         setsToWinMatch = SETS_TO_WIN_MATCH_STANDARD,
-                        useAdvantageScoring = false, useMatchTiebreak = false,
-                        matchTiebreakPoints = 0, regularTiebreakPoints = 0,
+                        useAdvantageScoring = false,
+                        useMatchTiebreak = false,
+                        matchTiebreakPoints = 0,
+                        regularTiebreakPoints = 0,
                         isSideOutScoring = true,
                         pointsToWinGame = PB_POINTS_11,
                     )

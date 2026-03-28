@@ -198,7 +198,8 @@ class ScoreModel(
             val fc = FormatConfig.forFormat(config.matchFormat)
             val isMatchTiebreak =
                 fc.useMatchTiebreak &&
-                    currentState.userSets == 1 && currentState.opponentSets == 1
+                    currentState.userSets == 1 &&
+                    currentState.opponentSets == 1
             val initialScore =
                 if (fc.isRallyScoring || fc.isSideOutScoring || isMatchTiebreak) {
                     PlayerScore.TiebreakScore(0)
@@ -206,16 +207,17 @@ class ScoreModel(
                     PlayerScore.Love
                 }
 
-            return currentState.copy(
-                userScore = initialScore,
-                opponentScore = initialScore,
-                userGames = 0,
-                opponentGames = 0,
-                setWinner = null,
-                gameWinner = null,
-                isNewSet = true,
-                isMatchTiebreak = isMatchTiebreak,
-            ).let { it.copy(announcement = generateAnnouncement(it)) }
+            return currentState
+                .copy(
+                    userScore = initialScore,
+                    opponentScore = initialScore,
+                    userGames = 0,
+                    opponentGames = 0,
+                    setWinner = null,
+                    gameWinner = null,
+                    isNewSet = true,
+                    isMatchTiebreak = isMatchTiebreak,
+                ).let { it.copy(announcement = generateAnnouncement(it)) }
         }
     }
 
