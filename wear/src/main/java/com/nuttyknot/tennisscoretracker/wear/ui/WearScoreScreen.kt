@@ -193,41 +193,22 @@ private fun AmbientScoreContent(scoreDisplay: WearScoreDisplay) {
                 .padding(SCREEN_PADDING),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Score content — centered in remaining space
+        // Top spacer — same weight as interactive top section
+        Spacer(modifier = Modifier.weight(TOP_SECTION_WEIGHT))
+
+        // Invisible player names — maintains same vertical position as interactive
+        PlayerNames(scoreDisplay, Color.Transparent, Color.Transparent, showServing = false)
+
+        // Bottom section — same weight as interactive, pushed to top
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(BOTTOM_SECTION_WEIGHT),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Top,
         ) {
-            Text(
-                text = "${scoreDisplay.userScore} - ${scoreDisplay.opponentScore}",
-                fontSize = SCORE_FONT_SIZE,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-            )
             Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(INNER_PADDING * 2),
-            ) {
-                scoreDisplay.setHistory.forEach { (user, opp) ->
-                    Text(
-                        text = "$user-$opp",
-                        fontSize = DETAIL_FONT_SIZE,
-                        fontFamily = FontFamily.Monospace,
-                        color = Color.Gray,
-                    )
-                }
-                if (!scoreDisplay.isMatchOver) {
-                    Text(
-                        text = "${scoreDisplay.userGames}-${scoreDisplay.opponentGames}",
-                        fontSize = DETAIL_FONT_SIZE,
-                        fontFamily = FontFamily.Monospace,
-                        color = Color.Gray,
-                    )
-                }
-            }
+            PointScore(scoreDisplay, Color.White, Color.White)
+            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+            WearScoreboardTable(scoreDisplay, Color.White, Color.Gray)
         }
     }
 }
