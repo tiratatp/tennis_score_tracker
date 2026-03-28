@@ -153,7 +153,7 @@ tasks.whenTaskAdded {
 }
 
 tasks.register<Copy>("updateReadmeScreenshots") {
-    dependsOn("recordPaparazziDebug")
+    dependsOn("recordPaparazziTennisDebug")
     from("src/test/snapshots/images") {
         include("*_watch.png")
         rename(".*_watch\\.png", "watch.png")
