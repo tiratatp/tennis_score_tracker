@@ -11,6 +11,11 @@
 # Kotlin metadata for R8 full mode nullability handling
 -keepattributes RuntimeVisibleAnnotations
 
+# Keep ambient mode classes — the library's consumer rule uses allowoptimization
+# which lets R8 strip the internal WearableControllerProvider reflection that
+# enables ambient mode, causing the activity to be destroyed on screen timeout.
+-keep class androidx.wear.ambient.** { *; }
+
 # Suppress warnings for optional security providers (referenced but not bundled)
 -dontwarn org.bouncycastle.**
 -dontwarn org.conscrypt.**

@@ -73,11 +73,14 @@ class WearRemoteViewModel(application: Application) :
                         CapabilityClient.FILTER_REACHABLE,
                     ).await()
                 updateConnectionFromCapability(info)
-                if (cachedNodeId != null) {
-                    sendCommand(WearConstants.CMD_LAUNCH_APP)
-                }
             } catch (e: ApiException) {
                 Log.e(TAG, "Error querying capability", e)
+                _isConnected.value = false
+            } catch (
+                @Suppress("TooGenericExceptionCaught")
+                e: Exception,
+            ) {
+                Log.e(TAG, "Unexpected error querying capability", e)
                 _isConnected.value = false
             }
         }
@@ -138,6 +141,11 @@ class WearRemoteViewModel(application: Application) :
                 Log.e(TAG, "Error loading current data", e)
             } catch (e: JSONException) {
                 Log.e(TAG, "Error parsing score JSON", e)
+            } catch (
+                @Suppress("TooGenericExceptionCaught")
+                e: Exception,
+            ) {
+                Log.e(TAG, "Unexpected error loading data", e)
             }
         }
     }
@@ -176,6 +184,12 @@ class WearRemoteViewModel(application: Application) :
                 ).await()
             } catch (e: ApiException) {
                 Log.e(TAG, "Error sending command: $command", e)
+                _isConnected.value = false
+            } catch (
+                @Suppress("TooGenericExceptionCaught")
+                e: Exception,
+            ) {
+                Log.e(TAG, "Unexpected error sending command: $command", e)
                 _isConnected.value = false
             }
         }

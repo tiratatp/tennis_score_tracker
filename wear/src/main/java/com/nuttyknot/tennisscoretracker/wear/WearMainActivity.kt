@@ -48,11 +48,13 @@ class WearMainActivity : ComponentActivity() {
             }
         }
 
+    private val ambientObserver = AmbientLifecycleObserver(this, ambientCallback)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        lifecycle.addObserver(AmbientLifecycleObserver(this, ambientCallback))
+        lifecycle.addObserver(ambientObserver)
         viewModel.startListening()
 
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -82,6 +84,11 @@ class WearMainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(ambientObserver)
     }
 
     companion object {

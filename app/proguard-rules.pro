@@ -11,8 +11,6 @@
     public static ** valueOf(java.lang.String);
 }
 
-# WearableListenerService instantiated by Wear OS via manifest class name
--keep class com.nuttyknot.tennisscoretracker.PhoneWearListenerService { *; }
 
 # Coroutine dispatcher ServiceLoader pattern
 -keep class kotlinx.coroutines.android.AndroidDispatcherFactory { *; }
