@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import org.json.JSONException
 
 @Suppress("TooManyFunctions")
 class WearRemoteViewModel(application: Application) :
@@ -37,6 +38,7 @@ class WearRemoteViewModel(application: Application) :
     val isConnected: StateFlow<Boolean> = _isConnected.asStateFlow()
 
     private var isListening = false
+    private var isCapabilityListening = false
     private var cachedNodeId: String? = null
 
     fun startListening() {
@@ -55,6 +57,10 @@ class WearRemoteViewModel(application: Application) :
     }
 
     private fun startCapabilityListener() {
+        if (isCapabilityListening) {
+            return
+        }
+        isCapabilityListening = true
         capabilityClient.addListener(
             this,
             BuildConfig.CAPABILITY_PHONE_APP,
@@ -78,6 +84,10 @@ class WearRemoteViewModel(application: Application) :
     }
 
     private fun stopCapabilityListener() {
+        if (!isCapabilityListening) {
+            return
+        }
+        isCapabilityListening = false
         capabilityClient.removeListener(this)
     }
 
@@ -126,6 +136,8 @@ class WearRemoteViewModel(application: Application) :
                 }
             } catch (e: ApiException) {
                 Log.e(TAG, "Error loading current data", e)
+            } catch (e: JSONException) {
+                Log.e(TAG, "Error parsing score JSON", e)
             }
         }
     }
@@ -145,8 +157,12 @@ class WearRemoteViewModel(application: Application) :
         val json =
             DataMapItem.fromDataItem(dataItem).dataMap
                 .getString(WearConstants.KEY_SCORE_JSON) ?: return
-        _scoreDisplay.value = WearScoreDisplay.fromJson(json)
-        _isConnected.value = true
+        try {
+            _scoreDisplay.value = WearScoreDisplay.fromJson(json)
+            _isConnected.value = true
+        } catch (e: JSONException) {
+            Log.e(TAG, "Error parsing score JSON", e)
+        }
     }
 
     fun sendCommand(command: String) {

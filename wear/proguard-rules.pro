@@ -1,3 +1,6 @@
+# Keep ViewModel constructor — instantiated via reflection by ViewModelProvider
+-keep class com.nuttyknot.tennisscoretracker.wear.WearRemoteViewModel { <init>(...); }
+
 # Keep WearDataListenerService — instantiated by Wear OS system via manifest class name
 -keep class com.nuttyknot.tennisscoretracker.wear.WearDataListenerService { *; }
 
