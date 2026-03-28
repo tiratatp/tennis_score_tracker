@@ -169,7 +169,9 @@ jobs:
         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      run: ./gradlew :wear:bundleRelease :app:publishTennisReleaseBundle :app:publishBadmintonReleaseBundle :app:publishPickleballReleaseBundle
+      run: ./gradlew :wear:bundleRelease :app:publishTennisReleaseBundle
+      # TODO: Uncomment when badminton/pickleball apps are created on Play Store
+      # :app:publishBadmintonReleaseBundle :app:publishPickleballReleaseBundle
 
     - name: Publish Tennis Wear App to Play Store (Internal Testing)
       if: env.PLAY_STORE_SERVICE_ACCOUNT_JSON != ''
@@ -184,28 +186,30 @@ jobs:
       env:
         PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
 
-    - name: Publish Badminton Wear App to Play Store (Internal Testing)
-      if: env.PLAY_STORE_SERVICE_ACCOUNT_JSON != ''
-      uses: r0adkll/upload-google-play@v1
-      with:
-        serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
-        packageName: com.nuttyknot.badmintonscoretracker
-        releaseFiles: wear/build/outputs/bundle/badmintonRelease/wear-badminton-release.aab
-        track: wear:internal
-        status: completed
-        mappingFile: wear/build/outputs/mapping/badmintonRelease/mapping.txt
-      env:
-        PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+    # TODO: Uncomment when badminton app is created on Play Store
+    # - name: Publish Badminton Wear App to Play Store (Internal Testing)
+    #   if: env.PLAY_STORE_SERVICE_ACCOUNT_JSON != ''
+    #   uses: r0adkll/upload-google-play@v1
+    #   with:
+    #     serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+    #     packageName: com.nuttyknot.badmintonscoretracker
+    #     releaseFiles: wear/build/outputs/bundle/badmintonRelease/wear-badminton-release.aab
+    #     track: wear:internal
+    #     status: completed
+    #     mappingFile: wear/build/outputs/mapping/badmintonRelease/mapping.txt
+    #   env:
+    #     PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
 
-    - name: Publish Pickleball Wear App to Play Store (Internal Testing)
-      if: env.PLAY_STORE_SERVICE_ACCOUNT_JSON != ''
-      uses: r0adkll/upload-google-play@v1
-      with:
-        serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
-        packageName: com.nuttyknot.pickleballscoretracker
-        releaseFiles: wear/build/outputs/bundle/pickleballRelease/wear-pickleball-release.aab
-        track: wear:internal
-        status: completed
-        mappingFile: wear/build/outputs/mapping/pickleballRelease/mapping.txt
-      env:
-        PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+    # TODO: Uncomment when pickleball app is created on Play Store
+    # - name: Publish Pickleball Wear App to Play Store (Internal Testing)
+    #   if: env.PLAY_STORE_SERVICE_ACCOUNT_JSON != ''
+    #   uses: r0adkll/upload-google-play@v1
+    #   with:
+    #     serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+    #     packageName: com.nuttyknot.pickleballscoretracker
+    #     releaseFiles: wear/build/outputs/bundle/pickleballRelease/wear-pickleball-release.aab
+    #     track: wear:internal
+    #     status: completed
+    #     mappingFile: wear/build/outputs/mapping/pickleballRelease/mapping.txt
+    #   env:
+    #     PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
