@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("app.cash.paparazzi")
+    id("com.github.triplet.play")
 }
 
 fun gitTagCount(): Int {
@@ -127,6 +128,25 @@ android {
                     "/*.properties",
                 )
         }
+    }
+}
+
+play {
+    track.set("wear:internal")
+    defaultToAppBundles.set(true)
+    val saJson = System.getenv("PLAY_STORE_SERVICE_ACCOUNT_JSON")
+    if (!saJson.isNullOrBlank()) {
+        val saFile = layout.buildDirectory.file("service-account.json")
+        serviceAccountCredentials.set(
+            saFile.map { f ->
+                f.also {
+                    it.asFile.apply {
+                        parentFile.mkdirs()
+                        writeText(saJson)
+                    }
+                }
+            },
+        )
     }
 }
 
