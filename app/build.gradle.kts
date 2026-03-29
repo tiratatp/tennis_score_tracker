@@ -158,7 +158,7 @@ play {
 }
 
 dependencies {
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.core:core-splashscreen:1.2.0")
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.0")
@@ -167,12 +167,13 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.appcompat:appcompat")
     implementation("androidx.compose.ui:ui-text-google-fonts")
 
     implementation("androidx.navigation:navigation-compose:2.8.9")
 
     // DataStore Preferences
-    implementation("androidx.datastore:datastore-preferences:1.1.4")
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
 
     // Shared module
     implementation(project(":shared"))

@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -32,10 +29,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.nuttyknot.tennisscoretracker.shared.R
+import com.nuttyknot.tennisscoretracker.R
+import com.nuttyknot.tennisscoretracker.shared.R as SharedR
 
 @Suppress("FunctionName")
 @Composable
@@ -194,17 +193,19 @@ fun CollapsibleSettingsSection(
                     style = MaterialTheme.typography.titleSmall,
                 )
                 Icon(
-                    imageVector =
-                        if (expanded) {
-                            Icons.Default.KeyboardArrowUp
-                        } else {
-                            Icons.Default.KeyboardArrowDown
-                        },
+                    painter =
+                        painterResource(
+                            if (expanded) {
+                                R.drawable.ic_keyboard_arrow_up_24
+                            } else {
+                                R.drawable.ic_keyboard_arrow_down_24
+                            },
+                        ),
                     contentDescription =
                         if (expanded) {
-                            stringResource(R.string.collapse)
+                            stringResource(SharedR.string.collapse)
                         } else {
-                            stringResource(R.string.expand)
+                            stringResource(SharedR.string.expand)
                         },
                     tint = MaterialTheme.colorScheme.primary,
                 )

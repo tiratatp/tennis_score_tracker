@@ -12,11 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -29,13 +24,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nuttyknot.tennisscoretracker.shared.R
+import com.nuttyknot.tennisscoretracker.R
 import com.nuttyknot.tennisscoretracker.ui.AppFooter
+import com.nuttyknot.tennisscoretracker.shared.R as SharedR
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,10 +41,13 @@ fun HelpScreen(onDismiss: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.help_title)) },
+                title = { Text(stringResource(SharedR.string.help_title)) },
                 navigationIcon = {
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                        Icon(
+                            painterResource(R.drawable.ic_arrow_back_24),
+                            contentDescription = stringResource(SharedR.string.back),
+                        )
                     }
                 },
             )
@@ -77,7 +76,7 @@ private fun HelpScreenContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Icon(
-            imageVector = Icons.Default.Info,
+            painter = painterResource(R.drawable.ic_info_24),
             contentDescription = null,
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.primary,
@@ -86,7 +85,7 @@ private fun HelpScreenContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = stringResource(R.string.help_welcome),
+            text = stringResource(SharedR.string.help_welcome),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
         )
@@ -105,7 +104,7 @@ private fun HelpScreenContent(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(56.dp),
         ) {
-            Text(stringResource(R.string.help_got_it), fontSize = 18.sp)
+            Text(stringResource(SharedR.string.help_got_it), fontSize = 18.sp)
         }
 
         AppFooter()
@@ -116,29 +115,29 @@ private fun HelpScreenContent(
 @Composable
 private fun ScoringGestures() {
     HelpSection(
-        title = stringResource(R.string.help_scoring_gestures),
-        description = stringResource(R.string.help_scoring_gestures_desc),
+        title = stringResource(SharedR.string.help_scoring_gestures),
+        description = stringResource(SharedR.string.help_scoring_gestures_desc),
     )
 
     GestureItem(
-        icon = Icons.Default.KeyboardArrowUp,
-        label = stringResource(R.string.help_tap_your_side),
-        action = stringResource(R.string.help_award_your_point),
-        description = stringResource(R.string.help_tap_your_side_desc),
+        icon = R.drawable.ic_keyboard_arrow_up_24,
+        label = stringResource(SharedR.string.help_tap_your_side),
+        action = stringResource(SharedR.string.help_award_your_point),
+        description = stringResource(SharedR.string.help_tap_your_side_desc),
     )
 
     GestureItem(
-        icon = Icons.Default.KeyboardArrowUp,
-        label = stringResource(R.string.help_tap_opponent_side),
-        action = stringResource(R.string.help_award_opponent_point),
-        description = stringResource(R.string.help_tap_opponent_desc),
+        icon = R.drawable.ic_keyboard_arrow_up_24,
+        label = stringResource(SharedR.string.help_tap_opponent_side),
+        action = stringResource(SharedR.string.help_award_opponent_point),
+        description = stringResource(SharedR.string.help_tap_opponent_desc),
     )
 
     GestureItem(
-        icon = Icons.Default.Refresh,
-        label = stringResource(R.string.help_long_press),
-        action = stringResource(R.string.help_undo),
-        description = stringResource(R.string.help_long_press_desc),
+        icon = R.drawable.ic_refresh_24,
+        label = stringResource(SharedR.string.help_long_press),
+        action = stringResource(SharedR.string.help_undo),
+        description = stringResource(SharedR.string.help_long_press_desc),
     )
 
     Spacer(modifier = Modifier.height(16.dp))
@@ -148,20 +147,20 @@ private fun ScoringGestures() {
 @Composable
 private fun HardwareButtons() {
     HelpSection(
-        title = stringResource(R.string.help_hardware_buttons),
-        description = stringResource(R.string.help_hardware_buttons_desc),
+        title = stringResource(SharedR.string.help_hardware_buttons),
+        description = stringResource(SharedR.string.help_hardware_buttons_desc),
     )
 
     InfoRow(
-        text = stringResource(R.string.help_hardware_button_actions),
+        text = stringResource(SharedR.string.help_hardware_button_actions),
     )
 
     InfoRow(
-        text = stringResource(R.string.help_hardware_button_types),
+        text = stringResource(SharedR.string.help_hardware_button_types),
     )
 
     Text(
-        text = stringResource(R.string.help_hardware_button_keycode),
+        text = stringResource(SharedR.string.help_hardware_button_keycode),
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -172,12 +171,12 @@ private fun HardwareButtons() {
 @Composable
 private fun MatchFormat() {
     HelpSection(
-        title = stringResource(R.string.help_match_format),
-        description = stringResource(R.string.help_match_format_desc),
+        title = stringResource(SharedR.string.help_match_format),
+        description = stringResource(SharedR.string.help_match_format_desc),
     )
 
-    InfoRow(text = stringResource(R.string.help_best_of_3))
-    InfoRow(text = stringResource(R.string.help_tiebreak))
+    InfoRow(text = stringResource(SharedR.string.help_best_of_3))
+    InfoRow(text = stringResource(SharedR.string.help_tiebreak))
 
     Spacer(modifier = Modifier.height(24.dp))
 }
@@ -186,11 +185,11 @@ private fun MatchFormat() {
 @Composable
 private fun VoiceAnnouncements() {
     HelpSection(
-        title = stringResource(R.string.help_voice_announcements),
-        description = stringResource(R.string.help_voice_announcements_desc),
+        title = stringResource(SharedR.string.help_voice_announcements),
+        description = stringResource(SharedR.string.help_voice_announcements_desc),
     )
 
-    InfoRow(text = stringResource(R.string.help_volume_tip))
+    InfoRow(text = stringResource(SharedR.string.help_volume_tip))
 
     Spacer(modifier = Modifier.height(24.dp))
 }
@@ -203,7 +202,7 @@ private fun InfoRow(text: String) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = Icons.Default.Info,
+            painter = painterResource(R.drawable.ic_info_24),
             contentDescription = null,
             modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.secondary,
@@ -242,7 +241,7 @@ fun HelpSection(
 @Suppress("FunctionName")
 @Composable
 fun GestureItem(
-    icon: ImageVector,
+    icon: Int,
     label: String,
     action: String,
     description: String,
@@ -261,14 +260,14 @@ fun GestureItem(
         ) {
             Row {
                 Icon(
-                    imageVector = icon,
+                    painter = painterResource(icon),
                     contentDescription = null,
                     modifier = Modifier.size(32.dp),
                     tint = MaterialTheme.colorScheme.secondary,
                 )
                 if (isDouble) {
                     Icon(
-                        imageVector = icon,
+                        painter = painterResource(icon),
                         contentDescription = null,
                         modifier = Modifier.size(32.dp),
                         tint = MaterialTheme.colorScheme.secondary,

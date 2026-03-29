@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,14 +24,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nuttyknot.tennisscoretracker.MatchState
+import com.nuttyknot.tennisscoretracker.R
 import com.nuttyknot.tennisscoretracker.ScoreModel
-import com.nuttyknot.tennisscoretracker.shared.R
 import com.nuttyknot.tennisscoretracker.ui.score.Scoreboard
+import com.nuttyknot.tennisscoretracker.shared.R as SharedR
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,10 +48,13 @@ fun MatchSummaryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.match_summary_title)) },
+                title = { Text(stringResource(SharedR.string.match_summary_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                        Icon(
+                            painterResource(R.drawable.ic_arrow_back_24),
+                            contentDescription = stringResource(SharedR.string.back),
+                        )
                     }
                 },
                 colors =
@@ -78,8 +80,8 @@ internal fun MatchSummaryContent(
     onNewMatch: () -> Unit,
     paddingValues: PaddingValues,
 ) {
-    val defaultUserName = stringResource(R.string.default_user_name)
-    val defaultOpponentName = stringResource(R.string.default_opponent_name)
+    val defaultUserName = stringResource(SharedR.string.default_user_name)
+    val defaultOpponentName = stringResource(SharedR.string.default_opponent_name)
     val isUserWinner = state.matchWinner == state.userName.ifEmpty { defaultUserName }
 
     Column(
@@ -93,7 +95,7 @@ internal fun MatchSummaryContent(
         verticalArrangement = Arrangement.Center,
     ) {
         Icon(
-            imageVector = Icons.Default.Star,
+            painter = painterResource(R.drawable.ic_star_24),
             contentDescription = null,
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.primary,
@@ -102,7 +104,7 @@ internal fun MatchSummaryContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = stringResource(R.string.winner_announcement, state.matchWinner ?: ""),
+            text = stringResource(SharedR.string.winner_announcement, state.matchWinner ?: ""),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
@@ -137,7 +139,7 @@ internal fun MatchSummaryContent(
         Button(
             onClick = onNewMatch,
         ) {
-            Text(stringResource(R.string.new_match), fontSize = 18.sp)
+            Text(stringResource(SharedR.string.new_match), fontSize = 18.sp)
         }
     }
 }
