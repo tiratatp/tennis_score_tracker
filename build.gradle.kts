@@ -1,8 +1,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     id("com.android.application") version "8.10.1" apply false
-    id("org.jetbrains.kotlin.android") version "2.2.21" apply false
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.21" apply false
+    id("org.jetbrains.kotlin.android") version "2.1.21" apply false
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.21" apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1" apply false
     id("app.cash.paparazzi") version "1.3.5" apply false
