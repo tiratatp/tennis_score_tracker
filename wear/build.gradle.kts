@@ -161,14 +161,15 @@ play {
 dependencies {
     implementation(project(":shared"))
     implementation("androidx.core:core-splashscreen:1.2.0")
-    implementation("androidx.wear.compose:compose-material3:1.0.0-alpha32")
+    implementation("androidx.wear.compose:compose-material3:1.5.6")
     implementation("androidx.wear.compose:compose-foundation:1.5.6")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.10.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
     implementation("com.google.android.gms:play-services-wearable:19.0.0")
-    implementation("androidx.wear:wear:1.3.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
+    implementation("androidx.wear:wear:1.4.0")
+    implementation("androidx.wear:wear-ongoing:1.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 }
 
 // Ensure linters run before the wear app is installed for debugging

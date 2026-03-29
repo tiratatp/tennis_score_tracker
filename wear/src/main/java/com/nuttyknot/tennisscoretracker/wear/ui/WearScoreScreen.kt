@@ -68,6 +68,7 @@ fun WearScoreScreen(
     isConnected: Boolean,
     isAmbient: Boolean = false,
     burnInProtectionRequired: Boolean = false,
+    lowBitAmbient: Boolean = false,
     ambientOffset: IntOffset = IntOffset.Zero,
     showHelp: Boolean = false,
     timeSource: TimeSource = TimeTextDefaults.rememberTimeSource(TimeTextDefaults.timeFormat()),
@@ -85,6 +86,7 @@ fun WearScoreScreen(
                 isConnected = isConnected,
                 isAmbient = isAmbient,
                 burnInProtectionRequired = burnInProtectionRequired,
+                lowBitAmbient = lowBitAmbient,
                 ambientOffset = ambientOffset,
                 showHelp = showHelp,
                 onShowHelp = onShowHelp,
@@ -132,6 +134,7 @@ private fun WearScoreContent(
     isConnected: Boolean,
     isAmbient: Boolean,
     burnInProtectionRequired: Boolean,
+    lowBitAmbient: Boolean,
     ambientOffset: IntOffset,
     showHelp: Boolean,
     onShowHelp: () -> Unit,
@@ -151,6 +154,7 @@ private fun WearScoreContent(
             AmbientScoreContent(
                 scoreDisplay = scoreDisplay,
                 burnInProtectionRequired = burnInProtectionRequired,
+                lowBitAmbient = lowBitAmbient,
                 ambientOffset = ambientOffset,
             )
         } else {
@@ -200,8 +204,10 @@ private fun WearScoreContent(
 private fun AmbientScoreContent(
     scoreDisplay: WearScoreDisplay,
     burnInProtectionRequired: Boolean,
+    lowBitAmbient: Boolean,
     ambientOffset: IntOffset,
 ) {
+    val scoreFontWeight = if (lowBitAmbient) FontWeight.Normal else FontWeight.Bold
     val offsetModifier =
         if (burnInProtectionRequired) {
             Modifier.offset { ambientOffset }
@@ -228,9 +234,9 @@ private fun AmbientScoreContent(
             verticalArrangement = Arrangement.Top,
         ) {
             Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-            PointScore(scoreDisplay, Color.White, Color.Gray)
+            PointScore(scoreDisplay, Color.White, Color.Gray, scoreFontWeight)
             Spacer(modifier = Modifier.height(SPACER_HEIGHT))
-            WearScoreboardTable(scoreDisplay, Color.White, Color.Gray)
+            WearScoreboardTable(scoreDisplay, Color.White, Color.Gray, scoreFontWeight)
         }
     }
 }
@@ -338,6 +344,7 @@ private fun WearScoreboardTable(
     scoreDisplay: WearScoreDisplay,
     userColor: Color,
     opponentColor: Color,
+    scoreFontWeight: FontWeight = FontWeight.Bold,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -352,7 +359,7 @@ private fun WearScoreboardTable(
                     text = "$userSet",
                     color = userColor.copy(alpha = SCOREBOARD_MUTED_ALPHA),
                     fontSize = DETAIL_FONT_SIZE,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = scoreFontWeight,
                     fontFamily = FontFamily.Monospace,
                 )
             }
@@ -361,7 +368,7 @@ private fun WearScoreboardTable(
                     text = "${scoreDisplay.userGames}",
                     color = userColor,
                     fontSize = DETAIL_FONT_SIZE,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = scoreFontWeight,
                     fontFamily = FontFamily.Monospace,
                 )
             }
@@ -379,7 +386,7 @@ private fun WearScoreboardTable(
                     text = "$oppSet",
                     color = opponentColor.copy(alpha = SCOREBOARD_MUTED_ALPHA),
                     fontSize = DETAIL_FONT_SIZE,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = scoreFontWeight,
                     fontFamily = FontFamily.Monospace,
                 )
             }
@@ -388,7 +395,7 @@ private fun WearScoreboardTable(
                     text = "${scoreDisplay.opponentGames}",
                     color = opponentColor,
                     fontSize = DETAIL_FONT_SIZE,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = scoreFontWeight,
                     fontFamily = FontFamily.Monospace,
                 )
             }
@@ -428,6 +435,7 @@ private fun PointScore(
     scoreDisplay: WearScoreDisplay,
     userColor: Color,
     opponentColor: Color,
+    scoreFontWeight: FontWeight = FontWeight.Bold,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -437,7 +445,7 @@ private fun PointScore(
         Text(
             text = scoreDisplay.userScore,
             fontSize = SCORE_FONT_SIZE,
-            fontWeight = FontWeight.Bold,
+            fontWeight = scoreFontWeight,
             fontFamily = FontFamily.Monospace,
             color = userColor,
         )
@@ -445,7 +453,7 @@ private fun PointScore(
         Text(
             text = scoreDisplay.opponentScore,
             fontSize = SCORE_FONT_SIZE,
-            fontWeight = FontWeight.Bold,
+            fontWeight = scoreFontWeight,
             fontFamily = FontFamily.Monospace,
             color = opponentColor,
         )
