@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -72,6 +73,9 @@ class WearMainActivity : ComponentActivity() {
         lifecycle.addObserver(ambientObserver)
         viewModel.startListening()
         createNotificationChannel()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 0)
+        }
         lifecycleScope.launch {
             viewModel.scoreDisplay.collect { score ->
                 if (!score.isMatchOver) {
