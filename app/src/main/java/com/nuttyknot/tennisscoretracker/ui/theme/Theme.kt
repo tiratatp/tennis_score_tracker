@@ -1,13 +1,8 @@
 package com.nuttyknot.tennisscoretracker.ui.theme
 
-import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.platform.LocalView
 import com.nuttyknot.tennisscoretracker.AppTheme
 
 private val GrandSlamColorScheme =
@@ -71,16 +66,6 @@ fun TennisScoreTrackerTheme(
             AppTheme.COLORBLIND_SAFE -> ColorblindSafeColorScheme
             AppTheme.SKY_BLUE -> SkyBlueColorScheme
         }
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            (view.context as? ComponentActivity)?.enableEdgeToEdge(
-                statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
-                navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
-            )
-        }
-    }
-
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
