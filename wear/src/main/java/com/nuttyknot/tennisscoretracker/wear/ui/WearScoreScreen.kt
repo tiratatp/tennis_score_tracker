@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -52,13 +51,13 @@ import androidx.wear.compose.material3.timeTextCurvedText
 import com.nuttyknot.tennisscoretracker.shared.R
 import com.nuttyknot.tennisscoretracker.shared.WearScoreDisplay
 
-private val SERVING_DOT_SIZE = 10.dp
-private val SCORE_GAP = 16.dp
-private val SCOREBOARD_COLUMN_GAP = 8.dp
-private val SCOREBOARD_ROW_GAP = 1.dp
+private const val SERVING_DOT_SIZE_BASE = 10f
+private const val SCORE_GAP_BASE = 16f
+private const val SCOREBOARD_COLUMN_GAP_BASE = 8f
+private const val SCOREBOARD_ROW_GAP_BASE = 1f
 private const val PILL_CORNER_PERCENT = 50
-private val BUTTON_HORIZONTAL_PADDING = 12.dp
-private val BUTTON_VERTICAL_PADDING = 4.dp
+private const val BUTTON_HORIZONTAL_PADDING_BASE = 12f
+private const val BUTTON_VERTICAL_PADDING_BASE = 4f
 
 @OptIn(ExperimentalFoundationApi::class)
 @Suppress("FunctionName", "LongParameterList")
@@ -104,13 +103,14 @@ fun WearScoreScreen(
 @Composable
 private fun WearTimeText(timeSource: TimeSource) {
     val isRound = LocalConfiguration.current.isScreenRound
+    val scale = screenScale()
     if (isRound) {
         TimeText(timeSource = timeSource) { time ->
             timeTextCurvedText(
                 time,
                 CurvedTextStyle(
                     color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
-                    fontSize = DETAIL_FONT_SIZE,
+                    fontSize = detailFontSize(scale),
                     fontWeight = FontWeight.Normal,
                 ),
             )
@@ -118,9 +118,11 @@ private fun WearTimeText(timeSource: TimeSource) {
     } else {
         Text(
             text = timeSource.currentTime(),
-            fontSize = DETAIL_FONT_SIZE,
+            fontSize = detailFontSize(scale),
             color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
             textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.fillMaxWidth(),
         )
     }
@@ -165,17 +167,18 @@ private fun WearScoreContent(
             }
 
             if (!showHelp) {
+                val scale = screenScale()
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.BottomCenter,
                 ) {
                     Text(
                         text = stringResource(R.string.help_button),
-                        fontSize = DETAIL_FONT_SIZE,
+                        fontSize = detailFontSize(scale),
                         color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
                         modifier =
                             Modifier
-                                .padding(bottom = SCREEN_PADDING)
+                                .padding(bottom = screenPadding(scale))
                                 .clickable(
                                     indication = null,
                                     interactionSource = remember { MutableInteractionSource() },
@@ -207,6 +210,9 @@ private fun AmbientScoreContent(
     lowBitAmbient: Boolean,
     ambientOffset: IntOffset,
 ) {
+    val scale = screenScale()
+    val isRound = LocalConfiguration.current.isScreenRound
+    val hPadding = if (isRound) roundHorizontalPadding(scale) else screenPadding(scale)
     val scoreFontWeight = if (lowBitAmbient) FontWeight.Normal else FontWeight.Bold
     val offsetModifier =
         if (burnInProtectionRequired) {
@@ -218,7 +224,7 @@ private fun AmbientScoreContent(
         modifier =
             offsetModifier
                 .fillMaxSize()
-                .padding(SCREEN_PADDING),
+                .padding(horizontal = hPadding, vertical = screenPadding(scale)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Top spacer — same weight as interactive top section
@@ -233,9 +239,9 @@ private fun AmbientScoreContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
         ) {
-            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+            Spacer(modifier = Modifier.height(spacerHeight(scale)))
             PointScore(scoreDisplay, Color.White, Color.Gray, scoreFontWeight)
-            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+            Spacer(modifier = Modifier.height(spacerHeight(scale)))
             WearScoreboardTable(scoreDisplay, Color.White, Color.Gray, scoreFontWeight)
         }
     }
@@ -248,6 +254,9 @@ private fun ScoreContent(
     isConnected: Boolean,
     onNewMatch: () -> Unit,
 ) {
+    val scale = screenScale()
+    val isRound = LocalConfiguration.current.isScreenRound
+    val hPadding = if (isRound) roundHorizontalPadding(scale) else screenPadding(scale)
     val userColor = scoreDisplay.primaryColorArgb?.let { Color(it) } ?: DEFAULT_PRIMARY_COLOR
     val opponentColor = scoreDisplay.secondaryColorArgb?.let { Color(it) } ?: DEFAULT_SECONDARY_COLOR
 
@@ -255,7 +264,7 @@ private fun ScoreContent(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(SCREEN_PADDING),
+                .padding(horizontal = hPadding, vertical = screenPadding(scale)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Top section: status — pushed to bottom of its space
@@ -272,11 +281,14 @@ private fun ScoreContent(
                 }
             Text(
                 text = statusText,
-                fontSize = LABEL_FONT_SIZE,
+                fontSize = labelFontSize(scale),
                 color = if (statusText != " ") Color(COLOR_TENNIS_GREEN) else Color.Transparent,
                 textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+            Spacer(modifier = Modifier.height(spacerHeight(scale)))
         }
 
         // Player names — PINNED at the boundary between weights
@@ -289,11 +301,11 @@ private fun ScoreContent(
             verticalArrangement = Arrangement.Top,
         ) {
             if (!scoreDisplay.isMatchOver) {
-                Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+                Spacer(modifier = Modifier.height(spacerHeight(scale)))
                 PointScore(scoreDisplay, userColor, opponentColor)
-                Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+                Spacer(modifier = Modifier.height(spacerHeight(scale)))
             } else {
-                Spacer(modifier = Modifier.height(INNER_PADDING))
+                Spacer(modifier = Modifier.height(innerPadding(scale)))
             }
             WearScoreboardTable(scoreDisplay, userColor, opponentColor)
 
@@ -309,14 +321,16 @@ private fun ScoreFooter(
     isConnected: Boolean,
     onNewMatch: () -> Unit,
 ) {
+    val scale = screenScale()
     if (scoreDisplay.isMatchOver && isConnected) {
         val view = LocalView.current
-        Spacer(modifier = Modifier.height(INNER_PADDING))
+        Spacer(modifier = Modifier.height(innerPadding(scale)))
         Text(
             text = stringResource(R.string.new_match),
-            fontSize = LABEL_FONT_SIZE,
+            fontSize = labelFontSize(scale),
             color = Color.White,
             textAlign = TextAlign.Center,
+            maxLines = 1,
             modifier =
                 Modifier
                     .background(
@@ -325,15 +339,20 @@ private fun ScoreFooter(
                     ).clickable {
                         view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                         onNewMatch()
-                    }.padding(horizontal = BUTTON_HORIZONTAL_PADDING, vertical = BUTTON_VERTICAL_PADDING),
+                    }.padding(
+                        horizontal = (BUTTON_HORIZONTAL_PADDING_BASE * scale).dp,
+                        vertical = (BUTTON_VERTICAL_PADDING_BASE * scale).dp,
+                    ),
         )
     } else if (!isConnected) {
-        Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+        Spacer(modifier = Modifier.height(spacerHeight(scale)))
         Text(
             text = stringResource(R.string.not_connected),
-            fontSize = LABEL_FONT_SIZE,
+            fontSize = labelFontSize(scale),
             color = Color(COLOR_DISCONNECTED_RED),
             textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -346,19 +365,20 @@ private fun WearScoreboardTable(
     opponentColor: Color,
     scoreFontWeight: FontWeight = FontWeight.Bold,
 ) {
+    val scale = screenScale()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // User row
         Row(
-            horizontalArrangement = Arrangement.spacedBy(SCOREBOARD_COLUMN_GAP),
+            horizontalArrangement = Arrangement.spacedBy((SCOREBOARD_COLUMN_GAP_BASE * scale).dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             scoreDisplay.setHistory.forEach { (userSet, _) ->
                 Text(
                     text = "$userSet",
                     color = userColor.copy(alpha = SCOREBOARD_MUTED_ALPHA),
-                    fontSize = DETAIL_FONT_SIZE,
+                    fontSize = detailFontSize(scale),
                     fontWeight = scoreFontWeight,
                     fontFamily = FontFamily.Monospace,
                 )
@@ -367,25 +387,25 @@ private fun WearScoreboardTable(
                 Text(
                     text = "${scoreDisplay.userGames}",
                     color = userColor,
-                    fontSize = DETAIL_FONT_SIZE,
+                    fontSize = detailFontSize(scale),
                     fontWeight = scoreFontWeight,
                     fontFamily = FontFamily.Monospace,
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(SCOREBOARD_ROW_GAP))
+        Spacer(modifier = Modifier.height((SCOREBOARD_ROW_GAP_BASE * scale).dp))
 
         // Opponent row
         Row(
-            horizontalArrangement = Arrangement.spacedBy(SCOREBOARD_COLUMN_GAP),
+            horizontalArrangement = Arrangement.spacedBy((SCOREBOARD_COLUMN_GAP_BASE * scale).dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             scoreDisplay.setHistory.forEach { (_, oppSet) ->
                 Text(
                     text = "$oppSet",
                     color = opponentColor.copy(alpha = SCOREBOARD_MUTED_ALPHA),
-                    fontSize = DETAIL_FONT_SIZE,
+                    fontSize = detailFontSize(scale),
                     fontWeight = scoreFontWeight,
                     fontFamily = FontFamily.Monospace,
                 )
@@ -394,7 +414,7 @@ private fun WearScoreboardTable(
                 Text(
                     text = "${scoreDisplay.opponentGames}",
                     color = opponentColor,
-                    fontSize = DETAIL_FONT_SIZE,
+                    fontSize = detailFontSize(scale),
                     fontWeight = scoreFontWeight,
                     fontFamily = FontFamily.Monospace,
                 )
@@ -411,9 +431,10 @@ private fun PlayerNames(
     opponentColor: Color,
     showServing: Boolean = true,
 ) {
+    val scale = screenScale()
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(SCORE_GAP),
+        horizontalArrangement = Arrangement.spacedBy((SCORE_GAP_BASE * scale).dp),
     ) {
         PlayerLabel(
             name = scoreDisplay.userName.ifEmpty { stringResource(R.string.default_user_name) },
@@ -437,6 +458,7 @@ private fun PointScore(
     opponentColor: Color,
     scoreFontWeight: FontWeight = FontWeight.Bold,
 ) {
+    val scale = screenScale()
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
@@ -444,15 +466,15 @@ private fun PointScore(
     ) {
         Text(
             text = scoreDisplay.userScore,
-            fontSize = SCORE_FONT_SIZE,
+            fontSize = scoreFontSize(scale),
             fontWeight = scoreFontWeight,
             fontFamily = FontFamily.Monospace,
             color = userColor,
         )
-        Spacer(modifier = Modifier.size(SCORE_GAP))
+        Spacer(modifier = Modifier.size((SCORE_GAP_BASE * scale).dp))
         Text(
             text = scoreDisplay.opponentScore,
-            fontSize = SCORE_FONT_SIZE,
+            fontSize = scoreFontSize(scale),
             fontWeight = scoreFontWeight,
             fontFamily = FontFamily.Monospace,
             color = opponentColor,
@@ -526,14 +548,14 @@ private fun RowScope.PlayerLabel(
     color: Color,
     dotOnRight: Boolean = false,
 ) {
-    val maxNameWidth = LocalConfiguration.current.screenWidthDp.dp * NAME_MAX_WIDTH_FRACTION
+    val scale = screenScale()
     val dotColor = if (isServing) color else Color.Transparent
     val dot =
         @Composable {
             Box(
                 modifier =
                     Modifier
-                        .size(SERVING_DOT_SIZE)
+                        .size((SERVING_DOT_SIZE_BASE * scale).dp)
                         .clip(CircleShape)
                         .background(dotColor),
             )
@@ -543,18 +565,18 @@ private fun RowScope.PlayerLabel(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement =
             Arrangement.spacedBy(
-                INNER_PADDING,
+                innerPadding(scale),
                 if (dotOnRight) Alignment.Start else Alignment.End,
             ),
     ) {
         if (!dotOnRight) dot()
         Text(
             text = name,
-            fontSize = LABEL_FONT_SIZE,
+            fontSize = labelFontSize(scale),
             color = color,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f, fill = false).widthIn(max = maxNameWidth),
+            modifier = Modifier.weight(1f, fill = false),
         )
         if (dotOnRight) dot()
     }

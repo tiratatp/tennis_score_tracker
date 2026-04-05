@@ -19,13 +19,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
 import com.nuttyknot.tennisscoretracker.shared.R
+
+private const val HELP_CORNER_RADIUS_BASE = 8f
+private const val HELP_DISMISS_SPACER_MULTIPLIER = 4
+private const val HELP_TOP_PADDING_ROUND_MULTIPLIER = 6
+private const val HELP_TOP_PADDING_SQUARE_MULTIPLIER = 3
+private const val HELP_BOTTOM_PADDING_ROUND_MULTIPLIER = 4
+private const val HELP_BOTTOM_PADDING_SQUARE_MULTIPLIER = 2
 
 @Suppress("FunctionName")
 @Composable
@@ -45,42 +52,71 @@ internal fun WearHelpOverlay(
                     onClick = onDismiss,
                 ),
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(
-                        start = SCREEN_PADDING,
-                        end = SCREEN_PADDING,
-                        top = SCREEN_PADDING * 6,
-                        bottom = SCREEN_PADDING * 4,
-                    ),
-        ) {
-            Text(
-                text = stringResource(R.string.help_how_to_play),
-                fontSize = DETAIL_FONT_SIZE,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            HelpTapZones(userColor, opponentColor, modifier = Modifier.height(HELP_TAP_ZONE_MAX_HEIGHT))
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = stringResource(R.string.help_long_press_undo),
-                fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.7f),
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.help_tap_dismiss),
-                fontSize = LABEL_FONT_SIZE,
-                color = Color.White.copy(alpha = 0.4f),
-                textAlign = TextAlign.Center,
-            )
+        HelpContent(userColor, opponentColor)
+    }
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun HelpContent(
+    userColor: Color,
+    opponentColor: Color,
+) {
+    val scale = screenScale()
+    val isRound = LocalConfiguration.current.isScreenRound
+    val topPadding =
+        if (isRound) {
+            screenPadding(scale) * HELP_TOP_PADDING_ROUND_MULTIPLIER
+        } else {
+            screenPadding(scale) * HELP_TOP_PADDING_SQUARE_MULTIPLIER
         }
+    val bottomPadding =
+        if (isRound) {
+            screenPadding(scale) * HELP_BOTTOM_PADDING_ROUND_MULTIPLIER
+        } else {
+            screenPadding(scale) * HELP_BOTTOM_PADDING_SQUARE_MULTIPLIER
+        }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(
+                    start = screenPadding(scale),
+                    end = screenPadding(scale),
+                    top = topPadding,
+                    bottom = bottomPadding,
+                ),
+    ) {
+        Text(
+            text = stringResource(R.string.help_how_to_play),
+            fontSize = detailFontSize(scale),
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        HelpTapZones(
+            userColor,
+            opponentColor,
+            scale,
+            modifier = Modifier.height(helpTapZoneMaxHeight(scale)),
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = stringResource(R.string.help_long_press_undo),
+            fontSize = labelFontSize(scale),
+            color = Color.White.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(spacerHeight(scale) * HELP_DISMISS_SPACER_MULTIPLIER))
+        Text(
+            text = stringResource(R.string.help_tap_dismiss),
+            fontSize = labelFontSize(scale),
+            color = Color.White.copy(alpha = 0.4f),
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -89,11 +125,12 @@ internal fun WearHelpOverlay(
 private fun HelpTapZones(
     userColor: Color,
     opponentColor: Color,
+    scale: Float,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(innerPadding(scale)),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -104,12 +141,12 @@ private fun HelpTapZones(
                     .fillMaxHeight()
                     .background(
                         color = userColor.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(8.dp),
-                    ).padding(horizontal = 4.dp),
+                        shape = RoundedCornerShape((HELP_CORNER_RADIUS_BASE * scale).dp),
+                    ).padding(horizontal = innerPadding(scale)),
         ) {
             Text(
                 text = stringResource(R.string.help_tap_left),
-                fontSize = 12.sp,
+                fontSize = labelFontSize(scale),
                 fontWeight = FontWeight.Bold,
                 color = userColor,
                 textAlign = TextAlign.Center,
@@ -117,7 +154,7 @@ private fun HelpTapZones(
             )
             Text(
                 text = stringResource(R.string.help_your_point),
-                fontSize = 12.sp,
+                fontSize = labelFontSize(scale),
                 color = userColor,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
@@ -132,12 +169,12 @@ private fun HelpTapZones(
                     .fillMaxHeight()
                     .background(
                         color = opponentColor.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(8.dp),
-                    ).padding(horizontal = 4.dp),
+                        shape = RoundedCornerShape((HELP_CORNER_RADIUS_BASE * scale).dp),
+                    ).padding(horizontal = innerPadding(scale)),
         ) {
             Text(
                 text = stringResource(R.string.help_tap_right),
-                fontSize = 12.sp,
+                fontSize = labelFontSize(scale),
                 fontWeight = FontWeight.Bold,
                 color = opponentColor,
                 textAlign = TextAlign.Center,
@@ -145,7 +182,7 @@ private fun HelpTapZones(
             )
             Text(
                 text = stringResource(R.string.help_opponent_point),
-                fontSize = 12.sp,
+                fontSize = labelFontSize(scale),
                 color = opponentColor,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
