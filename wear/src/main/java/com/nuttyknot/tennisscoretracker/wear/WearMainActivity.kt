@@ -146,12 +146,13 @@ class WearMainActivity : ComponentActivity() {
                 .Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
-                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setCategory(NotificationCompat.CATEGORY_WORKOUT)
                 .setSilent(true)
 
         val ongoingActivity =
             OngoingActivity
                 .Builder(this, NOTIFICATION_ID, notificationBuilder)
+                .setStaticIcon(R.drawable.ic_ongoing)
                 .setTouchIntent(pendingIntent)
                 .setStatus(
                     Status
