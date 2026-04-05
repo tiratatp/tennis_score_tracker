@@ -43,6 +43,10 @@
                     android:pathPrefix="/tennis/score" />
             </intent-filter>
         </service>
+
+        <receiver
+            android:name=".EndMatchReceiver"
+            android:exported="false" />
     </application>
 
 </manifest>

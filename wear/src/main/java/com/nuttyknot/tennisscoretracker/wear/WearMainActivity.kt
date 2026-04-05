@@ -140,6 +140,15 @@ class WearMainActivity : ComponentActivity() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
 
+        val endMatchIntent = Intent(this, EndMatchReceiver::class.java)
+        val endMatchPendingIntent =
+            PendingIntent.getBroadcast(
+                this,
+                1,
+                endMatchIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+
         val statusText = "${score.userScore} - ${score.opponentScore}"
         val notificationBuilder =
             NotificationCompat
@@ -148,6 +157,11 @@ class WearMainActivity : ComponentActivity() {
                 .setOngoing(true)
                 .setCategory(NotificationCompat.CATEGORY_WORKOUT)
                 .setSilent(true)
+                .addAction(
+                    R.drawable.ic_close,
+                    getString(com.nuttyknot.tennisscoretracker.shared.R.string.end_match),
+                    endMatchPendingIntent,
+                )
 
         val ongoingActivity =
             OngoingActivity
