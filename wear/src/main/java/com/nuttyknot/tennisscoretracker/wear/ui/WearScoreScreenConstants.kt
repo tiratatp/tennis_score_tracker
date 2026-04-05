@@ -19,6 +19,7 @@ private const val INNER_PADDING_BASE = 4f
 private const val SPACER_HEIGHT_BASE = 2f
 private const val HELP_TAP_ZONE_MAX_HEIGHT_BASE = 72f
 private const val ROUND_HORIZONTAL_PADDING_BASE = 14f
+private const val MIN_FONT_SIZE_SP = 10f
 
 @Composable
 internal fun screenScale(): Float {
@@ -30,7 +31,7 @@ internal fun scoreFontSize(scale: Float): TextUnit = (SCORE_FONT_SIZE_BASE * sca
 
 internal fun detailFontSize(scale: Float): TextUnit = (DETAIL_FONT_SIZE_BASE * scale).sp
 
-internal fun labelFontSize(scale: Float): TextUnit = (LABEL_FONT_SIZE_BASE * scale).sp
+internal fun labelFontSize(scale: Float): TextUnit = maxOf(LABEL_FONT_SIZE_BASE * scale, MIN_FONT_SIZE_SP).sp
 
 internal fun screenPadding(scale: Float): Dp = (SCREEN_PADDING_BASE * scale).dp
 

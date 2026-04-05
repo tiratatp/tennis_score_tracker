@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -46,6 +48,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.material3.AppScaffold
+import androidx.wear.compose.material3.Icon
+import androidx.wear.compose.material3.IconButton
+import androidx.wear.compose.material3.IconButtonDefaults
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TimeSource
@@ -63,6 +68,7 @@ private const val SCOREBOARD_ROW_GAP_BASE = 1f
 private const val PILL_CORNER_PERCENT = 50
 private const val BUTTON_HORIZONTAL_PADDING_BASE = 12f
 private const val BUTTON_VERTICAL_PADDING_BASE = 4f
+private val QUESTION_MARK_ICON_SIZE = 20.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Suppress("FunctionName", "LongParameterList")
@@ -328,40 +334,45 @@ private fun BottomActionBar(
     onEndMatchTapped: () -> Unit,
     onShowHelp: () -> Unit,
 ) {
-    val scale = screenScale()
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomCenter,
     ) {
         Row(
-            modifier = Modifier.padding(bottom = screenPadding(scale)),
-            horizontalArrangement = Arrangement.spacedBy(innerPadding(scale)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (showEndButton) {
-                Text(
-                    text = "X",
-                    fontSize = detailFontSize(scale),
-                    color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
-                    modifier =
-                        Modifier.clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() },
-                            onClick = onEndMatchTapped,
+                IconButton(
+                    onClick = onEndMatchTapped,
+                    modifier = Modifier.size(IconButtonDefaults.SmallButtonSize),
+                    colors =
+                        IconButtonDefaults.iconButtonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color.White.copy(alpha = TIME_TEXT_ALPHA),
                         ),
+                ) {
+                    Icon(
+                        painter = painterResource(com.nuttyknot.tennisscoretracker.wear.R.drawable.ic_close),
+                        contentDescription = stringResource(R.string.end_match),
+                        modifier = Modifier.size(IconButtonDefaults.SmallIconSize),
+                    )
+                }
+            }
+            IconButton(
+                onClick = onShowHelp,
+                modifier = Modifier.size(IconButtonDefaults.SmallButtonSize),
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.White.copy(alpha = TIME_TEXT_ALPHA),
+                    ),
+            ) {
+                Icon(
+                    painter = painterResource(com.nuttyknot.tennisscoretracker.wear.R.drawable.ic_question_mark),
+                    contentDescription = stringResource(R.string.help_button),
+                    modifier = Modifier.size(QUESTION_MARK_ICON_SIZE),
                 )
             }
-            Text(
-                text = stringResource(R.string.help_button),
-                fontSize = detailFontSize(scale),
-                color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
-                modifier =
-                    Modifier.clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = onShowHelp,
-                    ),
-            )
         }
     }
 }
@@ -423,26 +434,33 @@ private fun ScoreFooter(
     val scale = screenScale()
     if (scoreDisplay.isMatchOver && isConnected) {
         val view = LocalView.current
-        Spacer(modifier = Modifier.height(innerPadding(scale)))
-        Text(
-            text = stringResource(R.string.new_match),
-            fontSize = labelFontSize(scale),
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
+        Box(
             modifier =
                 Modifier
-                    .background(
-                        color = Color(COLOR_TENNIS_GREEN),
-                        shape = RoundedCornerShape(PILL_CORNER_PERCENT),
-                    ).clickable {
+                    .defaultMinSize(minHeight = 48.dp)
+                    .clickable {
                         view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                         onNewMatch()
-                    }.padding(
-                        horizontal = (BUTTON_HORIZONTAL_PADDING_BASE * scale).dp,
-                        vertical = (BUTTON_VERTICAL_PADDING_BASE * scale).dp,
-                    ),
-        )
+                    },
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = stringResource(R.string.new_match),
+                fontSize = labelFontSize(scale),
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                modifier =
+                    Modifier
+                        .background(
+                            color = Color(COLOR_TENNIS_GREEN),
+                            shape = RoundedCornerShape(PILL_CORNER_PERCENT),
+                        ).padding(
+                            horizontal = (BUTTON_HORIZONTAL_PADDING_BASE * scale).dp,
+                            vertical = (BUTTON_VERTICAL_PADDING_BASE * scale).dp,
+                        ),
+            )
+        }
     } else if (!isConnected) {
         Spacer(modifier = Modifier.height(spacerHeight(scale)))
         Text(
