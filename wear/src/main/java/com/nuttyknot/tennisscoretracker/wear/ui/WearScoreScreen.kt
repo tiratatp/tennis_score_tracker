@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +58,6 @@ import androidx.wear.compose.material3.TimeTextDefaults
 import androidx.wear.compose.material3.timeTextCurvedText
 import com.nuttyknot.tennisscoretracker.shared.R
 import com.nuttyknot.tennisscoretracker.shared.WearScoreDisplay
-import kotlinx.coroutines.delay
 
 private const val SERVING_DOT_SIZE_BASE = 10f
 private const val SCORE_GAP_BASE = 16f
@@ -176,6 +174,9 @@ private fun WearScoreContent(
         } else {
             var confirmingEndMatch by remember { mutableStateOf(false) }
             val showEndButton = isConnected && !scoreDisplay.isMatchOver
+            val userColor = scoreDisplay.primaryColorArgb?.let { Color(it) } ?: DEFAULT_PRIMARY_COLOR
+            val opponentColor =
+                scoreDisplay.secondaryColorArgb?.let { Color(it) } ?: DEFAULT_SECONDARY_COLOR
 
             ScoreContent(scoreDisplay, isConnected, onNewMatch)
 
@@ -191,26 +192,21 @@ private fun WearScoreContent(
                 )
             }
 
-            if (confirmingEndMatch) {
-                EndMatchConfirmOverlay(
-                    onConfirm = {
-                        onEndMatch()
-                        confirmingEndMatch = false
-                    },
-                    onDismiss = { confirmingEndMatch = false },
-                )
-            }
+            EndMatchDialog(
+                show = confirmingEndMatch,
+                onConfirm = {
+                    onEndMatch()
+                    confirmingEndMatch = false
+                },
+                onDismiss = { confirmingEndMatch = false },
+            )
 
-            if (showHelp) {
-                val userColor = scoreDisplay.primaryColorArgb?.let { Color(it) } ?: DEFAULT_PRIMARY_COLOR
-                val opponentColor =
-                    scoreDisplay.secondaryColorArgb?.let { Color(it) } ?: DEFAULT_SECONDARY_COLOR
-                WearHelpOverlay(
-                    userColor = userColor,
-                    opponentColor = opponentColor,
-                    onDismiss = onDismissHelp,
-                )
-            }
+            HelpDialog(
+                show = showHelp,
+                userColor = userColor,
+                opponentColor = opponentColor,
+                onDismiss = onDismissHelp,
+            )
         }
     }
 }
@@ -374,53 +370,6 @@ private fun BottomActionBar(
                 )
             }
         }
-    }
-}
-
-@Suppress("FunctionName")
-@Composable
-private fun EndMatchConfirmOverlay(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    val scale = screenScale()
-    val view = LocalView.current
-
-    LaunchedEffect(Unit) {
-        delay(END_MATCH_CONFIRM_TIMEOUT)
-        onDismiss()
-    }
-
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = OVERLAY_ALPHA))
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                ) {
-                    view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-                    onConfirm()
-                },
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = stringResource(R.string.end_match_confirm),
-            fontSize = labelFontSize(scale),
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            modifier =
-                Modifier
-                    .background(
-                        color = Color(COLOR_DISCONNECTED_RED),
-                        shape = RoundedCornerShape(PILL_CORNER_PERCENT),
-                    ).padding(
-                        horizontal = (BUTTON_HORIZONTAL_PADDING_BASE * scale).dp,
-                        vertical = (BUTTON_VERTICAL_PADDING_BASE * scale).dp,
-                    ),
-        )
     }
 }
 
@@ -700,5 +649,3 @@ private fun RowScope.PlayerLabel(
 }
 
 private const val COLOR_DISCONNECTED_RED = 0xFFFF5252
-private const val END_MATCH_CONFIRM_TIMEOUT = 3000L
-private const val OVERLAY_ALPHA = 0.93f

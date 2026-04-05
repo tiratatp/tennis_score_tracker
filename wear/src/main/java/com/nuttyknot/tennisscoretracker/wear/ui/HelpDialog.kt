@@ -1,10 +1,7 @@
 package com.nuttyknot.tennisscoretracker.wear.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,71 +20,68 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.material3.AlertDialog
+import androidx.wear.compose.material3.AlertDialogDefaults
 import androidx.wear.compose.material3.Text
 import com.nuttyknot.tennisscoretracker.shared.R
 
 private const val HELP_CORNER_RADIUS_BASE = 8f
-private const val HELP_DISMISS_SPACER_MULTIPLIER = 4
-private const val HELP_TOP_PADDING_ROUND_MULTIPLIER = 6
-private const val HELP_TOP_PADDING_SQUARE_MULTIPLIER = 3
-private const val HELP_BOTTOM_PADDING_ROUND_MULTIPLIER = 4
-private const val HELP_BOTTOM_PADDING_SQUARE_MULTIPLIER = 2
 
 @Suppress("FunctionName")
 @Composable
-internal fun WearHelpOverlay(
+internal fun HelpDialog(
+    show: Boolean,
     userColor: Color,
     opponentColor: Color,
     onDismiss: () -> Unit,
 ) {
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.93f))
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = onDismiss,
-                ),
+    val scale = screenScale()
+    AlertDialog(
+        visible = show,
+        onDismissRequest = onDismiss,
+        edgeButton = {
+            AlertDialogDefaults.EdgeButton(onClick = onDismiss)
+        },
+        title = { Text(stringResource(R.string.help_how_to_play)) },
     ) {
-        HelpContent(userColor, opponentColor)
+        item {
+            HelpTapZones(
+                userColor = userColor,
+                opponentColor = opponentColor,
+                scale = scale,
+                modifier = Modifier.height(helpTapZoneMaxHeight(scale)),
+            )
+        }
+        item {
+            Text(
+                text = stringResource(R.string.help_long_press_undo),
+                fontSize = labelFontSize(scale),
+                color = Color.White.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
 
+/** Renders dialog content in a plain Column — for Paparazzi screenshot tests. */
 @Suppress("FunctionName")
 @Composable
-private fun HelpContent(
+internal fun HelpDialogContent(
     userColor: Color,
     opponentColor: Color,
 ) {
     val scale = screenScale()
     val isRound = LocalConfiguration.current.isScreenRound
-    val topPadding =
-        if (isRound) {
-            screenPadding(scale) * HELP_TOP_PADDING_ROUND_MULTIPLIER
-        } else {
-            screenPadding(scale) * HELP_TOP_PADDING_SQUARE_MULTIPLIER
-        }
-    val bottomPadding =
-        if (isRound) {
-            screenPadding(scale) * HELP_BOTTOM_PADDING_ROUND_MULTIPLIER
-        } else {
-            screenPadding(scale) * HELP_BOTTOM_PADDING_SQUARE_MULTIPLIER
-        }
-
+    val hPadding = if (isRound) roundHorizontalPadding(scale) else screenPadding(scale)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(
-                    start = screenPadding(scale),
-                    end = screenPadding(scale),
-                    top = topPadding,
-                    bottom = bottomPadding,
-                ),
+                .background(Color.Black)
+                .padding(horizontal = hPadding, vertical = screenPadding(scale)),
     ) {
+        Spacer(modifier = Modifier.weight(1f))
         Text(
             text = stringResource(R.string.help_how_to_play),
             fontSize = detailFontSize(scale),
@@ -98,9 +91,9 @@ private fun HelpContent(
         )
         Spacer(modifier = Modifier.weight(1f))
         HelpTapZones(
-            userColor,
-            opponentColor,
-            scale,
+            userColor = userColor,
+            opponentColor = opponentColor,
+            scale = scale,
             modifier = Modifier.height(helpTapZoneMaxHeight(scale)),
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -110,13 +103,7 @@ private fun HelpContent(
             color = Color.White.copy(alpha = 0.7f),
             textAlign = TextAlign.Center,
         )
-        Spacer(modifier = Modifier.height(spacerHeight(scale) * HELP_DISMISS_SPACER_MULTIPLIER))
-        Text(
-            text = stringResource(R.string.help_tap_dismiss),
-            fontSize = labelFontSize(scale),
-            color = Color.White.copy(alpha = 0.4f),
-            textAlign = TextAlign.Center,
-        )
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
