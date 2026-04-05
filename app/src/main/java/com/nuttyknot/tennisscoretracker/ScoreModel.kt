@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
+@Suppress("TooManyFunctions")
 class ScoreModel(
     private val savedStateHandle: SavedStateHandle = SavedStateHandle(),
     private val settingsManager: SettingsManager? = null,
@@ -111,7 +112,7 @@ class ScoreModel(
     fun incrementOpponentScore() = scorePoint(userScored = false)
 
     private fun scorePoint(userScored: Boolean) {
-        if (_matchState.value.matchWinner != null) return
+        if (_matchState.value.isMatchOver) return
         historyStack.addLast(_matchState.value)
         _matchState.update { processor.calculateNextState(it, userScored) }
         saveState()
@@ -123,6 +124,12 @@ class ScoreModel(
             _matchState.value = previousState.copy(announcement = null)
             saveState()
         }
+    }
+
+    fun endMatch() {
+        historyStack.clear()
+        _matchState.update { it.copy(matchEnded = true, announcement = null) }
+        saveState()
     }
 
     fun reset() {

@@ -117,10 +117,9 @@ private fun ScoreScreenContent(
             PortraitScoreContent(state, maxHeight.value, maxWidth.value, onNavigateToSummary)
         }
 
-        if (state.matchWinner == null) {
+        if (!state.isMatchOver) {
             TapZones(
                 isLandscape = isLandscape,
-                matchWinner = state.matchWinner,
                 userName = state.userName.ifEmpty { defaultUserName },
                 opponentName = state.opponentName.ifEmpty { defaultOpponentName },
                 onUserScored = { scoreModel.incrementUserScore() },
@@ -134,6 +133,7 @@ private fun ScoreScreenContent(
 @Composable
 internal fun getStatusText(state: MatchState): String? =
     when {
+        state.matchEnded -> stringResource(R.string.status_match_over)
         state.matchWinner != null -> stringResource(R.string.status_match_over)
         state.setWinner != null ->
             if (state.matchFormat.sport == Sport.TENNIS) {
@@ -192,9 +192,9 @@ internal fun LandscapeScoreContent(
             setHistory = state.setHistory,
             userColor = MaterialTheme.colorScheme.primary,
             opponentColor = MaterialTheme.colorScheme.secondary,
-            isMatchOver = state.matchWinner != null,
+            isMatchOver = state.isMatchOver,
             statusText = getStatusText(state),
-            onViewSummary = onNavigateToSummary,
+            onViewSummary = if (state.matchWinner != null) onNavigateToSummary else ({}),
             matchFormat = state.matchFormat,
             scaleFactor = scaleFactor,
         )
@@ -240,7 +240,7 @@ internal fun PortraitScoreContent(
         verticalArrangement = Arrangement.Center,
     ) {
         // User Score (Top) — only show during active match
-        if (state.matchWinner == null) {
+        if (!state.isMatchOver) {
             Box(
                 modifier = Modifier.weight(1f).clipToBounds(),
                 contentAlignment = Alignment.Center,
@@ -264,9 +264,9 @@ internal fun PortraitScoreContent(
             setHistory = state.setHistory,
             userColor = MaterialTheme.colorScheme.primary,
             opponentColor = MaterialTheme.colorScheme.secondary,
-            isMatchOver = state.matchWinner != null,
+            isMatchOver = state.isMatchOver,
             statusText = getStatusText(state),
-            onViewSummary = onNavigateToSummary,
+            onViewSummary = if (state.matchWinner != null) onNavigateToSummary else ({}),
             userName = state.userName.ifEmpty { defaultUserName },
             opponentName = state.opponentName.ifEmpty { defaultOpponentNameShort },
             isUserServing = state.isUserServing,
@@ -274,7 +274,7 @@ internal fun PortraitScoreContent(
         )
 
         // Opponent Score (Bottom) — only show during active match
-        if (state.matchWinner == null) {
+        if (!state.isMatchOver) {
             Box(
                 modifier = Modifier.weight(1f).clipToBounds(),
                 contentAlignment = Alignment.Center,
@@ -298,7 +298,6 @@ internal fun PortraitScoreContent(
 @Composable
 private fun TapZones(
     isLandscape: Boolean,
-    matchWinner: String?,
     userName: String,
     opponentName: String,
     onUserScored: () -> Unit,
@@ -337,12 +336,12 @@ private fun TapZones(
     if (isLandscape) {
         Row(modifier = Modifier.fillMaxSize()) {
             TapZone(
-                onClick = { if (matchWinner == null) onUserScored() },
+                onClick = onUserScored,
                 playerName = userName,
                 modifier = Modifier.fillMaxHeight().weight(1f),
             )
             TapZone(
-                onClick = { if (matchWinner == null) onOpponentScored() },
+                onClick = onOpponentScored,
                 playerName = opponentName,
                 modifier = Modifier.fillMaxHeight().weight(1f),
             )
@@ -350,12 +349,12 @@ private fun TapZones(
     } else {
         Column(modifier = Modifier.fillMaxSize()) {
             TapZone(
-                onClick = { if (matchWinner == null) onUserScored() },
+                onClick = onUserScored,
                 playerName = userName,
                 modifier = Modifier.fillMaxWidth().weight(1f),
             )
             TapZone(
-                onClick = { if (matchWinner == null) onOpponentScored() },
+                onClick = onOpponentScored,
                 playerName = opponentName,
                 modifier = Modifier.fillMaxWidth().weight(1f),
             )

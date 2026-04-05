@@ -108,6 +108,7 @@ class WearMainActivity : ComponentActivity() {
                     },
                     onShowHelp = { showHelp = true },
                     onNewMatch = { viewModel.sendCommand(WearConstants.CMD_RESET) },
+                    onEndMatch = { viewModel.sendCommand(WearConstants.CMD_END_MATCH) },
                     onUserScored = { viewModel.sendCommand(WearConstants.CMD_USER_SCORED) },
                     onOpponentScored = { viewModel.sendCommand(WearConstants.CMD_OPPONENT_SCORED) },
                     onUndo = { viewModel.sendCommand(WearConstants.CMD_UNDO) },

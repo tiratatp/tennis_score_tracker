@@ -4,6 +4,7 @@ import com.nuttyknot.tennisscoretracker.announcements.generateAnnouncement
 import com.nuttyknot.tennisscoretracker.announcements.generateSideOutAnnouncement
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -600,5 +601,54 @@ class TennisScoreStateTest {
                 isUserServing = false,
             )
         assertEquals("15 All", generateAnnouncement(state))
+    }
+
+    @Test
+    fun testMatchEndedBundleRoundTrip() {
+        val original =
+            MatchState(
+                userScore = PlayerScore.Thirty,
+                opponentScore = PlayerScore.Fifteen,
+                userGames = 3,
+                opponentGames = 2,
+                matchEnded = true,
+            )
+        val restored = matchStateFromBundle(original.toBundle())
+        assertTrue(restored.matchEnded)
+        assertTrue(restored.isMatchOver)
+        assertNull(restored.matchWinner)
+        assertEquals(PlayerScore.Thirty, restored.userScore)
+        assertEquals(3, restored.userGames)
+    }
+
+    @Test
+    fun testMatchEndedJsonRoundTrip() {
+        val original =
+            MatchState(
+                userScore = PlayerScore.Thirty,
+                opponentScore = PlayerScore.Fifteen,
+                userGames = 3,
+                opponentGames = 2,
+                matchEnded = true,
+            )
+        val restored = matchStateFromJsonString(original.toJsonString())
+        assertTrue(restored.matchEnded)
+        assertTrue(restored.isMatchOver)
+        assertNull(restored.matchWinner)
+        assertEquals(PlayerScore.Thirty, restored.userScore)
+        assertEquals(3, restored.userGames)
+    }
+
+    @Test
+    fun testMatchEndedDefaultIsFalse() {
+        val original = MatchState()
+        assertFalse(original.matchEnded)
+        assertFalse(original.isMatchOver)
+
+        val restoredBundle = matchStateFromBundle(original.toBundle())
+        assertFalse(restoredBundle.matchEnded)
+
+        val restoredJson = matchStateFromJsonString(original.toJsonString())
+        assertFalse(restoredJson.matchEnded)
     }
 }

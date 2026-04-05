@@ -822,4 +822,48 @@ class ScoreModelTest {
         assertEquals(PlayerScore.Fifteen, state().userScore)
         assertEquals("Alice", state().userName)
     }
+
+    @Test
+    fun `test endMatch sets matchEnded and blocks scoring`() {
+        scoreModel.incrementUserScore()
+        assertEquals(PlayerScore.Fifteen, state().userScore)
+
+        scoreModel.endMatch()
+        assertTrue(state().matchEnded)
+        assertTrue(state().isMatchOver)
+        assertNull(state().matchWinner)
+        assertEquals(PlayerScore.Fifteen, state().userScore)
+
+        // Scoring should be blocked
+        scoreModel.incrementUserScore()
+        assertEquals(PlayerScore.Fifteen, state().userScore)
+
+        scoreModel.incrementOpponentScore()
+        assertEquals(PlayerScore.Love, state().opponentScore)
+    }
+
+    @Test
+    fun `test reset clears matchEnded`() {
+        scoreModel.incrementUserScore()
+        scoreModel.endMatch()
+        assertTrue(state().matchEnded)
+
+        scoreModel.reset()
+        assertFalse(state().matchEnded)
+        assertFalse(state().isMatchOver)
+        assertEquals(PlayerScore.Love, state().userScore)
+    }
+
+    @Test
+    fun `test endMatch preserves score`() {
+        // Score a few points
+        scoreModel.incrementUserScore() // 15-0
+        scoreModel.incrementUserScore() // 30-0
+        scoreModel.incrementOpponentScore() // 30-15
+
+        scoreModel.endMatch()
+        assertEquals(PlayerScore.Thirty, state().userScore)
+        assertEquals(PlayerScore.Fifteen, state().opponentScore)
+        assertEquals(0, state().userGames)
+    }
 }

@@ -171,4 +171,5 @@
 
     <!-- Wear-only -->
     <string name="not_connected">Not connected</string>
+    <string name="end_match_confirm">End Match?</string>
 </resources>

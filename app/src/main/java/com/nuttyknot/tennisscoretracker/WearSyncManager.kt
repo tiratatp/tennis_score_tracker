@@ -49,7 +49,7 @@ fun WearScoreDisplay.Companion.fromMatchState(
         opponentSets = state.opponentSets,
         setHistory = state.setHistory,
         isUserServing = state.isUserServing,
-        isMatchOver = state.matchWinner != null,
+        isMatchOver = state.isMatchOver,
         matchWinner = state.matchWinner,
         primaryColorArgb = appTheme.primaryArgb(),
         secondaryColorArgb = appTheme.secondaryArgb(),

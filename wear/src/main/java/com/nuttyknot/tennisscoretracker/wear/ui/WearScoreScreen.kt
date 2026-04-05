@@ -24,7 +24,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +54,7 @@ import androidx.wear.compose.material3.TimeTextDefaults
 import androidx.wear.compose.material3.timeTextCurvedText
 import com.nuttyknot.tennisscoretracker.shared.R
 import com.nuttyknot.tennisscoretracker.shared.WearScoreDisplay
+import kotlinx.coroutines.delay
 
 private const val SERVING_DOT_SIZE_BASE = 10f
 private const val SCORE_GAP_BASE = 16f
@@ -74,6 +79,7 @@ fun WearScoreScreen(
     onDismissHelp: () -> Unit = {},
     onShowHelp: () -> Unit = {},
     onNewMatch: () -> Unit = {},
+    onEndMatch: () -> Unit = {},
     onUserScored: () -> Unit,
     onOpponentScored: () -> Unit,
     onUndo: () -> Unit,
@@ -91,6 +97,7 @@ fun WearScoreScreen(
                 onShowHelp = onShowHelp,
                 onDismissHelp = onDismissHelp,
                 onNewMatch = onNewMatch,
+                onEndMatch = onEndMatch,
                 onUserScored = onUserScored,
                 onOpponentScored = onOpponentScored,
                 onUndo = onUndo,
@@ -142,6 +149,7 @@ private fun WearScoreContent(
     onShowHelp: () -> Unit,
     onDismissHelp: () -> Unit,
     onNewMatch: () -> Unit,
+    onEndMatch: () -> Unit,
     onUserScored: () -> Unit,
     onOpponentScored: () -> Unit,
     onUndo: () -> Unit,
@@ -160,32 +168,31 @@ private fun WearScoreContent(
                 ambientOffset = ambientOffset,
             )
         } else {
+            var confirmingEndMatch by remember { mutableStateOf(false) }
+            val showEndButton = isConnected && !scoreDisplay.isMatchOver
+
             ScoreContent(scoreDisplay, isConnected, onNewMatch)
 
-            if (isConnected && !scoreDisplay.isMatchOver) {
+            if (showEndButton) {
                 TapZones(scoreDisplay, onUserScored, onOpponentScored, onUndo)
             }
 
-            if (!showHelp) {
-                val scale = screenScale()
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.BottomCenter,
-                ) {
-                    Text(
-                        text = stringResource(R.string.help_button),
-                        fontSize = detailFontSize(scale),
-                        color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
-                        modifier =
-                            Modifier
-                                .padding(bottom = screenPadding(scale))
-                                .clickable(
-                                    indication = null,
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    onClick = onShowHelp,
-                                ),
-                    )
-                }
+            if (!showHelp && !confirmingEndMatch) {
+                BottomActionBar(
+                    showEndButton = showEndButton,
+                    onEndMatchTapped = { confirmingEndMatch = true },
+                    onShowHelp = onShowHelp,
+                )
+            }
+
+            if (confirmingEndMatch) {
+                EndMatchConfirmOverlay(
+                    onConfirm = {
+                        onEndMatch()
+                        confirmingEndMatch = false
+                    },
+                    onDismiss = { confirmingEndMatch = false },
+                )
             }
 
             if (showHelp) {
@@ -311,6 +318,98 @@ private fun ScoreContent(
 
             ScoreFooter(scoreDisplay, isConnected, onNewMatch)
         }
+    }
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun BottomActionBar(
+    showEndButton: Boolean,
+    onEndMatchTapped: () -> Unit,
+    onShowHelp: () -> Unit,
+) {
+    val scale = screenScale()
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        Row(
+            modifier = Modifier.padding(bottom = screenPadding(scale)),
+            horizontalArrangement = Arrangement.spacedBy(innerPadding(scale)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (showEndButton) {
+                Text(
+                    text = "X",
+                    fontSize = detailFontSize(scale),
+                    color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
+                    modifier =
+                        Modifier.clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                            onClick = onEndMatchTapped,
+                        ),
+                )
+            }
+            Text(
+                text = stringResource(R.string.help_button),
+                fontSize = detailFontSize(scale),
+                color = Color.White.copy(alpha = TIME_TEXT_ALPHA),
+                modifier =
+                    Modifier.clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = onShowHelp,
+                    ),
+            )
+        }
+    }
+}
+
+@Suppress("FunctionName")
+@Composable
+private fun EndMatchConfirmOverlay(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val scale = screenScale()
+    val view = LocalView.current
+
+    LaunchedEffect(Unit) {
+        delay(END_MATCH_CONFIRM_TIMEOUT)
+        onDismiss()
+    }
+
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = OVERLAY_ALPHA))
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                ) {
+                    view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                    onConfirm()
+                },
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.end_match_confirm),
+            fontSize = labelFontSize(scale),
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            modifier =
+                Modifier
+                    .background(
+                        color = Color(COLOR_DISCONNECTED_RED),
+                        shape = RoundedCornerShape(PILL_CORNER_PERCENT),
+                    ).padding(
+                        horizontal = (BUTTON_HORIZONTAL_PADDING_BASE * scale).dp,
+                        vertical = (BUTTON_VERTICAL_PADDING_BASE * scale).dp,
+                    ),
+        )
     }
 }
 
@@ -583,3 +682,5 @@ private fun RowScope.PlayerLabel(
 }
 
 private const val COLOR_DISCONNECTED_RED = 0xFFFF5252
+private const val END_MATCH_CONFIRM_TIMEOUT = 3000L
+private const val OVERLAY_ALPHA = 0.93f

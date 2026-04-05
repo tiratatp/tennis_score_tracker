@@ -86,7 +86,11 @@ data class MatchState(
     val announcement: String? = null,
     val matchFormat: MatchFormat = MatchFormat.STANDARD,
     val isMatchTiebreak: Boolean = false,
+    val matchEnded: Boolean = false,
 ) {
+    val isMatchOver: Boolean
+        get() = matchWinner != null || matchEnded
+
     val isDeuce: Boolean
         get() = userScore == PlayerScore.Forty && opponentScore == PlayerScore.Forty
 
@@ -140,6 +144,7 @@ fun MatchState.toBundle(): Bundle =
         putString("opponentName", opponentName)
         putString("matchFormat", matchFormat.name)
         putBoolean("isMatchTiebreak", isMatchTiebreak)
+        putBoolean("matchEnded", matchEnded)
         putIntArray("setHistoryUser", setHistory.map { it.first }.toIntArray())
         putIntArray("setHistoryOpp", setHistory.map { it.second }.toIntArray())
     }
@@ -166,6 +171,7 @@ fun matchStateFromBundle(bundle: Bundle): MatchState {
                 MatchFormat.STANDARD
             },
         isMatchTiebreak = bundle.getBoolean("isMatchTiebreak", false),
+        matchEnded = bundle.getBoolean("matchEnded", false),
         setHistory = setHistory,
     )
 }
@@ -184,6 +190,7 @@ fun MatchState.toJsonString(): String =
             put("opponentName", opponentName)
             put("matchFormat", matchFormat.name)
             put("isMatchTiebreak", isMatchTiebreak)
+            put("matchEnded", matchEnded)
             put(
                 "setHistory",
                 JSONArray().apply {
@@ -229,6 +236,7 @@ fun matchStateFromJsonString(json: String): MatchState {
                 MatchFormat.STANDARD
             },
         isMatchTiebreak = obj.optBoolean("isMatchTiebreak", false),
+        matchEnded = obj.optBoolean("matchEnded", false),
         setHistory = setHistory,
     )
 }

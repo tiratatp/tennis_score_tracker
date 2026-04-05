@@ -129,6 +129,7 @@ class MainActivity : ComponentActivity() {
                     WearConstants.CMD_OPPONENT_SCORED -> scoreModel.incrementOpponentScore()
                     WearConstants.CMD_UNDO -> scoreModel.undo()
                     WearConstants.CMD_RESET -> scoreModel.reset()
+                    WearConstants.CMD_END_MATCH -> scoreModel.endMatch()
                 }
             }
     }
