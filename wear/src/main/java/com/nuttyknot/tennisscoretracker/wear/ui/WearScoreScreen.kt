@@ -532,18 +532,22 @@ private fun PointScore(
     ) {
         Text(
             text = scoreDisplay.userScore,
+            modifier = Modifier.weight(1f),
             fontSize = scoreFontSize(scale),
             fontWeight = scoreFontWeight,
             fontFamily = FontFamily.Monospace,
             color = userColor,
+            textAlign = TextAlign.End,
         )
         Spacer(modifier = Modifier.size((SCORE_GAP_BASE * scale).dp))
         Text(
             text = scoreDisplay.opponentScore,
+            modifier = Modifier.weight(1f),
             fontSize = scoreFontSize(scale),
             fontWeight = scoreFontWeight,
             fontFamily = FontFamily.Monospace,
             color = opponentColor,
+            textAlign = TextAlign.Start,
         )
     }
 }
