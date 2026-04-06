@@ -24,6 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.AlertDialog
 import androidx.wear.compose.material3.AlertDialogDefaults
+import androidx.wear.compose.material3.EdgeButton
+import androidx.wear.compose.material3.EdgeButtonSize
 import androidx.wear.compose.material3.Text
 import com.nuttyknot.tennisscoretracker.shared.R
 
@@ -42,7 +44,11 @@ internal fun HelpDialog(
         visible = show,
         onDismissRequest = onDismiss,
         edgeButton = {
-            AlertDialogDefaults.EdgeButton(onClick = onDismiss)
+            EdgeButton(
+                onClick = onDismiss,
+                buttonSize = EdgeButtonSize.ExtraSmall,
+                content = AlertDialogDefaults.ConfirmIcon,
+            )
         },
         title = { Text(stringResource(R.string.help_how_to_play)) },
     ) {
