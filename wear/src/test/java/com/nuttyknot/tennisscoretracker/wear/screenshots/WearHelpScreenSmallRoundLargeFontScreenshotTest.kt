@@ -14,33 +14,34 @@ import com.nuttyknot.tennisscoretracker.wear.ui.WearTheme
 import org.junit.Rule
 import org.junit.Test
 
-// Circular variant for UX/internal testing on round watch displays
-class WearHelpScreenCircularScreenshotTest {
+// Large font test for help dialog on Wear OS small round 1.2" (192dp) with fontScale=1.37
+class WearHelpScreenSmallRoundLargeFontScreenshotTest {
     companion object {
-        // Wear OS large round 1.39" (227dp): 454x454 px, XHIGH density, round
-        private val WEAR_LARGE_ROUND =
+        // Wear OS small round 1.2" (192dp): 384x384 px, XHIGH density, round, large font
+        private val WEAR_SMALL_ROUND_LARGE_FONT =
             DeviceConfig(
-                screenWidth = 454,
-                screenHeight = 454,
+                screenWidth = 384,
+                screenHeight = 384,
                 density = Density.XHIGH,
                 ratio = ScreenRatio.NOTLONG,
                 size = ScreenSize.SMALL,
                 screenRound = ScreenRound.ROUND,
                 softButtons = false,
+                fontScale = 1.37f,
             )
     }
 
     @get:Rule
     val paparazzi =
         Paparazzi(
-            deviceConfig = WEAR_LARGE_ROUND,
+            deviceConfig = WEAR_SMALL_ROUND_LARGE_FONT,
             theme = "android:Theme.DeviceDefault",
             renderingMode = SessionParams.RenderingMode.NORMAL,
         )
 
     @Test
     fun help() {
-        paparazzi.snapshot("helpCircular") {
+        paparazzi.snapshot("helpSmallRoundLargeFont") {
             WearTheme {
                 HelpDialogContent(
                     userColor = DEFAULT_PRIMARY_COLOR,

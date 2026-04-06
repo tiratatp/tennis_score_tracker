@@ -15,8 +15,8 @@ import com.nuttyknot.tennisscoretracker.wear.ui.WearTheme
 import org.junit.Rule
 import org.junit.Test
 
-// Circular variants for UX/internal testing on round watch displays
-class WearScoreScreenCircularScreenshotTest {
+// Large font tests on Wear OS small round 1.2" (192dp) with fontScale=1.37
+class WearScoreScreenSmallRoundLargeFontScreenshotTest {
     companion object {
         private val FIXED_TIME_SOURCE =
             object : TimeSource {
@@ -24,30 +24,60 @@ class WearScoreScreenCircularScreenshotTest {
                 override fun currentTime(): String = "2:30 PM"
             }
 
-        // Wear OS large round 1.39" (227dp): 454x454 px, XHIGH density, round
-        private val WEAR_LARGE_ROUND =
+        // Wear OS small round 1.2" (192dp): 384x384 px, XHIGH density, round, large font
+        private val WEAR_SMALL_ROUND_LARGE_FONT =
             DeviceConfig(
-                screenWidth = 454,
-                screenHeight = 454,
+                screenWidth = 384,
+                screenHeight = 384,
                 density = Density.XHIGH,
                 ratio = ScreenRatio.NOTLONG,
                 size = ScreenSize.SMALL,
                 screenRound = ScreenRound.ROUND,
                 softButtons = false,
+                fontScale = 1.37f,
             )
     }
 
     @get:Rule
     val paparazzi =
         Paparazzi(
-            deviceConfig = WEAR_LARGE_ROUND,
+            deviceConfig = WEAR_SMALL_ROUND_LARGE_FONT,
             theme = "android:Theme.DeviceDefault",
             renderingMode = SessionParams.RenderingMode.NORMAL,
         )
 
     @Test
+    fun watch() {
+        val score =
+            WearScoreDisplay(
+                userName = "Sharapova",
+                opponentName = "Williams",
+                userScore = "40",
+                opponentScore = "30",
+                userGames = 5,
+                opponentGames = 4,
+                userSets = 1,
+                opponentSets = 0,
+                setHistory = listOf(6 to 1),
+                isUserServing = true,
+            )
+        paparazzi.snapshot("watchSmallRoundLargeFont") {
+            WearTheme {
+                WearScoreScreen(
+                    scoreDisplay = score,
+                    isConnected = true,
+                    timeSource = FIXED_TIME_SOURCE,
+                    onNewMatch = {},
+                    onUserScored = {},
+                    onOpponentScored = {},
+                    onUndo = {},
+                )
+            }
+        }
+    }
+
+    @Test
     fun matchOver() {
-        // 2004 Wimbledon Women's Final result: Sharapova d. S. Williams 6-1, 6-4
         val score =
             WearScoreDisplay(
                 userName = "Sharapova",
@@ -63,69 +93,7 @@ class WearScoreScreenCircularScreenshotTest {
                 isMatchOver = true,
                 matchWinner = "Sharapova",
             )
-        paparazzi.snapshot("matchOverCircular") {
-            WearTheme {
-                WearScoreScreen(
-                    scoreDisplay = score,
-                    isConnected = true,
-                    timeSource = FIXED_TIME_SOURCE,
-                    onNewMatch = {},
-                    onUserScored = {},
-                    onOpponentScored = {},
-                    onUndo = {},
-                )
-            }
-        }
-    }
-
-    @Test
-    fun watch() {
-        // Match point: Sharapova serving 40-30, 5-4 in 2nd set, won 1st 6-1
-        val score =
-            WearScoreDisplay(
-                userName = "Sharapova",
-                opponentName = "Williams",
-                userScore = "40",
-                opponentScore = "30",
-                userGames = 5,
-                opponentGames = 4,
-                userSets = 1,
-                opponentSets = 0,
-                setHistory = listOf(6 to 1),
-                isUserServing = true,
-            )
-        paparazzi.snapshot("watchCircular") {
-            WearTheme {
-                WearScoreScreen(
-                    scoreDisplay = score,
-                    isConnected = true,
-                    timeSource = FIXED_TIME_SOURCE,
-                    onNewMatch = {},
-                    onUserScored = {},
-                    onOpponentScored = {},
-                    onUndo = {},
-                )
-            }
-        }
-    }
-
-    @Test
-    fun watchOpponentServing() {
-        // Same scenario but Williams serving (40-30, 5-4 in 2nd set)
-        val score =
-            WearScoreDisplay(
-                userName = "Sharapova",
-                opponentName = "Williams",
-                userScore = "40",
-                opponentScore = "30",
-                userGames = 5,
-                opponentGames = 4,
-                userSets = 1,
-                opponentSets = 0,
-                setHistory = listOf(6 to 1),
-                isUserServing = false,
-            )
-        paparazzi.snapshot("watchOpponentServingCircular") {
+        paparazzi.snapshot("matchOverSmallRoundLargeFont") {
             WearTheme {
                 WearScoreScreen(
                     scoreDisplay = score,
@@ -142,7 +110,6 @@ class WearScoreScreenCircularScreenshotTest {
 
     @Test
     fun watchLongNames() {
-        // Long hyphenated names to verify ellipsis behavior
         val score =
             WearScoreDisplay(
                 userName = "Sharapova-Williams",
@@ -156,38 +123,7 @@ class WearScoreScreenCircularScreenshotTest {
                 setHistory = listOf(6 to 1),
                 isUserServing = true,
             )
-        paparazzi.snapshot("watchLongNamesCircular") {
-            WearTheme {
-                WearScoreScreen(
-                    scoreDisplay = score,
-                    isConnected = true,
-                    timeSource = FIXED_TIME_SOURCE,
-                    onNewMatch = {},
-                    onUserScored = {},
-                    onOpponentScored = {},
-                    onUndo = {},
-                )
-            }
-        }
-    }
-
-    @Test
-    fun watchLongNamesOpponentServing() {
-        // Long names with opponent serving to verify dot placement on right side
-        val score =
-            WearScoreDisplay(
-                userName = "Sharapova-Williams",
-                opponentName = "Alexandrova-Kuznetsova",
-                userScore = "40",
-                opponentScore = "30",
-                userGames = 5,
-                opponentGames = 4,
-                userSets = 1,
-                opponentSets = 0,
-                setHistory = listOf(6 to 1),
-                isUserServing = false,
-            )
-        paparazzi.snapshot("watchLongNamesOpponentServingCircular") {
+        paparazzi.snapshot("watchLongNamesSmallRoundLargeFont") {
             WearTheme {
                 WearScoreScreen(
                     scoreDisplay = score,

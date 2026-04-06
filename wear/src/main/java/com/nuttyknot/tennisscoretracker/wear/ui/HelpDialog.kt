@@ -3,12 +3,14 @@ package com.nuttyknot.tennisscoretracker.wear.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -49,7 +51,7 @@ internal fun HelpDialog(
                 userColor = userColor,
                 opponentColor = opponentColor,
                 scale = scale,
-                modifier = Modifier.height(helpTapZoneMaxHeight(scale)),
+                modifier = Modifier.heightIn(min = helpTapZoneMaxHeight(scale)),
             )
         }
         item {
@@ -94,7 +96,7 @@ internal fun HelpDialogContent(
             userColor = userColor,
             opponentColor = opponentColor,
             scale = scale,
-            modifier = Modifier.height(helpTapZoneMaxHeight(scale)),
+            modifier = Modifier.heightIn(min = helpTapZoneMaxHeight(scale)),
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
@@ -116,7 +118,7 @@ private fun HelpTapZones(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.spacedBy(innerPadding(scale)),
     ) {
         Column(

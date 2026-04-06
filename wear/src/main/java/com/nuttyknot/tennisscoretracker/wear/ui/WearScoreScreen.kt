@@ -184,9 +184,8 @@ private fun WearScoreContent(
                 TapZones(scoreDisplay, onUserScored, onOpponentScored, onUndo)
             }
 
-            if (!showHelp && !confirmingEndMatch) {
+            if (!showHelp && !confirmingEndMatch && showEndButton) {
                 BottomActionBar(
-                    showEndButton = showEndButton,
                     onEndMatchTapped = { confirmingEndMatch = true },
                     onShowHelp = onShowHelp,
                 )
@@ -326,7 +325,6 @@ private fun ScoreContent(
 @Suppress("FunctionName")
 @Composable
 private fun BottomActionBar(
-    showEndButton: Boolean,
     onEndMatchTapped: () -> Unit,
     onShowHelp: () -> Unit,
 ) {
@@ -337,22 +335,20 @@ private fun BottomActionBar(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (showEndButton) {
-                IconButton(
-                    onClick = onEndMatchTapped,
-                    modifier = Modifier.size(IconButtonDefaults.SmallButtonSize),
-                    colors =
-                        IconButtonDefaults.iconButtonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = Color.White.copy(alpha = TIME_TEXT_ALPHA),
-                        ),
-                ) {
-                    Icon(
-                        painter = painterResource(com.nuttyknot.tennisscoretracker.wear.R.drawable.ic_close),
-                        contentDescription = stringResource(R.string.end_match),
-                        modifier = Modifier.size(IconButtonDefaults.SmallIconSize),
-                    )
-                }
+            IconButton(
+                onClick = onEndMatchTapped,
+                modifier = Modifier.size(IconButtonDefaults.SmallButtonSize),
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.White.copy(alpha = TIME_TEXT_ALPHA),
+                    ),
+            ) {
+                Icon(
+                    painter = painterResource(com.nuttyknot.tennisscoretracker.wear.R.drawable.ic_close),
+                    contentDescription = stringResource(R.string.end_match),
+                    modifier = Modifier.size(IconButtonDefaults.SmallIconSize),
+                )
             }
             IconButton(
                 onClick = onShowHelp,

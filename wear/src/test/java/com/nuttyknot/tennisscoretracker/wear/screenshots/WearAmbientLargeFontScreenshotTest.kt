@@ -15,8 +15,8 @@ import com.nuttyknot.tennisscoretracker.wear.ui.WearTheme
 import org.junit.Rule
 import org.junit.Test
 
-// Ambient mode screenshots on round watch (Galaxy Watch 7)
-class WearAmbientCircularScreenshotTest {
+// Large font ambient mode tests on Wear OS large round 1.39" (227dp) with fontScale=1.37
+class WearAmbientLargeFontScreenshotTest {
     companion object {
         private val FIXED_TIME_SOURCE =
             object : TimeSource {
@@ -24,8 +24,8 @@ class WearAmbientCircularScreenshotTest {
                 override fun currentTime(): String = "2:30 PM"
             }
 
-        // Wear OS large round 1.39" (227dp): 454x454 px, XHIGH density, round
-        private val WEAR_LARGE_ROUND =
+        // Wear OS large round 1.39" (227dp): 454x454 px, XHIGH density, round, large font
+        private val WEAR_LARGE_ROUND_LARGE_FONT =
             DeviceConfig(
                 screenWidth = 454,
                 screenHeight = 454,
@@ -34,20 +34,20 @@ class WearAmbientCircularScreenshotTest {
                 size = ScreenSize.SMALL,
                 screenRound = ScreenRound.ROUND,
                 softButtons = false,
+                fontScale = 1.37f,
             )
     }
 
     @get:Rule
     val paparazzi =
         Paparazzi(
-            deviceConfig = WEAR_LARGE_ROUND,
+            deviceConfig = WEAR_LARGE_ROUND_LARGE_FONT,
             theme = "android:Theme.DeviceDefault",
             renderingMode = SessionParams.RenderingMode.NORMAL,
         )
 
     @Test
     fun ambientInMatch() {
-        // Match point: Sharapova serving 40-30, 5-4 in 2nd set, won 1st 6-1
         val score =
             WearScoreDisplay(
                 userName = "Sharapova",
@@ -61,7 +61,7 @@ class WearAmbientCircularScreenshotTest {
                 setHistory = listOf(6 to 1),
                 isUserServing = true,
             )
-        paparazzi.snapshot("ambientInMatchCircular") {
+        paparazzi.snapshot("ambientInMatchLargeFont") {
             WearTheme {
                 WearScoreScreen(
                     scoreDisplay = score,
@@ -79,7 +79,6 @@ class WearAmbientCircularScreenshotTest {
 
     @Test
     fun ambientMatchOver() {
-        // 2004 Wimbledon Women's Final result: Sharapova d. S. Williams 6-1, 6-4
         val score =
             WearScoreDisplay(
                 userName = "Sharapova",
@@ -95,7 +94,7 @@ class WearAmbientCircularScreenshotTest {
                 isMatchOver = true,
                 matchWinner = "Sharapova",
             )
-        paparazzi.snapshot("ambientMatchOverCircular") {
+        paparazzi.snapshot("ambientMatchOverLargeFont") {
             WearTheme {
                 WearScoreScreen(
                     scoreDisplay = score,
